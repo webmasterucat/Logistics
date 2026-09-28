@@ -110,7 +110,7 @@
                     </div>
                 </div>
 
-                <!-- SEZIONE GRAFICI PER MAGAZZINO -->
+                <!-- SEZIONE GRAFICI DINAMICI PER MAGAZZINO -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="container-grafici"></div>
 
                 <!-- Tabella Giacenze -->
@@ -570,7 +570,7 @@
 
                 let barreHTML = '';
                 if (stockSede.length === 0) {
-                    barreHTML = `<p class="text-xs text-slate-400 italic py-2">Nessun articolo in magazzino.</p>`;
+                    barreHTML = `<p class="text-xs text-slate-400 italic py-2">Nessun articolo in questo magazzino.</p>`;
                 } else {
                     stockSede.forEach(g => {
                         let perc = Math.round((g.quantita / maxSede) * 100);
@@ -590,11 +590,19 @@
 
                 containerGrafici.innerHTML += `
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-warehouse text-indigo-600"></i> ${m.nome}
-                            </h3>
-                            <span class="text-xs font-semibold bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg">${totSede} unità</span>
+                        <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-warehouse text-indigo-600"></i> ${m.nome}
+                                </h3>
+                                <div class="text-[11px] text-slate-500 mt-2 space-y-1">
+                                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot w-3.5 text-slate-400"></i><span>${m.indirizzo}</span></div>
+                                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-phone w-3.5 text-slate-400"></i><span>${m.telefono}</span></div>
+                                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-envelope w-3.5 text-slate-400"></i><span>${m.email}</span></div>
+                                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-user-tie w-3.5 text-slate-400"></i><span>Responsabile: <b>${m.responsabile}</b></span></div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-semibold bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg shrink-0">${totSede} unità</span>
                         </div>
                         <div class="space-y-3">${barreHTML}</div>
                     </div>
@@ -895,7 +903,6 @@
                 let vecchioNome = magazzini[index].nome;
                 magazzini[index] = { nome, indirizzo, telefono, email, responsabile };
                 
-                // Aggiorna anche il nome nelle giacenze se è cambiato
                 if (vecchioNome !== nome) {
                     giacenze.forEach(g => { if (g.magazzino === vecchioNome) g.magazzino = nome; });
                     localStorage.setItem('mg_giacenze', JSON.stringify(giacenze));
