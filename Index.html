@@ -353,18 +353,18 @@
         let statoUtente = localStorage.getItem('mg_ruolo') || 'utente'; 
         let nomeUtenteCorrente = localStorage.getItem('mg_nome') || 'PIPPO';
 
-        let magazzini = JSON.parse(localStorage.getItem('mg_lista_magazzini')) || [
+        let magazzini = caricaDati('mg_lista_magazzini', [
             { nome: 'Magazzino Nord', indirizzo: 'Via Industriale 12, Torino', telefono: '+39 011 555019', email: 'nord@magazzinopro.it', responsabile: 'Marco Neri' },
             { nome: 'Magazzino Sud', indirizzo: 'Via Portuale 45, Napoli', telefono: '+39 081 444882', email: 'sud@magazzinopro.it', responsabile: 'Anna Esposito' }
-        ];
+        ]);
 
-        let giacenze = JSON.parse(localStorage.getItem('mg_giacenze')) || [
+        let giacenze = caricaDati('mg_giacenze', [
             { magazzino: 'Magazzino Nord', prodotto: 'Laptop Pro', modello: '16 pollici 32GB', ean: '8050111222333', quantita: 15 },
             { magazzino: 'Magazzino Nord', prodotto: 'Mouse Wireless', modello: 'Ergonomico Bluetooth', ean: '8050444555666', quantita: 40 },
             { magazzino: 'Magazzino Sud', prodotto: 'Monitor 4K', modello: '27 pollici IPS', ean: '8050777888999', quantita: 10 }
-        ];
+        ]);
 
-        let ordini = JSON.parse(localStorage.getItem('mg_ordini')) || [
+        let ordini = caricaDati('mg_ordini', [
             {
                 id: 'ORD-1001',
                 magazzino: 'Magazzino Nord',
@@ -378,7 +378,37 @@
                 prodotti: [{prodotto: 'Laptop Pro', modello: '16 pollici 32GB', ean: '8050111222333', quantita: 2}],
                 spedizione: null
             }
-        ];
+        ]);
+
+        function caricaDati(chiave, defaultVal) {
+            try {
+                const item = localStorage.getItem(chiave);
+                return item ? JSON.parse(item) : defaultVal;
+            } catch(e) {
+                return defaultVal;
+            }
+        }
+
+        function salvaDati(chiave, valore) {
+            localStorage.setItem(chiave, JSON.stringify(valore));
+        }
+
+        // Sincronizzazione in tempo reale tra tab/ruoli diversi
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'mg_ordini') {
+                ordini = caricaDati('mg_ordini', []);
+                renderOrdini();
+                renderDashboard();
+            } else if (e.key === 'mg_giacenze') {
+                giacenze = caricaDati('mg_giacenze', []);
+                renderDashboard();
+            } else if (e.key === 'mg_lista_magazzini') {
+                magazzini = caricaDati('mg_lista_magazzini', []);
+                popolaSelectMagazziniDappertutto();
+                renderMagazzini();
+                renderDashboard();
+            }
+        });
 
         window.onload = function() {
             aggiornaUIUtente();
@@ -391,6 +421,7 @@
 
         function mostraNotifica(testo, tipo = 'success') {
             const container = document.getElementById('toast-container');
+            if(!container) return;
             const toast = document.createElement('div');
             const bgColor = tipo === 'success' ? 'bg-slate-900 text-white' : 'bg-indigo-600 text-white';
             toast.className = `${bgColor} px-4 py-3 rounded-2xl shadow-xl text-xs font-medium flex items-center space-x-3 transition transform translate-y-2 opacity-0 duration-300 border border-slate-800`;
@@ -478,6 +509,11 @@
                 attivo.classList.add('bg-indigo-50', 'text-indigo-600');
             }
 
+            // Ricarica dati freschi dal localStorage prima di visualizzare
+            ordini = caricaDati('mg_ordini', ordini);
+            giacenze = caricaDati('mg_giacenze', giacenze);
+            magazzini = caricaDati('mg_lista_magazzini', magazzini);
+
             if(idSezione === 'dashboard') renderDashboard();
             if(idSezione === 'magazzini') renderMagazzini();
             if(idSezione === 'ordini') renderOrdini();
@@ -487,6 +523,7 @@
 
         function renderMagazzini() {
             const container = document.getElementById('grid-elenco-magazzini');
+            if(!container) return;
             container.innerHTML = '';
 
             if (magazzini.length === 0) {
@@ -518,6 +555,9 @@
         }
 
         function renderDashboard() {
+            ordini = caricaDati('mg_ordini', ordini);
+            giacenze = caricaDati('mg_giacenze', giacenze);
+
             const filtro = document.getElementById('filtro-magazzino-dash') ? document.getElementById('filtro-magazzino-dash').value : 'tutti';
             const tbody = document.getElementById('tabella-giacenze');
             if (!tbody) return;
@@ -611,6 +651,7 @@
         }
 
         function renderOrdini() {
+            ordini = caricaDati('mg_ordini', ordini);
             const tbody = document.getElementById('tabella-ordini');
             if (!tbody) return;
             tbody.innerHTML = '';
@@ -764,9 +805,11 @@
                 spedizione: null
             };
 
+            ordini = caricaDati('mg_ordini', []);
             ordini.unshift(nuovoOrdine);
-            localStorage.setItem('mg_ordini', JSON.stringify(ordini));
-            localStorage.setItem('mg_giacenze', JSON.stringify(giacenze));
+            
+            salvaDati('mg_ordini', ordini);
+            salvaDati('mg_giacenze', giacenze);
 
             document.getElementById('form-ordine').reset();
             document.getElementById('ordine-venditore').value = nomeUtenteCorrente;
@@ -822,8 +865,8 @@
             }
 
             giacenze = giacenze.filter(g => g.quantita > 0);
+            salvaDati('mg_giacenze', giacenze);
 
-            localStorage.setItem('mg_giacenze', JSON.stringify(giacenze));
             renderDashboard();
             popolaSelectTrasferimento();
             mostraNotifica('Trasferimento merce completato con successo!');
@@ -872,7 +915,7 @@
 
             if (confirm(`Sei sicuro di voler eliminare la sede "${nomeSede}"?`)) {
                 magazzini.splice(index, 1);
-                localStorage.setItem('mg_lista_magazzini', JSON.stringify(magazzini));
+                salvaDati('mg_lista_magazzini', magazzini);
                 popolaSelectMagazziniDappertutto();
                 renderMagazzini();
                 renderDashboard();
@@ -898,18 +941,18 @@
                     mostraNotifica('Esiste già un magazzino con questo nome.', 'error');
                     return;
                 }
-                magazzini.push({ nome, indirizzo, telefono, email, responsabile });
+                magazzini.push({ nome, indirizzo, telefono, email, responsable });
             } else {
                 let vecchioNome = magazzini[index].nome;
                 magazzini[index] = { nome, indirizzo, telefono, email, responsabile };
                 
                 if (vecchioNome !== nome) {
                     giacenze.forEach(g => { if (g.magazzino === vecchioNome) g.magazzino = nome; });
-                    localStorage.setItem('mg_giacenze', JSON.stringify(giacenze));
+                    salvaDati('mg_giacenze', giacenze);
                 }
             }
 
-            localStorage.setItem('mg_lista_magazzini', JSON.stringify(magazzini));
+            salvaDati('mg_lista_magazzini', magazzini);
             chiudiModalMagazzino();
             popolaSelectMagazziniDappertutto();
             renderMagazzini();
@@ -950,7 +993,7 @@
         function eliminaProdottoStock(index) {
             if (confirm('Sei sicuro di voler eliminare questo articolo dallo stock?')) {
                 giacenze.splice(index, 1);
-                localStorage.setItem('mg_giacenze', JSON.stringify(giacenze));
+                salvaDati('mg_giacenze', giacenze);
                 renderDashboard();
                 mostraNotifica('Articolo eliminato.');
             }
@@ -975,7 +1018,7 @@
                 giacenze[index] = { magazzino, prodotto, modello, ean, quantita };
             }
 
-            localStorage.setItem('mg_giacenze', JSON.stringify(giacenze));
+            salvaDati('mg_giacenze', giacenze);
             chiudiModalProdotto();
             renderDashboard();
             mostraNotifica('Articolo salvato correttamente!');
@@ -1006,11 +1049,12 @@
                 return;
             }
 
+            ordini = caricaDati('mg_ordini', ordini);
             let ordine = ordini.find(o => o.id === idOrdine);
             if (ordine) {
                 ordine.stato = 'Evaso';
                 ordine.spedizione = { metodo, confezionamento, tracking };
-                localStorage.setItem('mg_ordini', JSON.stringify(ordini));
+                salvaDati('mg_ordini', ordini);
                 chiudiModalSpedizione();
                 renderOrdini();
                 renderDashboard();
