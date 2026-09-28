@@ -73,7 +73,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
                     <div>
                         <h1 class="text-xl font-bold text-slate-900">Dashboard & Giacenze Magazzino</h1>
-                        <p class="text-xs text-slate-500 mt-0.5">Visione in tempo reale di stock, grafici per sede e codici EAN</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Visione in tempo reale di stock, riepiloghi per sede e codici EAN</p>
                     </div>
                     <div class="flex items-center gap-3 w-full sm:w-auto">
                         <select id="filtro-magazzino-dash" onchange="renderDashboard()" class="border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium bg-slate-50 outline-none">
@@ -110,7 +110,7 @@
                     </div>
                 </div>
 
-                <!-- SEZIONE GRAFICI DINAMICI PER MAGAZZINO -->
+                <!-- SEZIONE RIEPILOGO DINAMICO PER MAGAZZINO -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="container-grafici"></div>
 
                 <!-- Tabella Giacenze -->
@@ -236,7 +236,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Magazzino di Partenza</label>
-                            <select id="trasf-da" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none"></select>
+                            <select id="trasf-da" onchange="aggiornaProdottiTrasferimento()" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none"></select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Magazzino di Arrivo</label>
@@ -407,7 +407,6 @@
             localStorage.setItem(chiave, JSON.stringify(valore));
         }
 
-        // Sincronizzazione in tempo reale tra tab/ruoli diversi
         window.addEventListener('storage', function(e) {
             if (e.key === 'mg_ordini') {
                 ordini = caricaDati('mg_ordini', []);
@@ -472,283 +471,262 @@
             renderOrdini();
         }
 
-        function popolaSelectMagazziniDappertutto() {
-            const filtroDash = document.getElementById('filtro-magazzino-dash');
-            const selectOrdine = document.getElementById('ordine-magazzino');
-            const selectTrasfDa = document.getElementById('trasf-da');
-            const selectTrasfA = document.getElementById('trasf-a');
-            const selectModalProd = document.getElementById('modal-prod-magazzino');
-
-            let valoreDashCorrente = filtroDash ? filtroDash.value : 'tutti';
-            let valoreOrdineCorrente = selectOrdine ? selectOrdine.value : '';
-            let valoreDaCorrente = selectTrasfDa ? selectTrasfDa.value : '';
-            let valoreACorrente = selectTrasfA ? selectTrasfA.value : '';
-            let valoreModalProdCorrente = selectModalProd ? selectModalProd.value : '';
-
-            if (filtroDash) {
-                filtroDash.innerHTML = `<option value="tutti">Tutti i Magazzini</option>` + magazzini.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('');
-                filtroDash.value = valoreDashCorrente;
-            }
-
-            if (selectOrdine) {
-                selectOrdine.innerHTML = magazzini.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('');
-                if (magazzini.some(m => m.nome === valoreOrdineCorrente)) selectOrdine.value = valoreOrdineCorrente;
-            }
-
-            if (selectTrasfDa && selectTrasfA) {
-                let optionsMag = magazzini.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('');
-                selectTrasfDa.innerHTML = optionsMag;
-                selectTrasfA.innerHTML = optionsMag;
-                if (magazzini.some(m => m.nome === valoreDaCorrente)) selectTrasfDa.value = valoreDaCorrente;
-                if (magazzini.some(m => m.nome === valoreACorrente)) selectTrasfA.value = valoreACorrente;
-            }
-
-            if (selectModalProd) {
-                selectModalProd.innerHTML = magazzini.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('');
-                if (magazzini.some(m => m.nome === valoreModalProdCorrente)) selectModalProd.value = valoreModalProdCorrente;
-            }
-        }
-
         function mostraSezione(idSezione) {
             document.querySelectorAll('.sezione-contenuto').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`sezione-${idSezione}`).classList.remove('hidden');
+            const sec = document.getElementById(`sezione-${idSezione}`);
+            if(sec) sec.classList.remove('hidden');
 
             document.querySelectorAll('aside nav button').forEach(btn => {
-                btn.classList.remove('bg-indigo-50', 'text-indigo-600');
-                btn.classList.add('text-slate-600', 'hover:bg-slate-50');
+                btn.className = "w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50";
             });
-            const attivo = document.getElementById(`nav-${idSezione}`);
-            if(attivo) {
-                attivo.classList.remove('text-slate-600', 'hover:bg-slate-50');
-                attivo.classList.add('bg-indigo-50', 'text-indigo-600');
+            const activeBtn = document.getElementById(`nav-${idSezione}`);
+            if(activeBtn) {
+                activeBtn.className = "w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-50 text-indigo-600";
             }
-
-            ordini = caricaDati('mg_ordini', ordini);
-            giacenze = caricaDati('mg_giacenze', giacenze);
-            magazzini = caricaDati('mg_lista_magazzini', magazzini);
-
-            if(idSezione === 'dashboard') renderDashboard();
-            if(idSezione === 'magazzini') renderMagazzini();
-            if(idSezione === 'ordini') renderOrdini();
-            if(idSezione === 'nuovo-ordine') aggiornaProdottiDisponibiliSelect();
-            if(idSezione === 'trasferimenti') popolaSelectTrasferimento();
         }
 
-        function renderMagazzini() {
-            const container = document.getElementById('grid-elenco-magazzini');
-            if(!container) return;
-            container.innerHTML = '';
-
-            if (magazzini.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic col-span-2">Nessun magazzino configurato.</p>`;
-                return;
-            }
-
-            magazzini.forEach((m, index) => {
-                container.innerHTML += `
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3 relative">
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                                <i class="fa-solid fa-warehouse text-indigo-600"></i> ${m.nome}
-                            </h3>
-                            <div class="flex items-center gap-1">
-                                <button onclick="modificaMagazzino(${index})" class="text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg transition" title="Modifica"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="eliminaMagazzino(${index})" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition" title="Elimina"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                        <div class="text-xs space-y-1.5 text-slate-600 border-t border-slate-100 pt-3">
-                            <div class="flex items-center gap-2"><i class="fa-solid fa-location-dot w-4 text-slate-400"></i><span>${m.indirizzo}</span></div>
-                            <div class="flex items-center gap-2"><i class="fa-solid fa-phone w-4 text-slate-400"></i><span>${m.telefono}</span></div>
-                            <div class="flex items-center gap-2"><i class="fa-solid fa-envelope w-4 text-slate-400"></i><span>${m.email}</span></div>
-                            <div class="flex items-center gap-2"><i class="fa-solid fa-user-tie w-4 text-slate-400"></i><span>Responsabile: <b>${m.responsabile}</b></span></div>
-                        </div>
-                    </div>
-                `;
+        function popolaSelectMagazziniDappertutto() {
+            const selects = ['filtro-magazzino-dash', 'ordine-magazzino', 'modal-prod-magazzino', 'trasf-da', 'trasf-a'];
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                if(!el) return;
+                const valCorrente = el.value;
+                el.innerHTML = '';
+                if(id === 'filtro-magazzino-dash') {
+                    el.innerHTML = '<option value="tutti">Tutti i Magazzini</option>';
+                }
+                magazzini.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.nome;
+                    opt.textContent = m.nome;
+                    el.appendChild(opt);
+                });
+                el.value = valCorrente;
             });
+            aggiornaProdottiDisponibiliSelect();
+            aggiornaProdottiTrasferimento();
         }
 
         function renderDashboard() {
-            ordini = caricaDati('mg_ordini', ordini);
-            giacenze = caricaDati('mg_giacenze', giacenze);
+            const filtro = document.getElementById('filtro-magazzino-dash')?.value || 'tutti';
+            
+            let totStock = 0;
+            let ordiniAttesa = 0;
+            let ordiniEvasi = 0;
 
-            const filtro = document.getElementById('filtro-magazzino-dash') ? document.getElementById('filtro-magazzino-dash').value : 'tutti';
-            const tbody = document.getElementById('tabella-giacenze');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            let totaleStock = 0;
-            let filtrate = giacenze.filter(g => filtro === 'tutti' || g.magazzino === filtro);
-
-            filtrate.forEach((g, index) => {
-                totaleStock += g.quantita;
-                let azioniAdminHTML = statoUtente === 'admin' ? `
-                    <div class="flex items-center justify-end gap-2">
-                        <button onclick="modificaProdottoStock(${index})" class="text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg transition" title="Modifica"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="eliminaProdottoStock(${index})" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition" title="Elimina"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                ` : '';
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition">
-                        <td class="px-6 py-4 font-semibold text-slate-800">${g.magazzino}</td>
-                        <td class="px-6 py-4">
-                            <div class="font-semibold text-slate-900">${g.prodotto}</div>
-                            <div class="text-xs text-slate-400">${g.modello}</div>
-                        </td>
-                        <td class="px-6 py-4 font-mono text-xs text-slate-600">${g.ean || 'N.D.'}</td>
-                        <td class="px-6 py-4 text-center font-bold text-slate-900">${g.quantita}</td>
-                        <td class="px-6 py-4 text-right admin-only ${statoUtente === 'admin' ? '' : 'hidden'}">${azioniAdminHTML}</td>
-                    </tr>
-                `;
+            giacenze.forEach(g => {
+                if(filtro === 'tutti' || g.magazzino === filtro) {
+                    totStock += Number(g.quantita);
+                }
             });
 
-            document.getElementById('kpi-tot-stock').innerText = totaleStock;
-            document.getElementById('kpi-ordini-attesa').innerText = ordini.filter(o => o.stato !== 'Evaso').length;
-            document.getElementById('kpi-ordini-evasi').innerText = ordini.filter(o => o.stato === 'Evaso').length;
-
-            renderizzaGraficiMagazziniDinamici(filtro);
-        }
-
-        function renderizzaGraficiMagazziniDinamici(filtroMagazzino) {
-            const containerGrafici = document.getElementById('container-grafici');
-            if (!containerGrafici) return;
-            containerGrafici.innerHTML = '';
-
-            let magazziniDaMostrare = filtroMagazzino === 'tutti' ? magazzini : magazzini.filter(m => m.nome === filtroMagazzino);
-
-            magazziniDaMostrare.forEach(m => {
-                let stockSede = giacenze.filter(g => g.magazzino === m.nome);
-                let maxSede = Math.max(...stockSede.map(g => g.quantita), 1);
-                let totSede = stockSede.reduce((acc, curr) => acc + curr.quantita, 0);
-
-                let barreHTML = '';
-                if (stockSede.length === 0) {
-                    barreHTML = `<p class="text-xs text-slate-400 italic py-2">Nessun articolo in questo magazzino.</p>`;
-                } else {
-                    stockSede.forEach(g => {
-                        let perc = Math.round((g.quantita / maxSede) * 100);
-                        barreHTML += `
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="font-medium text-slate-700">${g.prodotto} (${g.modello})</span>
-                                    <span class="font-bold text-slate-900">${g.quantita} u.</span>
-                                </div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                    <div class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: ${perc}%"></div>
-                                </div>
-                            </div>
-                        `;
-                    });
+            ordini.forEach(o => {
+                if(filtro === 'tutti' || o.magazzino === filtro) {
+                    if(o.stato === 'Evaso') ordiniEvasi++;
+                    else ordiniAttesa++;
                 }
+            });
 
-                containerGrafici.innerHTML += `
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
-                        <div class="flex justify-between items-start border-b border-slate-100 pb-3">
-                            <div>
-                                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                    <i class="fa-solid fa-warehouse text-indigo-600"></i> ${m.nome}
-                                </h3>
-                                <div class="text-[11px] text-slate-500 mt-2 space-y-1">
-                                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot w-3.5 text-slate-400"></i><span>${m.indirizzo}</span></div>
-                                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-phone w-3.5 text-slate-400"></i><span>${m.telefono}</span></div>
-                                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-envelope w-3.5 text-slate-400"></i><span>${m.email}</span></div>
-                                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-user-tie w-3.5 text-slate-400"></i><span>Responsabile: <b>${m.responsabile}</b></span></div>
+            document.getElementById('kpi-tot-stock').textContent = totStock;
+            document.getElementById('kpi-ordini-attesa').textContent = ordiniAttesa;
+            document.getElementById('kpi-ordini-evasi').textContent = ordiniEvasi;
+
+            const containerGrafici = document.getElementById('container-grafici');
+            containerGrafici.innerHTML = '';
+            
+            magazzini.filter(m => filtro === 'tutti' || m.nome === filtro).forEach(mag => {
+                const articoliMag = giacenze.filter(g => g.magazzino === mag.nome);
+                const countArticoli = articoliMag.reduce((acc, curr) => acc + Number(curr.quantita), 0);
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-3';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-warehouse text-indigo-600 mr-2"></i>${mag.nome}</h4>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg font-medium">${countArticoli} unità totali</span>
+                    </div>
+                    <p class="text-xs text-slate-500">${mag.indirizzo} - Resp: <strong>${mag.responsabile}</strong></p>
+                    <div class="space-y-2 pt-2 border-t border-slate-100">
+                        ${articoliMag.length === 0 ? '<p class="text-xs text-slate-400 italic">Nessun articolo registrato in questa sede.</p>' : 
+                            articoliMag.map(art => `
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-slate-700 font-medium">${art.prodotto} (${art.modello})</span>
+                                    <span class="font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">${art.quantita} pz</span>
                                 </div>
-                            </div>
-                            <span class="text-xs font-semibold bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg shrink-0">${totSede} unità</span>
-                        </div>
-                        <div class="space-y-3">${barreHTML}</div>
+                            `).join('')}
                     </div>
                 `;
+                containerGrafici.appendChild(card);
+            });
+
+            const tbody = document.getElementById('tabella-giacenze');
+            tbody.innerHTML = '';
+            const giacenzeFiltrate = giacenze.filter(g => filtro === 'tutti' || g.magazzino === filtro);
+
+            if(giacenzeFiltrate.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-xs text-slate-400">Nessun articolo trovato.</td></tr>`;
+                return;
+            }
+
+            giacenzeFiltrate.forEach((g, idx) => {
+                const realIndex = giacenze.indexOf(g);
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/50 transition';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-slate-800">${g.magazzino}</td>
+                    <td class="px-6 py-4">
+                        <div class="font-semibold text-slate-900">${g.prodotto}</div>
+                        <div class="text-xs text-slate-400">${g.modello}</div>
+                    </td>
+                    <td class="px-6 py-4 font-mono text-xs text-slate-600">${g.ean}</td>
+                    <td class="px-6 py-4 text-center font-bold text-indigo-600">${g.quantita}</td>
+                    <td class="px-6 py-4 text-right admin-only ${statoUtente === 'admin' ? '' : 'hidden'}">
+                        <button onclick="modificaProdotto(${realIndex})" class="text-indigo-600 hover:text-indigo-800 p-1.5"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="eliminaProdotto(${realIndex})" class="text-rose-500 hover:text-rose-700 p-1.5 ml-2"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderMagazzini() {
+            const grid = document.getElementById('grid-elenco-magazzini');
+            if(!grid) return;
+            grid.innerHTML = '';
+
+            magazzini.forEach((m, idx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-3';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base">${m.nome}</h3>
+                            <p class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i>${m.indirizzo}</p>
+                        </div>
+                        ${statoUtente === 'admin' ? `
+                            <div class="flex gap-1">
+                                <button onclick="modificaMagazzino(${idx})" class="p-2 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-50"><i class="fa-solid fa-pen text-xs"></i></button>
+                                <button onclick="eliminaMagazzino(${idx})" class="p-2 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-50"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs">
+                        <div><span class="text-slate-400 block">Telefono</span><span class="font-medium text-slate-700">${m.telefono}</span></div>
+                        <div><span class="text-slate-400 block">Email</span><span class="font-medium text-slate-700">${m.email}</span></div>
+                    </div>
+                    <div class="pt-1 text-xs">
+                        <span class="text-slate-400 block">Responsabile Sede</span>
+                        <span class="font-semibold text-indigo-600">${m.responsabile}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
             });
         }
 
         function renderOrdini() {
-            ordini = caricaDati('mg_ordini', ordini);
             const tbody = document.getElementById('tabella-ordini');
-            if (!tbody) return;
+            if(!tbody) return;
             tbody.innerHTML = '';
 
-            if (ordini.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400 text-xs italic">Nessun ordine registrato.</td></tr>`;
+            if(ordini.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-6 text-center text-xs text-slate-400">Nessun ordine registrato.</td></tr>`;
                 return;
             }
 
-            ordini.forEach(o => {
-                let badgeStatoColor = 'bg-amber-50 text-amber-700 border-amber-200';
-                if (o.stato === 'Preso in carico') badgeStatoColor = 'bg-indigo-50 text-indigo-700 border-indigo-200';
-                if (o.stato === 'Evaso') badgeStatoColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            ordini.forEach((o, idx) => {
+                const badgeStato = o.stato === 'Evaso' 
+                    ? '<span class="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg text-xs font-semibold">Evaso</span>'
+                    : '<span class="bg-amber-50 text-amber-600 px-2.5 py-1 rounded-lg text-xs font-semibold">Preso in carico</span>';
 
-                let prodottiHTML = o.prodotti.map(p => `<div class="text-xs"><span class="font-semibold">${p.prodotto}</span> (${p.modello}) - EAN: <span class="font-mono">${p.ean || 'N.D.'}</span> x <b>${p.quantita}</b></div>`).join('');
+                const prodottiHtml = o.prodotti.map(p => `<div class="text-xs text-slate-700">${p.quantita}x ${p.prodotto} (${p.modello}) - <span class="font-mono text-slate-400">${p.ean}</span></div>`).join('');
                 
-                let spedizioneHTML = o.spedizione ? `
-                    <div class="text-[11px] text-slate-500 mt-1 space-y-0.5">
-                        <div><b>Data Evasione:</b> <span class="text-emerald-700 font-semibold">${o.spedizione.dataEvasione}</span></div>
-                        <div><b>Metodo:</b> ${o.spedizione.metodo}</div>
-                        <div><b>Cod. Pacco:</b> <span class="font-mono text-indigo-600 font-bold">${o.spedizione.codPacco}</span></div>
-                        <div><b>Misure:</b> ${o.spedizione.misure} | <b>Peso:</b> ${o.spedizione.peso}</div>
-                        <div><b>Tracking:</b> <span class="font-mono">${o.spedizione.tracking}</span></div>
-                    </div>
-                ` : '<div class="text-[11px] text-slate-400 italic">In attesa di spedizione</div>';
-
-                let azioniAdminHTML = statoUtente === 'admin' && o.stato !== 'Evaso' ? `
-                    <div class="flex flex-col items-end gap-2">
-                        <button onclick="apriModalSpedizione('${o.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl shadow-sm transition">
-                            Evadi & Spedisci
+                // Pulsante di eliminazione visibile per admin solo se l'ordine è 'Evaso'
+                let azioniHtml = '';
+                if (o.stato !== 'Evaso' && statoUtente === 'admin') {
+                    azioniHtml = `
+                        <button onclick="apriModalSpedizione('${o.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-xl font-semibold shadow-sm transition">
+                            Evadi Ordine
                         </button>
-                    </div>
-                ` : '';
+                    `;
+                } else if (o.stato === 'Evaso') {
+                    let dettaglioSped = `
+                        <div class="text-[11px] text-slate-500 text-right">
+                            <div>Sped: <strong>${o.spedizione ? o.spedizione.metodo : '-'}</strong></div>
+                            <div class="font-mono text-slate-400">${o.spedizione ? o.spedizione.tracking : ''}</div>
+                        </div>
+                    `;
+                    if (statoUtente === 'admin') {
+                        azioniHtml = `
+                            <div class="flex items-center justify-end gap-3">
+                                ${dettaglioSped}
+                                <button onclick="eliminaOrdine(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-xl text-xs transition" title="Elimina Ordine Evaso">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        azioniHtml = dettaglioSped;
+                    }
+                } else {
+                    azioniHtml = '<span class="text-xs text-slate-400">-</span>';
+                }
 
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition">
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-slate-900">${o.id}</div>
-                            <div class="text-xs text-slate-400">${o.data}</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="font-medium text-slate-800">V: <span class="text-indigo-600 font-bold">${o.venditore}</span></div>
-                            <div class="text-xs text-slate-500">A: ${o.acquirente}</div>
-                        </td>
-                        <td class="px-6 py-4 text-xs text-slate-600 space-y-0.5">
-                            <div><b>Magazzino:</b> ${o.magazzino}</div>
-                            <div><b>Fornitore:</b> ${o.fornitore}</div>
-                            <div><b>Fattura:</b> ${o.rifFattura}</div>
-                        </td>
-                        <td class="px-6 py-4 space-y-1">${prodottiHTML}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold border ${badgeStatoColor}">${o.stato}</span>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            ${spedizioneHTML}
-                            <div class="mt-2">${azioniAdminHTML}</div>
-                        </td>
-                    </tr>
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/50 transition';
+                tr.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-slate-900 text-xs">${o.id}</div>
+                        <div class="text-[11px] text-slate-400">${o.data}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-xs font-semibold text-slate-800">Vend: ${o.venditore}</div>
+                        <div class="text-xs text-slate-500">Acq: ${o.acquirente}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-xs font-medium text-slate-800">${o.fornitore}</div>
+                        <div class="text-[11px] text-slate-400">Fatt: ${o.rifFattura} | Deal: ${o.rifDeal}</div>
+                        <div class="text-[11px] text-indigo-600 font-medium">Sede: ${o.magazzino}</div>
+                    </td>
+                    <td class="px-6 py-4">${prodottiHtml}</td>
+                    <td class="px-6 py-4">${badgeStato}</td>
+                    <td class="px-6 py-4 text-right">${azioniHtml}</td>
                 `;
+                tbody.appendChild(tr);
             });
         }
 
+        function eliminaOrdine(idx) {
+            if(confirm("Sei sicuro di voler eliminare questo ordine evaso?")) {
+                ordini.splice(idx, 1);
+                salvaDati('mg_ordini', ordini);
+                renderOrdini();
+                renderDashboard();
+                mostraNotifica('Ordine eliminato con successo.');
+            }
+        }
+
+        // --- GESTIONE NUOVO ORDINE ---
         function aggiungiRigaProdotto() {
             const container = document.getElementById('righe-prodotti-container');
-            const magazzinoSelezionato = document.getElementById('ordine-magazzino').value;
-            const prodottiDisponibili = giacenze.filter(g => g.magazzino === magazzinoSelezionato);
-
-            let optionsHTML = prodottiDisponibili.map(p => `<option value="${p.ean}">${p.prodotto} - ${p.modello} (Disp: ${p.quantita})</option>`).join('');
+            const magSelezionato = document.getElementById('ordine-magazzino')?.value;
+            const prodottiDisponibili = giacenze.filter(g => g.magazzino === magSelezionato);
 
             const rigaDiv = document.createElement('div');
-            rigaDiv.className = 'flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 riga-prodotto-ordine';
+            rigaDiv.className = 'flex items-center gap-3 riga-prodotto-ordine bg-slate-50 p-3 rounded-xl border border-slate-200/60';
             rigaDiv.innerHTML = `
                 <div class="flex-grow">
                     <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Articolo</label>
-                    <select class="w-full border border-slate-200 rounded-lg p-2 text-xs bg-white outline-none select-articolo">
-                        ${optionsHTML || '<option value="">Nessun prodotto disponibile</option>'}
+                    <select class="select-prodotto-item w-full border border-slate-200 rounded-lg p-2 text-xs bg-white outline-none" required>
+                        ${prodottiDisponibili.length === 0 ? '<option value="">Nessun prodotto disponibile</option>' : 
+                            prodottiDisponibili.map(p => `<option value="${p.ean}">${p.prodotto} - ${p.modello} (Disp:${p.quantita})</option>`).join('')}
                     </select>
                 </div>
-                <div class="w-28">
+                <div class="w-24">
                     <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Quantità</label>
-                    <input type="number" min="1" value="1" class="w-full border border-slate-200 rounded-lg p-2 text-xs bg-white outline-none input-qta-ordine" required>
+                    <input type="number" min="1" value="1" class="input-qta-item w-full border border-slate-200 rounded-lg p-2 text-xs bg-white outline-none" required>
                 </div>
-                <div class="pt-5">
-                    <button type="button" onclick="this.closest('.riga-prodotto-ordine').remove()" class="text-slate-400 hover:text-rose-600 p-2 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
+                <div class="pt-4">
+                    <button type="button" onclick="this.closest('.riga-prodotto-ordine').remove()" class="text-rose-500 hover:text-rose-700 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
                 </div>
             `;
             container.appendChild(rigaDiv);
@@ -769,284 +747,57 @@
             const rifDeal = document.getElementById('ordine-rif-deal').value;
 
             const righe = document.querySelectorAll('.riga-prodotto-ordine');
-            if (righe.length === 0) {
-                mostraNotifica('Aggiungi almeno un prodotto all\'ordine.', 'error');
-                return;
+            let prodottiSelezionati = [];
+
+            for(let riga of righe) {
+                const ean = riga.querySelector('.select-prodotto-item').value;
+                const qta = Number(riga.querySelector('.input-qta-item').value);
+                
+                const artTrovato = giacenze.find(g => g.ean === ean && g.magazzino === magazzino);
+                if(!artTrovato || artTrovato.quantita < qta) {
+                    mostraNotifica(`Quantità non disponibile per l'articolo EAN: ${ean}`, 'error');
+                    return;
+                }
+
+                prodottiSelezionati.push({
+                    prodotto: artTrovato.prodotto,
+                    modello: artTrovato.modello,
+                    ean: ean,
+                    quantita: qta
+                });
             }
 
-            let prodottiOrdine = [];
-            let stockInsufficiente = false;
-
-            righe.forEach(riga => {
-                const eanSelezionato = riga.querySelector('.select-articolo').value;
-                const qtaRichiesta = parseInt(riga.querySelector('.input-qta-ordine').value);
-
-                let articoloStock = giacenze.find(g => g.ean === eanSelezionato && g.magazzino === magazzino);
-                if (!articoloStock || articoloStock.quantita < qtaRichiesta) {
-                    stockInsufficiente = true;
-                } else {
-                    prodottiOrdine.push({
-                        prodotto: articoloStock.prodotto,
-                        modello: articoloStock.modello,
-                        ean: articoloStock.ean,
-                        quantita: qtaRichiesta
-                    });
-                }
+            prodottiSelezionati.forEach(ps => {
+                const art = giacenze.find(g => g.ean === ps.ean && g.magazzino === magazzino);
+                if(art) art.quantita -= ps.quantita;
             });
-
-            if (stockInsufficiente) {
-                mostraNotifica('Quantità richiesta superiore allo stock disponibile in magazzino.', 'error');
-                return;
-            }
-
-            prodottiOrdine.forEach(po => {
-                let item = giacenze.find(g => g.ean === po.ean && g.magazzino === magazzino);
-                if (item) {
-                    item.quantita -= po.quantita;
-                }
-            });
+            salvaDati('mg_giacenze', giacenze);
 
             const nuovoOrdine = {
                 id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-                magazzino,
-                venditore,
-                acquirente,
-                fornitore,
-                rifFattura,
-                rifDeal,
+                magazzino, venditore, acquirente, fornitore, rifFattura, rifDeal,
                 data: new Date().toISOString().split('T')[0],
                 stato: 'Preso in carico',
-                prodotti: prodottiOrdine,
+                prodotti: prodottiSelezionati,
                 spedizione: null
             };
 
-            ordini = caricaDati('mg_ordini', []);
             ordini.unshift(nuovoOrdine);
-            
             salvaDati('mg_ordini', ordini);
-            salvaDati('mg_giacenze', giacenze);
 
+            mostraNotifica('Ordine creato con successo!');
             document.getElementById('form-ordine').reset();
             document.getElementById('ordine-venditore').value = nomeUtenteCorrente;
             aggiornaProdottiDisponibiliSelect();
             renderDashboard();
             renderOrdini();
-            mostraNotifica('Ordine creato con successo e stock aggiornato!');
             mostraSezione('ordini');
         }
 
-        function popolaSelectTrasferimento() {
-            const selectProd = document.getElementById('trasf-prodotto-modello');
-            if (!selectProd) return;
-            selectProd.innerHTML = '';
-            giacenze.forEach((g, idx) => {
-                if (g.quantita > 0) {
-                    selectProd.innerHTML += `<option value="${idx}">${g.prodotto} - ${g.modello} (${g.magazzino}: ${g.quantita} disp)</option>`;
-                }
-            });
-        }
-
-        function eseguiTrasferimento(e) {
-            e.preventDefault();
-            const daSede = document.getElementById('trasf-da').value;
-            const aSede = document.getElementById('trasf-a').value;
-            const indexProdotto = parseInt(document.getElementById('trasf-prodotto-modello').value);
-            const qtaDaTrasferire = parseInt(document.getElementById('trasf-qta').value);
-
-            if (daSede === aSede) {
-                mostraNotifica('Il magazzino di partenza e di arrivo devono essere differenti.', 'error');
-                return;
-            }
-
-            let itemOrigine = giacenze[indexProdotto];
-            if (!itemOrigine || itemOrigine.quantita < qtaDaTrasferire) {
-                mostraNotifica('Quantità insufficiente nel magazzino di partenza.', 'error');
-                return;
-            }
-
-            itemOrigine.quantita -= qtaDaTrasferire;
-
-            let itemDestinazione = giacenze.find(g => g.magazzino === aSede && g.ean === itemOrigine.ean);
-            if (itemDestinazione) {
-                itemDestinazione.quantita += qtaDaTrasferire;
-            } else {
-                giacenze.push({
-                    magazzino: aSede,
-                    prodotto: itemOrigine.prodotto,
-                    modello: itemOrigine.modello,
-                    ean: itemOrigine.ean,
-                    quantita: qtaDaTrasferire
-                });
-            }
-
-            giacenze = giacenze.filter(g => g.quantita > 0);
-            salvaDati('mg_giacenze', giacenze);
-
-            renderDashboard();
-            popolaSelectTrasferimento();
-            mostraNotifica('Trasferimento merce completato con successo!');
-            mostraSezione('dashboard');
-        }
-
-        function apriModalMagazzino() {
-            document.getElementById('modal-mag-titolo').innerText = 'Nuova Sede Magazzino';
-            document.getElementById('modal-mag-index').value = '-1';
-            document.getElementById('modal-mag-nome').value = '';
-            document.getElementById('modal-mag-indirizzo').value = '';
-            document.getElementById('modal-mag-telefono').value = '';
-            document.getElementById('modal-mag-email').value = '';
-            document.getElementById('modal-mag-responsabile').value = '';
-            document.getElementById('modal-magazzino').classList.remove('hidden');
-            document.getElementById('modal-magazzino').classList.add('flex');
-        }
-
-        function chiudiModalMagazzino() {
-            document.getElementById('modal-magazzino').classList.remove('flex');
-            document.getElementById('modal-magazzino').classList.add('hidden');
-        }
-
-        function modificaMagazzino(index) {
-            let m = magazzini[index];
-            document.getElementById('modal-mag-titolo').innerText = 'Modifica Sede Magazzino';
-            document.getElementById('modal-mag-index').value = index;
-            document.getElementById('modal-mag-nome').value = m.nome;
-            document.getElementById('modal-mag-indirizzo').value = m.indirizzo;
-            document.getElementById('modal-mag-telefono').value = m.telefono;
-            document.getElementById('modal-mag-email').value = m.email;
-            document.getElementById('modal-mag-responsabile').value = m.responsabile;
-
-            document.getElementById('modal-magazzino').classList.remove('hidden');
-            document.getElementById('modal-magazzino').classList.add('flex');
-        }
-
-        function eliminaMagazzino(index) {
-            let nomeSede = magazzini[index].nome;
-            let haStock = giacenze.some(g => g.magazzino === nomeSede && g.quantita > 0);
-            
-            if (haStock) {
-                mostraNotifica('Impossibile eliminare: la sede contiene ancora articoli in stock.', 'error');
-                return;
-            }
-
-            if (confirm(`Sei sicuro di voler eliminare la sede "${nomeSede}"?`)) {
-                magazzini.splice(index, 1);
-                salvaDati('mg_lista_magazzini', magazzini);
-                popolaSelectMagazziniDappertutto();
-                renderMagazzini();
-                renderDashboard();
-                mostraNotifica('Sede magazzino eliminata.');
-            }
-        }
-
-        function salvaMagazzinoAdmin() {
-            const index = parseInt(document.getElementById('modal-mag-index').value);
-            const nome = document.getElementById('modal-mag-nome').value.trim();
-            const indirizzo = document.getElementById('modal-mag-indirizzo').value.trim();
-            const telefono = document.getElementById('modal-mag-telefono').value.trim();
-            const email = document.getElementById('modal-mag-email').value.trim();
-            const responsabile = document.getElementById('modal-mag-responsabile').value.trim();
-
-            if (!nome || !indirizzo || !telefono || !email || !responsabile) {
-                mostraNotifica('Compila tutti i campi richiesti.', 'error');
-                return;
-            }
-
-            if (index === -1) {
-                if (magazzini.some(m => m.nome.toLowerCase() === nome.toLowerCase())) {
-                    mostraNotifica('Esiste già un magazzino con questo nome.', 'error');
-                    return;
-                }
-                magazzini.push({ nome, indirizzo, telefono, email, responsabile });
-            } else {
-                let vecchioNome = magazzini[index].nome;
-                magazzini[index] = { nome, indirizzo, telefono, email, responsabile };
-                
-                if (vecchioNome !== nome) {
-                    giacenze.forEach(g => { if (g.magazzino === vecchioNome) g.magazzino = nome; });
-                    salvaDati('mg_giacenze', giacenze);
-                }
-            }
-
-            salvaDati('mg_lista_magazzini', magazzini);
-            chiudiModalMagazzino();
-            popolaSelectMagazziniDappertutto();
-            renderMagazzini();
-            renderDashboard();
-            mostraNotifica('Sede magazzino salvata correttamente!');
-        }
-
-        function apriModalProdotto() {
-            document.getElementById('modal-prod-titolo').innerText = 'Nuovo Articolo / Stock';
-            document.getElementById('modal-prod-index').value = '-1';
-            document.getElementById('modal-prod-nome').value = '';
-            document.getElementById('modal-prod-modello').value = '';
-            document.getElementById('modal-prod-ean').value = '';
-            document.getElementById('modal-prod-qta').value = '10';
-            document.getElementById('modal-prodotto').classList.remove('hidden');
-            document.getElementById('modal-prodotto').classList.add('flex');
-        }
-
-        function chiudiModalProdotto() {
-            document.getElementById('modal-prodotto').classList.remove('flex');
-            document.getElementById('modal-prodotto').classList.add('hidden');
-        }
-
-        function modificaProdottoStock(index) {
-            let g = giacenze[index];
-            document.getElementById('modal-prod-titolo').innerText = 'Modifica Articolo';
-            document.getElementById('modal-prod-index').value = index;
-            document.getElementById('modal-prod-magazzino').value = g.magazzino;
-            document.getElementById('modal-prod-nome').value = g.prodotto;
-            document.getElementById('modal-prod-modello').value = g.modello;
-            document.getElementById('modal-prod-ean').value = g.ean;
-            document.getElementById('modal-prod-qta').value = g.quantita;
-
-            document.getElementById('modal-prodotto').classList.remove('hidden');
-            document.getElementById('modal-prodotto').classList.add('flex');
-        }
-
-        function eliminaProdottoStock(index) {
-            if (confirm('Sei sicuro di voler eliminare questo articolo dallo stock?')) {
-                giacenze.splice(index, 1);
-                salvaDati('mg_giacenze', giacenze);
-                renderDashboard();
-                mostraNotifica('Articolo eliminato.');
-            }
-        }
-
-        function salvaProdottoAdmin() {
-            const index = parseInt(document.getElementById('modal-prod-index').value);
-            const magazzino = document.getElementById('modal-prod-magazzino').value;
-            const prodotto = document.getElementById('modal-prod-nome').value;
-            const modello = document.getElementById('modal-prod-modello').value;
-            const ean = document.getElementById('modal-prod-ean').value;
-            const quantita = parseInt(document.getElementById('modal-prod-qta').value);
-
-            if (!prodotto || !modello || !ean) {
-                mostraNotifica('Compila tutti i campi obbligatori.', 'error');
-                return;
-            }
-
-            if (index === -1) {
-                giacenze.push({ magazzino, prodotto, modello, ean, quantita });
-            } else {
-                giacenze[index] = { magazzino, prodotto, modello, ean, quantita };
-            }
-
-            salvaDati('mg_giacenze', giacenze);
-            chiudiModalProdotto();
-            renderDashboard();
-            mostraNotifica('Articolo salvato correttamente!');
-        }
-
+        // --- MODALE SPEDIZIONE ---
         function apriModalSpedizione(idOrdine) {
             document.getElementById('sped-ordine-id').value = idOrdine;
             document.getElementById('sped-data').value = new Date().toISOString().split('T')[0];
-            document.getElementById('sped-metodo').value = '';
-            document.getElementById('sped-cod-pacco').value = '';
-            document.getElementById('sped-misure').value = '';
-            document.getElementById('sped-peso').value = '';
-            document.getElementById('sped-tracking').value = '';
             document.getElementById('modal-spedizione').classList.remove('hidden');
             document.getElementById('modal-spedizione').classList.add('flex');
         }
@@ -1058,28 +809,219 @@
 
         function confermaEvadiOrdine() {
             const idOrdine = document.getElementById('sped-ordine-id').value;
-            const dataEvasione = document.getElementById('sped-data').value;
-            const metodo = document.getElementById('sped-metodo').value;
-            const codPacco = document.getElementById('sped-cod-pacco').value;
-            const misure = document.getElementById('sped-misure').value;
-            const peso = document.getElementById('sped-peso').value;
-            const tracking = document.getElementById('sped-tracking').value;
+            const spedizione = {
+                data: document.getElementById('sped-data').value,
+                metodo: document.getElementById('sped-metodo').value,
+                codPacco: document.getElementById('sped-cod-pacco').value,
+                misure: document.getElementById('sped-misure').value,
+                peso: document.getElementById('sped-peso').value,
+                tracking: document.getElementById('sped-tracking').value
+            };
 
-            if (!dataEvasione || !metodo || !codPacco || !misure || !peso || !tracking) {
-                mostraNotifica('Compila tutti i campi di spedizione ed evasione.', 'error');
+            const ordine = ordini.find(o => o.id === idOrdine);
+            if(ordine) {
+                ordine.stato = 'Evaso';
+                ordine.spedizione = spedizione;
+                salvaDati('mg_ordini', ordini);
+                renderOrdini();
+                renderDashboard();
+                mostraNotifica(`Ordine ${idOrdine} evaso con successo!`);
+            }
+            chiudiModalSpedizione();
+        }
+
+        // --- GESTIONE TRASFERIMENTI ---
+        function aggiornaProdottiTrasferimento() {
+            const magDa = document.getElementById('trasf-da')?.value;
+            const selectProd = document.getElementById('trasf-prodotto-modello');
+            if(!selectProd) return;
+
+            selectProd.innerHTML = '';
+            const articoli = giacenze.filter(g => g.magazzino === magDa && g.quantita > 0);
+            
+            if(articoli.length === 0) {
+                selectProd.innerHTML = '<option value="">Nessun articolo disponibile per il trasferimento</option>';
                 return;
             }
 
-            ordini = caricaDati('mg_ordini', ordini);
-            let ordine = ordini.find(o => o.id === idOrdine);
-            if (ordine) {
-                ordine.stato = 'Evaso';
-                ordine.spedizione = { dataEvasione, metodo, codPacco, misure, peso, tracking };
-                salvaDati('mg_ordini', ordini);
-                chiudiModalSpedizione();
-                renderOrdini();
+            articoli.forEach(art => {
+                const opt = document.createElement('option');
+                opt.value = art.ean;
+                opt.textContent = `${art.prodotto} (${art.modello}) - Disp: ${art.quantita}`;
+                selectProd.appendChild(opt);
+            });
+        }
+
+        function eseguiTrasferimento(e) {
+            e.preventDefault();
+            const da = document.getElementById('trasf-da').value;
+            const a = document.getElementById('trasf-a').value;
+            const ean = document.getElementById('trasf-prodotto-modello').value;
+            const qta = Number(document.getElementById('trasf-qta').value);
+
+            if(da === a) {
+                mostraNotifica('Il magazzino di partenza e di arrivo devono essere differenti.', 'error');
+                return;
+            }
+
+            const artPartenza = giacenze.find(g => g.magazzino === da && g.ean === ean);
+            if(!artPartenza || artPartenza.quantita < qta) {
+                mostraNotifica('Quantità insufficiente nel magazzino di partenza.', 'error');
+                return;
+            }
+
+            artPartenza.quantita -= qta;
+
+            let artArrivo = giacenze.find(g => g.magazzino === a && g.ean === ean);
+            if(artArrivo) {
+                artArrivo.quantita += qta;
+            } else {
+                giacenze.push({
+                    magazzino: a,
+                    prodotto: artPartenza.prodotto,
+                    modello: artPartenza.modello,
+                    ean: artPartenza.ean,
+                    quantita: qta
+                });
+            }
+
+            salvaDati('mg_giacenze', giacenze);
+            renderDashboard();
+            aggiornaProdottiTrasferimento();
+            mostraNotifica('Trasferimento merce completato con successo!');
+        }
+
+        // --- MODALI ADMIN (Magazzini e Prodotti) ---
+        function apriModalMagazzino(idx = -1) {
+            document.getElementById('modal-mag-index').value = idx;
+            if(idx >= 0) {
+                const m = magazzini[idx];
+                document.getElementById('modal-mag-titolo').textContent = 'Modifica Sede Magazzino';
+                document.getElementById('modal-mag-nome').value = m.nome;
+                document.getElementById('modal-mag-indirizzo').value = m.indirizzo;
+                document.getElementById('modal-mag-telefono').value = m.telefono;
+                document.getElementById('modal-mag-email').value = m.email;
+                document.getElementById('modal-mag-responsabile').value = m.responsabile;
+            } else {
+                document.getElementById('modal-mag-titolo').textContent = 'Nuova Sede Magazzino';
+                document.getElementById('modal-mag-nome').value = '';
+                document.getElementById('modal-mag-indirizzo').value = '';
+                document.getElementById('modal-mag-telefono').value = '';
+                document.getElementById('modal-mag-email').value = '';
+                document.getElementById('modal-mag-responsabile').value = '';
+            }
+            document.getElementById('modal-magazzino').classList.remove('hidden');
+            document.getElementById('modal-magazzino').classList.add('flex');
+        }
+
+        function chiudiModalMagazzino() {
+            document.getElementById('modal-magazzino').classList.remove('flex');
+            document.getElementById('modal-magazzino').classList.add('hidden');
+        }
+
+        function salvaMagazzinoAdmin() {
+            const idx = Number(document.getElementById('modal-mag-index').value);
+            const nuovoMag = {
+                nome: document.getElementById('modal-mag-nome').value,
+                indirizzo: document.getElementById('modal-mag-indirizzo').value,
+                telefono: document.getElementById('modal-mag-telefono').value,
+                email: document.getElementById('modal-mag-email').value,
+                responsabile: document.getElementById('modal-mag-responsabile').value
+            };
+
+            if(!nuovoMag.nome) {
+                mostraNotifica('Inserisci il nome del magazzino.', 'error');
+                return;
+            }
+
+            if(idx >= 0) {
+                magazzini[idx] = nuovoMag;
+            } else {
+                magazzini.push(nuovoMag);
+            }
+
+            salvaDati('mg_lista_magazzini', magazzini);
+            popolaSelectMagazziniDappertutto();
+            renderMagazzini();
+            renderDashboard();
+            chiudiModalMagazzino();
+            mostraNotifica('Magazzino salvato con successo!');
+        }
+
+        function modificaMagazzino(idx) { apriModalMagazzino(idx); }
+
+        function eliminaMagazzino(idx) {
+            if(confirm("Sei sicuro di voler eliminare questa sede?")) {
+                magazzini.splice(idx, 1);
+                salvaDati('mg_lista_magazzini', magazzini);
+                popolaSelectMagazziniDappertutto();
+                renderMagazzini();
                 renderDashboard();
-                mostraNotifica('Ordine evaso e spedito con successo!');
+                mostraNotifica('Magazzino eliminato.');
+            }
+        }
+
+        function apriModalProdotto(idx = -1) {
+            document.getElementById('modal-prod-index').value = idx;
+            if(idx >= 0) {
+                const g = giacenze[idx];
+                document.getElementById('modal-prod-titolo').textContent = 'Modifica Prodotto / Stock';
+                document.getElementById('modal-prod-magazzino').value = g.magazzino;
+                document.getElementById('modal-prod-nome').value = g.prodotto;
+                document.getElementById('modal-prod-modello').value = g.modello;
+                document.getElementById('modal-prod-ean').value = g.ean;
+                document.getElementById('modal-prod-qta').value = g.quantita;
+            } else {
+                document.getElementById('modal-prod-titolo').textContent = 'Nuovo Prodotto / Stock';
+                document.getElementById('modal-prod-nome').value = '';
+                document.getElementById('modal-prod-modello').value = '';
+                document.getElementById('modal-prod-ean').value = '';
+                document.getElementById('modal-prod-qta').value = 10;
+            }
+            document.getElementById('modal-prodotto').classList.remove('hidden');
+            document.getElementById('modal-prodotto').classList.add('flex');
+        }
+
+        function chiudiModalProdotto() {
+            document.getElementById('modal-prodotto').classList.remove('flex');
+            document.getElementById('modal-prodotto').classList.add('hidden');
+        }
+
+        function salvaProdottoAdmin() {
+            const idx = Number(document.getElementById('modal-prod-index').value);
+            const nuovoArt = {
+                magazzino: document.getElementById('modal-prod-magazzino').value,
+                prodotto: document.getElementById('modal-prod-nome').value,
+                modello: document.getElementById('modal-prod-modello').value,
+                ean: document.getElementById('modal-prod-ean').value,
+                quantita: Number(document.getElementById('modal-prod-qta').value)
+            };
+
+            if(!nuovoArt.prodotto || !nuovoArt.ean) {
+                mostraNotifica('Compila i campi obbligatori del prodotto.', 'error');
+                return;
+            }
+
+            if(idx >= 0) {
+                giacenze[idx] = nuovoArt;
+            } else {
+                giacenze.push(nuovoArt);
+            }
+
+            salvaDati('mg_giacenze', giacenze);
+            renderDashboard();
+            chiudiModalProdotto();
+            mostraNotifica('Articolo salvato con successo!');
+        }
+
+        function modificaProdotto(idx) { apriModalProdotto(idx); }
+
+        function eliminaProdotto(idx) {
+            if(confirm("Sei sicuro di voler eliminare questo articolo dall'inventario?")) {
+                giacenze.splice(idx, 1);
+                salvaDati('mg_giacenze', giacenze);
+                renderDashboard();
+                mostraNotifica('Articolo eliminato.');
             }
         }
     </script>
