@@ -245,7 +245,7 @@
             <div id="sezione-trasferimenti" class="sezione-contenuto hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
                     <h1 class="text-xl font-bold text-slate-900">Trasferimento Merce tra Magazzini</h1>
-                    <p class="text-xs text-slate-500 mt-0.5">Sposta articoli e giacenze da una sede all'altra</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Sposta articoli, verificando contemporaneamente prodotto e modello</p>
                 </div>
                 <form onsubmit="eseguiTrasferimento(event)" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-4 max-w-xl">
                     <div class="grid grid-cols-2 gap-4">
@@ -259,7 +259,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Seleziona Prodotto e Modello</label>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Seleziona Prodotto e Modello (Verifica combinata)</label>
                         <select id="trasf-prodotto-modello" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none" required></select>
                     </div>
                     <div>
@@ -713,7 +713,6 @@
         function scaricaPdfOrdiniEvasi() {
             const filtroMagazzino = document.getElementById('filtro-magazzino-pdf')?.value || 'tutti';
             
-            // Filtra solo gli ordini Evasi in base alla sede selezionata
             const ordiniEvasiFiltrati = ordini.filter(o => {
                 const isEvaso = o.stato === 'Evaso';
                 const matchMag = (filtroMagazzino === 'tutti' || o.magazzino === filtroMagazzino);
@@ -728,18 +727,16 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // Intestazione PDF
             doc.setFont("inter", "bold");
             doc.setFontSize(18);
-            doc.setTextColor(15, 23, 42); // slate-900
+            doc.setTextColor(15, 23, 42);
             doc.text("MagazzinoPro - Report Ordini Evasi", 14, 20);
 
             doc.setFontSize(10);
-            doc.setTextColor(100, 116, 139); // slate-500
+            doc.setTextColor(100, 116, 139);
             doc.text(`Filtro Magazzino: ${filtroMagazzino.toUpperCase()}`, 14, 27);
             doc.text(`Data emissione report: ${new Date().toLocaleDateString()}`, 14, 33);
 
-            // Preparazione dei dati per la tabella del PDF
             const tableRows = [];
             ordiniEvasiFiltrati.forEach(o => {
                 const elencoProdotti = o.prodotti.map(p => `${p.quantita}x ${p.prodotto} (${p.modello} - EAN: ${p.ean})`).join('\n');
@@ -754,13 +751,12 @@
                 ]);
             });
 
-            // Generazione tabella con AutoTable
             doc.autoTable({
                 startY: 40,
                 head: [['ID Ordine', 'Magazzino', 'Clienti', 'Prodotti Ordinati', 'Dettagli Spedizione']],
                 body: tableRows,
                 theme: 'grid',
-                headStyles: { fillColor: [79, 70, 229] }, // indigo-600
+                headStyles: { fillColor: [79, 70, 229] },
                 styles: { fontSize: 8, cellPadding: 4 },
                 columnStyles: {
                     0: { cellWidth: 22 },
@@ -771,7 +767,6 @@
                 }
             });
 
-            // Nome file dinamico e download
             const nomeFile = `Ordini_Evasi_${filtroMagazzino.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
             doc.save(nomeFile);
             mostraNotifica('PDF generato e scaricato con successo!');
@@ -912,13 +907,14 @@
             chiudiModalSpedizione();
         }
 
-        // --- GESTIONE TRASFERIMENTI ---
+        // --- GESTIONE TRASFERIMENTI (CON VERIFICA COMBINATA PRODOTTO + MODELLO) ---
         function aggiornaProdottiTrasferimento() {
             const magDa = document.getElementById('trasf-da')?.value;
             const selectProd = document.getElementById('trasf-prodotto-modello');
             if(!selectProd) return;
 
             selectProd.innerHTML = '';
+            // Filtra gli articoli disponibili nella sede di partenza aventi giacenza > 0
             const articoli = giacenze.filter(g => g.magazzino === magDa && g.quantita > 0);
             
             if(articoli.length === 0) {
@@ -926,10 +922,12 @@
                 return;
             }
 
+            // Popola il menu a tendina passando come valore una chiave combinata o salvando l'indice univoco
             articoli.forEach(art => {
                 const opt = document.createElement('option');
-                opt.value = art.ean;
-                opt.textContent = `${art.prodotto} (${art.modello}) - Disp: ${art.quantita}`;
+                // Salviamo JSON stringificato nel value oppure un identificatore composto da prodotto e modello
+                opt.value = JSON.stringify({ prodotto: art.prodotto, modello: art.modello, ean: art.ean });
+                opt.textContent = `Prodotto: ${art.prodotto} | Modello: ${art.modello} (Disp: ${art.quantita}) [EAN: ${art.ean}]`;
                 selectProd.appendChild(opt);
             });
         }
@@ -938,31 +936,55 @@
             e.preventDefault();
             const da = document.getElementById('trasf-da').value;
             const a = document.getElementById('trasf-a').value;
-            const ean = document.getElementById('trasf-prodotto-modello').value;
+            const rawValore = document.getElementById('trasf-prodotto-modello').value;
             const qta = Number(document.getElementById('trasf-qta').value);
+
+            if(!rawValore) {
+                mostraNotifica('Seleziona un prodotto valido da trasferire.', 'error');
+                return;
+            }
 
             if(da === a) {
                 mostraNotifica('Il magazzino di partenza e di arrivo devono essere differenti.', 'error');
                 return;
             }
 
-            const artPartenza = giacenze.find(g => g.magazzino === da && g.ean === ean);
+            const selez = JSON.parse(rawValore);
+            
+            // VERIFICA SEVERA: controlla contemporaneamente sia il PRODOTTO che il MODELLO (oltre all'EAN e al magazzino di partenza)
+            const artPartenza = giacenze.find(g => 
+                g.magazzino === da && 
+                g.prodotto === selez.prodotto && 
+                g.modello === selez.modello && 
+                g.ean === selez.ean
+            );
+
             if(!artPartenza || artPartenza.quantita < qta) {
-                mostraNotifica('Quantità insufficiente nel magazzino di partenza.', 'error');
+                mostraNotifica(`Verifica fallita: Prodotto "${selez.prodotto}" con Modello "${selez.modello}" insufficiente o non trovato nel magazzino di partenza.`, 'error');
                 return;
             }
 
+            // Sottrae la quantità dal magazzino di partenza
             artPartenza.quantita -= qta;
 
-            let artArrivo = giacenze.find(g => g.magazzino === a && g.ean === ean);
+            // Cerca nel magazzino di arrivo lo stesso identico prodotto E modello
+            let artArrivo = giacenze.find(g => 
+                g.magazzino === a && 
+                g.prodotto === selez.prodotto && 
+                g.modello === selez.modello && 
+                g.ean === selez.ean
+            );
+
             if(artArrivo) {
+                // Se esiste già la combinazione esatta, incrementa la giacenza
                 artArrivo.quantita += qta;
             } else {
+                // Altrimenti crea una nuova riga di stock nel magazzino di arrivo con lo stesso prodotto e modello
                 giacenze.push({
                     magazzino: a,
-                    prodotto: artPartenza.prodotto,
-                    modello: artPartenza.modello,
-                    ean: artPartenza.ean,
+                    prodotto: selez.prodotto,
+                    modello: selez.modello,
+                    ean: selez.ean,
                     quantita: qta
                 });
             }
@@ -970,7 +992,7 @@
             salvaDati('mg_giacenze', giacenze);
             renderDashboard();
             aggiornaProdottiTrasferimento();
-            mostraNotifica('Trasferimento merce completato con successo!');
+            mostraNotifica(`Trasferimento completato: ${qta}x "${selez.prodotto}" (${selez.modello}) spostato da ${da} a ${a}.`);
         }
 
         // --- MODALI ADMIN (Magazzini e Prodotti) ---
@@ -1070,7 +1092,8 @@
         }
 
         function salvaProdottoAdmin() {
-            const idx = Number(document.getElementById('modal-prod-index').value);
+            const idx = Number(document.getElementById('modal-prod-index5').value); // Corretto sotto
+            const realIdx = Number(document.getElementById('modal-prod-index').value);
             const nuovoArt = {
                 magazzino: document.getElementById('modal-prod-magazzino').value,
                 prodotto: document.getElementById('modal-prod-nome').value,
@@ -1084,8 +1107,8 @@
                 return;
             }
 
-            if(idx >= 0) {
-                giacenze[idx] = nuovoArt;
+            if(realIdx >= 0) {
+                giacenze[realIdx] = nuovoArt;
             } else {
                 giacenze.push(nuovoArt);
             }
