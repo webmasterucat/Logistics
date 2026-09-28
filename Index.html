@@ -163,36 +163,34 @@
                     <p class="text-xs text-slate-500 mt-0.5">Compila i dati dell'ordine scegliendo tra i prodotti in magazzino</p>
                 </div>
                 <form id="form-ordine" onsubmit="salvaOrdine(event)" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Tutti i campi principali su un'unica riga flessibile -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Magazzino di Riferimento</label>
-                            <select id="ordine-magazzino" onchange="aggiornaProdottiDisponibiliSelect()" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none" required>
+                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Magazzino</label>
+                            <select id="ordine-magazzino" onchange="aggiornaProdottiDisponibiliSelect()" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
                                 <option value="Magazzino Nord">Magazzino Nord</option>
                                 <option value="Magazzino Sud">Magazzino Sud</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Venditore (Chi fa ordine es. PIPPO)</label>
-                            <input type="text" id="ordine-venditore" value="PIPPO" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none" required>
+                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Venditore</label>
+                            <input type="text" id="ordine-venditore" value="PIPPO" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Acquirente (Riceve merce)</label>
-                            <input type="text" id="ordine-acquirente" placeholder="Nome acquirente" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none" required>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Fornitore</label>
-                            <input type="text" id="ordine-fornitore" placeholder="Nome fornitore" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none" required>
+                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Acquirente</label>
+                            <input type="text" id="ordine-acquirente" placeholder="Nome acquirente" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Riferimento Fattura</label>
-                            <input type="text" id="ordine-rif-fattura" placeholder="Es. FAT-2026-001" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none" required>
+                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Fornitore</label>
+                            <input type="text" id="ordine-fornitore" placeholder="Nome fornitore" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Riferimento Deal</label>
-                            <input type="text" id="ordine-rif-deal" placeholder="Es. DEAL-9982" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none" required>
+                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Rif. Fattura</label>
+                            <input type="text" id="ordine-rif-fattura" placeholder="Es. FAT-001" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Rif. Deal</label>
+                            <input type="text" id="ordine-rif-deal" placeholder="Es. DEAL-99" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
                         </div>
                     </div>
 
@@ -441,7 +439,6 @@
             document.getElementById('kpi-ordini-evasi').innerText = ordini.filter(o => o.stato === 'Evaso').length;
         }
 
-        // GESTIONE MODALE PRODOTTO (Aggiungi / Modifica)
         function apriModalProdotto() {
             document.getElementById('modal-prod-index').value = '-1';
             document.getElementById('modal-prod-titolo').innerText = 'Aggiungi Nuovo Prodotto';
@@ -485,11 +482,9 @@
             }
 
             if (index === -1) {
-                // Nuovo
                 giacenze.push({ magazzino, prodotto, modello, ean, quantita });
                 mostraNotifica(`Prodotto "${prodotto}" aggiunto con successo!`);
             } else {
-                // Modifica
                 giacenze[index] = { magazzino, prodotto, modello, ean, quantita };
                 mostraNotifica(`Prodotto aggiornato con successo!`);
             }
@@ -508,7 +503,6 @@
             }
         }
 
-        // GESTIONE ORDINI & SELEZIONE PRODOTTI CON EAN
         function aggiornaProdottiDisponibiliSelect() {
             const magazzinoSelezionato = document.getElementById('ordine-magazzino').value;
             const selectsProdotti = document.querySelectorAll('.select-prodotto-catalogo');
