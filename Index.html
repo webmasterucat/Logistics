@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MultiMagazzino Pro - Gestionale Ordini</title>
+    <!-- Tailwind CSS per un design pulito e professionale -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Notifica Visiva Fluttuante -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <!-- Header / Navbar -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-boxes-stacked text-2xl text-indigo-400"></i>
+                <span class="text-xl font-bold tracking-wide">MagazzinoPro</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div id="user-info" class="text-sm bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700"></div>
+                <button onclick="cambiaRuolo()" class="bg-indigo-600 hover:bg-indigo-500 text-xs px-3 py-1.5 rounded font-medium transition">
+                    Cambia Ruolo / Login
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenuto Principale -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <!-- Sidebar di Navigazione -->
+        <aside class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 lg:col-span-1 h-fit">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Menu Principale</h2>
+            <nav class="space-y-1">
+                <button onclick="mostraSezione('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition bg-indigo-50 text-indigo-600">
+                    <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard & Giacenze</span>
+                </button>
+                <button onclick="mostraSezione('ordini')" id="nav-ordini" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-clipboard-list w-5"></i><span>Gestione Ordini</span>
+                </button>
+                <button onclick="mostraSezione('nuovo-ordine')" id="nav-nuovo-ordine" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-cart-plus w-5"></i><span>Crea Ordine</span>
+                </button>
+                <button onclick="mostraSezione('trasferimenti')" id="nav-trasferimenti" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 admin-only">
+                    <i class="fa-solid fa-right-left w-5"></i><span>Trasferisci Merce</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Area Dinamica dei Contenuti -->
+        <section class="lg:col-span-3 space-y-6">
+
+            <!-- SEZIONE: DASHBOARD & GIACENZE -->
+            <div id="sezione-dashboard" class="sezione-contenuto space-y-6">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-slate-900">Dashboard & Giacenze Magazzini</h1>
+                    <div class="flex gap-2">
+                        <select id="filtro-magazzino-dash" onchange="renderDashboard()" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm bg-white">
+                            <option value="tutti">Tutti i Magazzini</option>
+                            <option value="Magazzino Nord">Magazzino Nord</option>
+                            <option value="Magazzino Sud">Magazzino Sud</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-medium text-slate-500 uppercase">Totale Prodotti in Stock</p>
+                        <h3 id="kpi-tot-stock" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-medium text-slate-500 uppercase">Ordini in Lavorazione / Attesa</p>
+                        <h3 id="kpi-ordini-attesa" class="text-2xl font-bold text-indigo-600 mt-1">0</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-medium text-slate-500 uppercase">Ordini Evasі (Totali)</p>
+                        <h3 id="kpi-ordini-evasi" class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
+                    </div>
+                </div>
+
+                <!-- Tabella Giacenze -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="font-semibold text-slate-800">Inventario Attuale per Magazzino</h3>
+                        <button onclick="aggiungiProdottoStockPrompt()" class="admin-only hidden bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-slate-800 transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi / Ricarica Stock
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 text-xs uppercase border-b border-slate-200">
+                                    <th class="px-6 py-3 font-semibold">Magazzino</th>
+                                    <th class="px-6 py-3 font-semibold">Prodotto</th>
+                                    <th class="px-6 py-3 font-semibold">Modello</th>
+                                    <th class="px-6 py-3 font-semibold text-right">Giacenza Disponibile</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabella-giacenze" class="divide-y divide-slate-100 text-sm text-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEZIONE: GESTIONE ORDINI -->
+            <div id="sezione-ordini" class="sezione-contenuto hidden space-y-6">
+                <h1 class="text-2xl font-bold text-slate-900">Elenco Ordini</h1>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 text-xs uppercase border-b border-slate-200">
+                                    <th class="px-6 py-3">ID / Data</th>
+                                    <th class="px-6 py-3">Venditore / Acquirente</th>
+                                    <th class="px-6 py-3">Rif. & Fornitore</th>
+                                    <th class="px-6 py-3">Prodotti Ordinati</th>
+                                    <th class="px-6 py-3">Stato</th>
+                                    <th class="px-6 py-3 text-right">Azioni / Dettagli Spedizione</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabella-ordini" class="divide-y divide-slate-100 text-sm text-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEZIONE: NUOVO ORDINE -->
+            <div id="sezione-nuovo-ordine" class="sezione-contenuto hidden space-y-6">
+                <h1 class="text-2xl font-bold text-slate-900">Nuovo Ordine Prodotti</h1>
+                <form id="form-ordine" onsubmit="salvaOrdine(event)" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Origine/Riferimento</label>
+                            <select id="ordine-magazzino" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm bg-white" required>
+                                <option value="Magazzino Nord">Magazzino Nord</option>
+                                <option value="Magazzino Sud">Magazzino Sud</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Venditore (Chi fa l'ordine e.g. PIPPO)</label>
+                            <input type="text" id="ordine-venditore" value="PIPPO" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Acquirente (Riceve la merce)</label>
+                            <input type="text" id="ordine-acquirente" placeholder="Nome acquirente / reparto" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fornitore</label>
+                            <input type="text" id="ordine-fornitore" placeholder="Nome fornitore" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Riferimento Fattura</label>
+                            <input type="text" id="ordine-rif-fattura" placeholder="Es. FAT-2026-001" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Riferimento Deal</label>
+                            <input type="text" id="ordine-rif-deal" placeholder="Es. DEAL-9982" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
+                        </div>
+                    </div>
+
+                    <!-- Righe Prodotti Multipli -->
+                    <div class="border-t border-slate-200 pt-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-semibold text-slate-800 text-sm">Prodotti e Modelli dell'Ordine</h3>
+                            <button type="button" onclick="aggiungiRigaProdotto()" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs px-3 py-1.5 rounded-lg font-medium transition">
+                                <i class="fa-solid fa-plus mr-1"></i> Aggiungi Prodotto
+                            </button>
+                        </div>
+                        <div id="righe-prodotti-container" class="space-y-3">
+                            <!-- Inserito via JS -->
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-4 border-t border-slate-200">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-lg text-sm font-medium shadow-sm transition">
+                            Inoltra Ordine
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- SEZIONE: TRASFERIMENTO MERCE (Admin) -->
+            <div id="sezione-trasferimenti" class="sezione-contenuto hidden space-y-6">
+                <h1 class="text-2xl font-bold text-slate-900">Trasferimento Merce tra Magazzini</h1>
+                <form onsubmit="eseguiTrasferimento(event)" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4 max-w-xl">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Partenza</label>
+                            <select id="trasf-da" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm bg-white">
+                                <option value="Magazzino Nord">Magazzino Nord</option>
+                                <option value="Magazzino Sud">Magazzino Sud</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Arrivo</label>
+                            <select id="trasf-a" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm bg-white">
+                                <option value="Magazzino Sud">Magazzino Sud</option>
+                                <option value="Magazzino Nord">Magazzino Nord</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seleziona Prodotto e Modello</label>
+                        <select id="trasf-prodotto-modello" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm bg-white" required></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Quantità da Trasferire</label>
+                        <input type="number" id="trasf-qta" min="1" value="1" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-lg text-sm font-medium transition">
+                        Conferma Trasferimento
+                    </button>
+                </form>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Modal Dettagli Spedizione (Admin) -->
+    <div id="modal-spedizione" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <h3 class="text-lg font-bold text-slate-900">Dettagli di Spedizione & Chiusura Ordine</h3>
+            <input type="hidden" id="sped-ordine-id">
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Metodo di Spedizione</label>
+                <input type="text" id="sped-metodo" placeholder="Es. Espresso / Aereo" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tipo di Confezionamento</label>
+                <input type="text" id="sped-confezionamento" placeholder="Es. Scatola rinforzata / Pallet" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Corriere e Tracking</label>
+                <input type="text" id="sped-tracking" placeholder="Es. DHL - TRK123456789" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button type="button" onclick="chiudiModalSpedizione()" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50">Annulla</button>
+                <button type="button" onclick="confermaEvadiOrdine()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-500">Conferma ed Evadi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logica Applicativa -->
+    <script>
+        // Stato Iniziale e Dati Mock salvati in localStorage se presenti
+        let statoUtente = localStorage.getItem('mg_ruolo') || 'utente'; // 'utente' o 'admin'
+        let nomeUtenteCorrente = localStorage.getItem('mg_nome') || 'PIPPO';
+
+        let giacenze = JSON.parse(localStorage.getItem('mg_giacenze')) || [
+            { magazzino: 'Magazzino Nord', prodotto: 'Laptop Pro', modello: '16 pollici 32GB', quantita: 15 },
+            { magazzino: 'Magazzino Nord', prodotto: 'Mouse Wireless', modello: 'Ergonomico Bluetooth', quantita: 40 },
+            { magazzino: 'Magazzino Sud', prodotto: 'Monitor 4K', modello: '27 pollici IPS', quantita: 10 }
+        ];
+
+        let ordini = JSON.parse(localStorage.getItem('mg_ordini')) || [
+            {
+                id: 'ORD-1001',
+                magazzino: 'Magazzino Nord',
+                venditore: 'PIPPO',
+                acquirente: 'Mario Rossi',
+                fornitore: 'TechSupplier SpA',
+                rifFattura: 'FAT-2026-88',
+                rifDeal: 'DEAL-441',
+                data: '2026-09-28',
+                stato: 'Preso in carico', // Preso in carico, In lavorazione, Pronto, Evaso
+                spedizione: null
+            }
+        ];
+
+        // Inizializzazione applicazione al caricamento
+        window.onload = function() {
+            aggiornaUIUtente();
+            renderDashboard();
+            renderOrdini();
+            aggiungiRigaProdotto();
+        };
+
+        // Gestione Notifiche Visive
+        function mostraNotifica(testo, tipo = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = tipo === 'success' ? 'bg-slate-900 text-white' : 'bg-indigo-600 text-white';
+            toast.className = `${bgColor} px-4 py-3 rounded-xl shadow-lg text-sm font-medium flex items-center space-x-3 transition transform translate-y-2 opacity-0 duration-300`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i><span>${testo}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Cambio Ruolo simulato (Utente <-> Amministratore)
+        fnCambiaRuolo();
+        function cambiaRuolo() {
+            statoUtente = statoUtente === 'utente' ? 'admin' : 'utente';
+            localStorage.setItem('mg_ruolo', statoUtente);
+            aggiornaUIUtente();
+            mostraNotifica(`Ruolo cambiato a: ${statoUtente.toUpperCase()}`, 'info');
+        }
+
+        function fnCambiaRuolo() {
+            // Helper di sincronizzazione visibilità elementi admin
+        }
+
+        function aggiornaUIUtente() {
+            const userInfoDiv = document.getElementById('user-info');
+            const adminElements = document.querySelectorAll('.admin-only');
+            
+            if (statoUtente === 'admin') {
+                userInfoDiv.innerHTML = `<span class="text-indigo-400 font-semibold"><i class="fa-solid fa-user-shield mr-1"></i> Admin</span>`;
+                adminElements.forEach(el => el.classList.remove('hidden'));
+            } else {
+                userInfoDiv.innerHTML = `<span class="text-slate-300"><i class="fa-solid fa-user mr-1"></i> Utente (${nomeUtenteCorrente})</span>`;
+                adminElements.forEach(el => el.classList.add('hidden'));
+            }
+        }
+
+        // Navigazione Sezioni
+        function mostraSezione(idSezione) {
+            document.querySelectorAll('.sezione-contenuto').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`sezione-${idSezione}`).classList.remove('hidden');
+
+            document.querySelectorAll('aside nav button').forEach(btn => {
+                btn.classList.remove('bg-indigo-50', 'text-indigo-600');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+            const attivo = document.getElementById(`nav-${idSezione}`);
+            if(attivo) {
+                attivo.classList.remove('text-slate-600', 'hover:bg-slate-100');
+                attivo.classList.add('bg-indigo-50', 'text-indigo-600');
+            }
+
+            if(idSezione === 'dashboard') renderDashboard();
+            if(idSezione === 'ordini') renderOrdini();
+            if(idSezione === 'trasferimenti') popolaSelectTrasferimento();
+        }
+
+        // RENDER DASHBOARD & GIACENZE
+        function renderDashboard() {
+            const filtro = document.getElementById('filtro-magazzino-dash').value;
+            const tbody = document.getElementById('tabella-giacenze');
+            tbody.innerHTML = '';
+
+            let totaleStock = 0;
+            let filtrate = giacenze.filter(g => filtro === 'tutti' || g.magazzino === filtro);
+
+            filtrate.forEach(g => {
+                totaleStock += g.quantita;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-3 font-medium text-slate-800">${g.magazzino}</td>
+                        <td class="px-6 py-3">${g.prodotto}</td>
+                        <td class="px-6 py-3 text-slate-500">${g.modello}</td>
+                        <td class="px-6 py-3 text-right font-bold text-slate-900">${g.quantita}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('kpi-tot-stock').innerText = totaleStock;
+            document.getElementById('kpi-ordini-attesa').innerText = ordini.filter(o => o.stato !== 'Evaso').length;
+            document.getElementById('kpi-ordini-evasi').innerText = ordini.filter(o => o.stato === 'Evaso').length;
+        }
+
+        // AGGIUNTA PRODOTTO RAPIDO IN STOCK (Admin)
+        function aggiungiProdottoStockPrompt() {
+            const magazzino = prompt("Magazzino (Magazzino Nord / Magazzino Sud):", "Magazzino Nord");
+            if (!magazzino) return;
+            const prodotto = prompt("Nome Prodotto:", "Nuovo Articolo");
+            if (!prodotto) return;
+            const modello = prompt("Modello:", "Standard");
+            const quantita = parseInt(prompt("Quantità da aggiungere:", "10"));
+            if (isNaN(quantita)) return;
+
+            let esistente = giacenze.find(g => g.magazzino === magazzino && g.prodotto === prodotto && g.modello === modello);
+            if (esistente) {
+                esistente.quantita += quantita;
+            } else {
+                giacenze.push({ magazzino, prodotto, modello, quantita });
+            }
+
+            localStorage.setItem('mg_giacenze', JSON.stringify(giacenze));
+            renderDashboard();
+            mostraNotifica(`Stock aggiornato per ${prodotto} (+${quantita})`);
+        }
+
+        // GESTIONE RIGHE ORDINE MULTIPLO
+        function aggiungiRigaProdotto() {
+            const container = document.getElementById('righe-prodotti-container');
+            const div = document.createElement('div');
+            div.className = 'flex gap-3 items-center riga-prodotto';
+            div.innerHTML = `
+                <input type="text" placeholder="Nome Prodotto" class="flex-2 border border-slate-300 rounded-lg p-2 text-sm prod-nome" required>
+                <input type="text" placeholder="Modello" class="flex-2 border border-slate-300 rounded-lg p-2 text-sm prod-modello" required>
+                <input type="number" min="1" value="1" placeholder="Q.ta" class="w-20 border border-slate-300 rounded-lg p-2 text-sm prod-qta" required>
+                <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(div);
+        }
+
+        // SALVA NUOVO ORDINE
+        function salvaOrdine(e) {
+            e.preventDefault();
+            const righeNodes = document.querySelectorAll('.riga-prodotto');
+            let prodottiList = [];
+            righeNodes.forEach(r => {
+                prodottiList.push({
+                    prodotto: r.querySelector('.prod-nome').value,
+                    modello: r.querySelector('.prod-modello').value,
+                    quantita: parseInt(r.querySelector('.prod-qta').value)
+                });
+            });
+
+            const nuovoOrdine = {
+                id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
+                magazzino: document.getElementById('ordine-magazzino').value,
+                venditore: document.getElementById('ordine-venditore').value,
+                acquirente: document.getElementById('ordine-acquirente').value,
+                fornitore: document.getElementById('ordine-fornitore').value,
+                rifFattura: document.getElementById('ordine-rif-fattura').value,
+                rifDeal: document.getElementById('ordine-rif-deal').value,
+                data: new Date().toISOString().split('T')[0],
+                stato: 'Preso in carico',
+                prodotti: prodottiList,
+                spedizione: null
+            };
+
+            ordini.unshift(nuovoOrdine);
+            localStorage.setItem('mg_ordini', JSON.stringify(ordini));
+            
+            mostraNotifica(`Ordine ${nuutoOrdineId = nuovoOrdine.id} creato con successo!`);
+            document.getElementById('form-ordine').reset();
+            document.getElementById('righe-prodotti-container').innerHTML = '';
+            aggiungiRigaProdotto();
+            mostraSezione('ordini');
+        }
+
+        // RENDER ORDINI
+        function renderOrdini() {
+            const tbody = document.getElementById('tabella-ordini');
+            tbody.innerHTML = '';
+
+            ordini.forEach(o => {
+                let badgeColor = 'bg-amber-100 text-amber-800';
+                if (o.stato === 'In lavorazione') badgeColor = 'bg-blue-100 text-blue-800';
+                if (o.stato === 'Pronto') badgeColor = 'bg-purple-100 text-purple-800';
+                if (o.stato === 'Evaso') badgeColor = 'bg-emerald-100 text-emerald-800';
+
+                let prodottiStr = o.prodotti ? o.prodotti.map(p => `${p.prodotto} (${p.modello}) x${p.quantita}`).join(', ') : (o.prodotto || 'N.D.');
+
+                let azioniHTML = `<span class="text-xs text-slate-400">Nessuna azione</span>`;
+                
+                // Opzioni Admin per cambiare stato
+                if (statoUtente === 'admin') {
+                    azioniHTML = `
+                        <div class="flex items-center justify-end gap-2">
+                            <select onchange="aggiornaStatoOrdine('${o.id}', this.value)" class="border border-slate-300 rounded text-xs p-1 bg-white">
+                                <option value="Preso in carico" ${o.stato==='Preso in carico'?'selected':''}>Preso in carico</option>
+                                <option value="In lavorazione" ${o.stato==='In lavorazione'?'selected':''}>In lavorazione</option>
+                                <option value="Pronto" ${o.stato==='Pronto'?'selected':''}>Pronto</option>
+                                <option value="Evaso" ${o.stato==='Evaso'?'selected':''}>Evaso</option>
+                            </select>
+                        </div>
+                    `;
+                }
+
+                let infoSpedizione = o.spedizione ? `<div class="text-xs text-slate-500 mt-1">Sped: ${o.spedizione.metodo} | Conf: ${o.spedizione.confezionamento} | Trk: ${o.spedizione.tracking}</div>` : '';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 align-top">
+                        <td class="px-6 py-3">
+                            <span class="font-bold text-slate-900">${o.id}</span>
+                            <div class="text-xs text-slate-400">${o.data}</div>
+                        </td>
+                        <td class="px-6 py-3">
+                            <div class="font-medium text-slate-800">Vend: ${o.venditore}</div>
+                            <div class="text-xs text-slate-500">Acq: ${o.acquirente}</div>
+                        </td>
+                        <td class="px-6 py-3">
+                            <div class="text-slate-800">Forn: ${o.fornitore}</div>
+                            <div class="text-xs text-slate-500">Fat: ${o.rifFattura} | Deal: ${o.rifDeal}</div>
+                        </td>
+                        <td class="px-6 py-3">
+                            <div class="text-slate-700">${prodottiStr}</div>
+                            ${infoSpedizione}
+                        </td>
+                        <td class="px-6 py-3">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeColor}">${o.stato}</span>
+                        </td>
+                        <td class="px-6 py-3 text-right">
+                            ${azioniHTML}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // AGGIORNA STATO ORDINE E SCARICA GIACENZE SE EVASO
+        function aggiornaStatoOrdine(idOrdine, nuovoStato) {
+            let ordine = ordini.find(o => o.id === idOrdine);
+            if (!ordine) return;
+
+            if (nuovoStato === 'Evaso' && ordine.stato !== 'Evaso') {
+                // Apri modale dettagli spedizione obbligatori prima di evadere
+                document.getElementById('sped-ordine-id').value = idOrdine;
+                document.getElementById('modal-spedizione').classList.remove('hidden');
+                document.getElementById('modal-spedizione').classList.add('flex');
+                return;
+            }
+
+            ordine.stato = nuovoStato;
+            localStorage.setItem('mg_ordini', JSON.stringify(ordini));
+            renderDashboard();
+            renderOrdini();
+            mostraNotifica(`Stato ordine ${idOrdine} aggiornato a: ${nuovoStato}`);
+        }
+
+        function chiudiModalSpedizione() {
+            document.getElementById('modal-spedizione').classList.remove('flex');
+            document.getElementById('modal-spedizione').classList.add('hidden');
+            renderOrdini(); // ripristina select
+        }
+
+        function confermaEvadiOrdine() {
+            const idOrdine = document.getElementById('sped-ordine-id').value;
+            const metodo = document.getElementById('sped-metodo').value;
+            const confezionamento = document.getElementById('sped-confezionamento').value;
+            const tracking = document.getElementById('sped-tracking').value;
+
+            if (!metodo || !confezionamento || !tracking) {
+                alert("Compila tutti i campi di spedizione.");
+                return;
+            }
+
+            let ordine = ordini.find(o => o.id === idOrdine);
+            if (ordine) {
+                ordine.stato = 'Evaso';
+                ordine.spedizione = { metodo, confezionamento, tracking };
+
+                // SCARICA GIACENZE MAGAZZINO
+                let listaProdotti = ordine.prodotti || [{prodotto: ordine.prodotto, modello: ordine.modello, quantita: ordine.quantita || 1}];
+                listaProdotti.forEach(item => {
+                    let stock = giacenze.find(g => g.magazzino === ordine.magazzino && g.prodotto === item.prodotto && g.modello === item.modello);
+                    if (stock) {
+                        stock.quantita = Math.max(0, stock.quantita - item.quantita);
+                    }
+                });
+
+                localStorage.setItem('mg_ordini', JSON.stringify(ordini));
+                localStorage.setItem('mg_giacenze', JSON.stringify(giacenze));
+            }
+
+            chiudiModalSpedizione();
+            renderDashboard();
+            renderOrdini();
+            mostraNotifica(`Ordine ${idOrdine} evaso con successo e giacenze aggiornate!`);
+        }
+
+        // TRASFERIMENTO MERCE
+        function popolaSelectTrasferimento() {
+            const select = document.getElementById('trasf-prodotto-modello');
+            select.innerHTML = '';
+            giacenze.forEach((g, index) => {
+                if (g.quantita > 0) {
+                    select.innerHTML += `<option value="${index}">${g.magazzino}: ${g.prodotto} (${g.modello}) - Disp: ${g.quantita}</option>`;
+                }
+            });
+        }
+
+        function eseguiTrasferimento(e) {
+            e.preventDefault();
+            const indexStock = document.getElementById('trasf-prodotto-modello').value;
+            const qtaDaTrasferire = parseInt(document.getElementById('trasf-qta').value);
+            const magazzinoDestinazione = document.getElementById('trasf-a').value;
+            const magazzinoPartenza = document.getElementById('trasf-da').value;
+
+            let stockOrigine = giacenze[indexStock];
+            if (!stockOrigine || stockOrigine.quantita < qtaDaTrasferire) {
+                alert("Quantità insufficiente nel magazzino di partenza.");
+                return;
+            }
+
+            // Scala dal magazzino origine
+            stockOrigine.quantita -= qtaDaTrasferire;
+
+            // Aggiungi al magazzino destinazione
+            let stockDestinazione = giacenze.find(g => g.magazzino === magazzinoDestinazione && g.prodotto === stockOrigine.prodotto && g.modello === stockOrigine.modello);
+            if (stockDestinazione) {
+                stockDestinazione.quantita += qtaDaTrasferire;
+            } else {
+                giacenze.push({
+                    magazzino: magazzinoDestinazione,
+                    prodotto: stockOrigine.prodotto,
+                    modello: stockOrigine.modello,
+                    quantita: qtaDaTrasferire
+                });
+            }
+
+            localStorage.setItem('mg_giacenze', JSON.stringify(giacenze));
+            renderDashboard();
+            popolaSelectTrasferimento();
+            mostraNotifica(`Trasferiti ${qtaDaTrasferire}x ${stockOrigine.prodotto} da ${magazzinoPartenza} a ${magazzinoDestinazione}!`);
+        }
+    </script>
+</body>
+</html>
