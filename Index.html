@@ -214,7 +214,10 @@
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Venditore</label>
-                            <input type="text" id="ordine-venditore" value="PIPPO" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
+                            <select id="ordine-venditore" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
+                                <option value="KRONOS">KRONOS</option>
+                                <option value="ATEC">ATEC</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Acquirente</label>
@@ -391,7 +394,7 @@
     <!-- SCRIPT LOGICA APPLICATIVA -->
     <script>
         let statoUtente = localStorage.getItem('mg_ruolo') || 'utente'; 
-        let nomeUtenteCorrente = localStorage.getItem('mg_nome') || 'PIPPO';
+        let nomeUtenteCorrente = localStorage.getItem('mg_nome') || 'KRONOS';
 
         let magazzini = caricaDati('mg_lista_magazzini', [
             { nome: 'Magazzino Nord', indirizzo: 'Via Industriale 12, Torino', telefono: '+39 011 555019', email: 'nord@magazzinopro.it', responsabile: 'Marco Neri' },
@@ -408,7 +411,7 @@
             {
                 id: 'ORD-1001',
                 magazzino: 'Magazzino Nord',
-                venditore: 'PIPPO',
+                venditore: 'KRONOS',
                 acquirente: 'Mario Rossi',
                 fornitore: 'TechSupplier SpA',
                 rifFattura: 'FAT-2026-88',
