@@ -37,13 +37,15 @@
             
             <!-- Azioni Rapide & Backup / Ruolo -->
             <div class="flex items-center flex-wrap gap-2">
-                <button onclick="esportaBackup()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5" title="Salva Backup dati su file JSON">
+                <!-- Pulsanti Backup protetti (visibili solo ad admin) -->
+                <button onclick="esportaBackup()" class="admin-only hidden bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5" title="Salva Backup dati su file JSON">
                     <i class="fa-solid fa-download"></i> <span>Salva Backup</span>
                 </button>
-                <label class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 cursor-pointer" title="Carica Backup da file JSON">
+                <label class="admin-only hidden bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 cursor-pointer" title="Carica Backup da file JSON">
                     <i class="fa-solid fa-upload"></i> <span>Carica Backup</span>
                     <input type="file" id="file-backup" accept=".json" onchange="importaBackup(event)" class="hidden">
                 </label>
+                
                 <div id="user-info" class="text-xs font-medium bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 shadow-inner"></div>
                 <button onclick="cambiaRuolo()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-2">
                     <i class="fa-solid fa-right-left"></i> Cambia Ruolo
