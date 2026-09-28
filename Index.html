@@ -245,7 +245,7 @@
             <div id="sezione-trasferimenti" class="sezione-contenuto hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
                     <h1 class="text-xl font-bold text-slate-900">Trasferimento Merce tra Magazzini</h1>
-                    <p class="text-xs text-slate-500 mt-0.5">Sposta articoli, verificando contemporaneamente prodotto e modello</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Sposta articoli, verificando contemporaneamente prodotto e modello (creazione automatica se assente)</p>
                 </div>
                 <form onsubmit="eseguiTrasferimento(event)" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-4 max-w-xl">
                     <div class="grid grid-cols-2 gap-4">
@@ -907,14 +907,13 @@
             chiudiModalSpedizione();
         }
 
-        // --- GESTIONE TRASFERIMENTI (CON VERIFICA COMBINATA PRODOTTO + MODELLO) ---
+        // --- GESTIONE TRASFERIMENTI (CON VERIFICA COMBINATA & AGGIUNTA AUTOMATICA) ---
         function aggiornaProdottiTrasferimento() {
             const magDa = document.getElementById('trasf-da')?.value;
             const selectProd = document.getElementById('trasf-prodotto-modello');
             if(!selectProd) return;
 
             selectProd.innerHTML = '';
-            // Filtra gli articoli disponibili nella sede di partenza aventi giacenza > 0
             const articoli = giacenze.filter(g => g.magazzino === magDa && g.quantita > 0);
             
             if(articoli.length === 0) {
@@ -922,10 +921,8 @@
                 return;
             }
 
-            // Popola il menu a tendina passando come valore una chiave combinata o salvando l'indice univoco
             articoli.forEach(art => {
                 const opt = document.createElement('option');
-                // Salviamo JSON stringificato nel value oppure un identificatore composto da prodotto e modello
                 opt.value = JSON.stringify({ prodotto: art.prodotto, modello: art.modello, ean: art.ean });
                 opt.textContent = `Prodotto: ${art.prodotto} | Modello: ${art.modello} (Disp: ${art.quantita}) [EAN: ${art.ean}]`;
                 selectProd.appendChild(opt);
@@ -951,7 +948,7 @@
 
             const selez = JSON.parse(rawValore);
             
-            // VERIFICA SEVERA: controlla contemporaneamente sia il PRODOTTO che il MODELLO (oltre all'EAN e al magazzino di partenza)
+            // VERIFICA SEVERA: controlla contemporaneamente sia il PRODOTTO che il MODELLO
             const artPartenza = giacenze.find(g => 
                 g.magazzino === da && 
                 g.prodotto === selez.prodotto && 
@@ -979,7 +976,7 @@
                 // Se esiste già la combinazione esatta, incrementa la giacenza
                 artArrivo.quantita += qta;
             } else {
-                // Altrimenti crea una nuova riga di stock nel magazzino di arrivo con lo stesso prodotto e modello
+                // Se NON c'è nel magazzino di arrivo, lo aggiunge automaticamente come nuova riga di stock
                 giacenze.push({
                     magazzino: a,
                     prodotto: selez.prodotto,
@@ -1092,7 +1089,6 @@
         }
 
         function salvaProdottoAdmin() {
-            const idx = Number(document.getElementById('modal-prod-index5').value); // Corretto sotto
             const realIdx = Number(document.getElementById('modal-prod-index').value);
             const nuovoArt = {
                 magazzino: document.getElementById('modal-prod-magazzino').value,
