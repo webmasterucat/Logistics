@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MultiMagazzino Pro - Gestionale Ordini</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS per un design pulito e professionale -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
+    <!-- FontAwesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
@@ -87,9 +87,9 @@
                 <!-- Tabella Giacenze -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                        <h3 class="font-semibold text-slate-800">Inventario Attuale per Magazzino (Gestito da Admin)</h3>
+                        <h3 class="font-semibold text-slate-800">Inventario Attuale per Magazzino</h3>
                         <button onclick="aggiungiProdottoStockPrompt()" class="admin-only hidden bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-slate-800 transition">
-                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi / Gestisci Catalogo Stock
+                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi / Ricarica Stock
                         </button>
                     </div>
                     <div class="overflow-x-auto">
@@ -136,19 +136,19 @@
                 <form id="form-ordine" onsubmit="salvaOrdine(event)" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Riferimento</label>
-                            <select id="ordine-magazzino" onchange="aggiornaProdottiDisponibiliSelect()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm bg-white" required>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Origine/Riferimento</label>
+                            <select id="ordine-magazzino" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm bg-white" required>
                                 <option value="Magazzino Nord">Magazzino Nord</option>
                                 <option value="Magazzino Sud">Magazzino Sud</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Venditore (Chi fa ordine es. PIPPO)</label>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Venditore (Chi fa l'ordine e.g. PIPPO)</label>
                             <input type="text" id="ordine-venditore" value="PIPPO" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Acquirente (Riceve merce)</label>
-                            <input type="text" id="ordine-acquirente" placeholder="Nome acquirente" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Acquirente (Riceve la merce)</label>
+                            <input type="text" id="ordine-acquirente" placeholder="Nome acquirente / reparto" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" required>
                         </div>
                     </div>
 
@@ -167,12 +167,12 @@
                         </div>
                     </div>
 
-                    <!-- Righe Prodotti Multipli (Scelta tra quelli autorizzati in magazzino) -->
+                    <!-- Righe Prodotti Multipli -->
                     <div class="border-t border-slate-200 pt-4">
                         <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-semibold text-slate-800 text-sm">Seleziona Prodotti e Modelli</h3>
+                            <h3 class="font-semibold text-slate-800 text-sm">Prodotti e Modelli dell'Ordine</h3>
                             <button type="button" onclick="aggiungiRigaProdotto()" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs px-3 py-1.5 rounded-lg font-medium transition">
-                                <i class="fa-solid fa-plus mr-1"></i> Aggiungi Prodotto all'ordine
+                                <i class="fa-solid fa-plus mr-1"></i> Aggiungi Prodotto
                             </button>
                         </div>
                         <div id="righe-prodotti-container" class="space-y-3">
@@ -251,7 +251,8 @@
 
     <!-- Script Logica Applicativa -->
     <script>
-        let statoUtente = localStorage.getItem('mg_ruolo') || 'utente'; 
+        // Stato Iniziale e Dati Mock salvati in localStorage se presenti
+        let statoUtente = localStorage.getItem('mg_ruolo') || 'utente'; // 'utente' o 'admin'
         let nomeUtenteCorrente = localStorage.getItem('mg_nome') || 'PIPPO';
 
         let giacenze = JSON.parse(localStorage.getItem('mg_giacenze')) || [
@@ -270,12 +271,12 @@
                 rifFattura: 'FAT-2026-88',
                 rifDeal: 'DEAL-441',
                 data: '2026-09-28',
-                stato: 'Preso in carico',
-                prodotti: [{prodotto: 'Laptop Pro', modello: '16 pollici 32GB', quantita: 2}],
+                stato: 'Preso in carico', // Preso in carico, In lavorazione, Pronto, Evaso
                 spedizione: null
             }
         ];
 
+        // Inizializzazione applicazione al caricamento
         window.onload = function() {
             aggiornaUIUtente();
             renderDashboard();
@@ -283,6 +284,7 @@
             aggiungiRigaProdotto();
         };
 
+        // Gestione Notifiche Visive
         function mostraNotifica(testo, tipo = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -291,18 +293,27 @@
             toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i><span>${testo}</span>`;
             container.appendChild(toast);
             
-            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
         }
 
+        // Cambio Ruolo simulato (Utente <-> Amministratore)
+        fnCambiaRuolo();
         function cambiaRuolo() {
             statoUtente = statoUtente === 'utente' ? 'admin' : 'utente';
             localStorage.setItem('mg_ruolo', statoUtente);
             aggiornaUIUtente();
             mostraNotifica(`Ruolo cambiato a: ${statoUtente.toUpperCase()}`, 'info');
+        }
+
+        function fnCambiaRuolo() {
+            // Helper di sincronizzazione visibilità elementi admin
         }
 
         function aggiornaUIUtente() {
@@ -316,9 +327,9 @@
                 userInfoDiv.innerHTML = `<span class="text-slate-300"><i class="fa-solid fa-user mr-1"></i> Utente (${nomeUtenteCorrente})</span>`;
                 adminElements.forEach(el => el.classList.add('hidden'));
             }
-            renderOrdini();
         }
 
+        // Navigazione Sezioni
         function mostraSezione(idSezione) {
             document.querySelectorAll('.sezione-contenuto').forEach(el => el.classList.add('hidden'));
             document.getElementById(`sezione-${idSezione}`).classList.remove('hidden');
@@ -335,10 +346,10 @@
 
             if(idSezione === 'dashboard') renderDashboard();
             if(idSezione === 'ordini') renderOrdini();
-            if(idSezione === 'nuovo-ordine') aggiornaProdottiDisponibiliSelect();
             if(idSezione === 'trasferimenti') popolaSelectTrasferimento();
         }
 
+        // RENDER DASHBOARD & GIACENZE
         function renderDashboard() {
             const filtro = document.getElementById('filtro-magazzino-dash').value;
             const tbody = document.getElementById('tabella-giacenze');
@@ -364,14 +375,14 @@
             document.getElementById('kpi-ordini-evasi').innerText = ordini.filter(o => o.stato === 'Evaso').length;
         }
 
-        // AGGIUNTA PRODOTTO / CATALOGO IN STOCK (Solo Admin)
+        // AGGIUNTA PRODOTTO RAPIDO IN STOCK (Admin)
         function aggiungiProdottoStockPrompt() {
             const magazzino = prompt("Magazzino (Magazzino Nord / Magazzino Sud):", "Magazzino Nord");
             if (!magazzino) return;
-            const prodotto = prompt("Nome Prodotto autorizzato:", "Nuovo Articolo");
+            const prodotto = prompt("Nome Prodotto:", "Nuovo Articolo");
             if (!prodotto) return;
             const modello = prompt("Modello:", "Standard");
-            const quantita = parseInt(prompt("Quantità iniziale in stock:", "10"));
+            const quantita = parseInt(prompt("Quantità da aggiungere:", "10"));
             if (isNaN(quantita)) return;
 
             let esistente = giacenze.find(g => g.magazzino === magazzino && g.prodotto === prodotto && g.modello === modello);
@@ -383,55 +394,19 @@
 
             localStorage.setItem('mg_giacenze', JSON.stringify(giacenze));
             renderDashboard();
-            mostraNotifica(`Catalogo aggiornato: ${prodotto} (${modello}) aggiunto a ${magazzino}`);
+            mostraNotifica(`Stock aggiornato per ${prodotto} (+${quantita})`);
         }
 
-        // GESTIONE RIGHE ORDINE (Scelta tra prodotti autorizzati del magazzino)
-        function aggiornaProdottiDisponibiliSelect() {
-            const magazzinoSelezionato = document.getElementById('ordine-magazzino').value;
-            const selectsProdotti = document.querySelectorAll('.select-prodotto-catalogo');
-            
-            selectsProdotti.forEach(sel => {
-                const valorePrecedente = sel.value;
-                sel.innerHTML = '';
-                
-                let prodottiMagazzino = giacenze.filter(g => g.magazzino === magazzinoSelezionato);
-                if (prodottiMagazzino.length === 0) {
-                    sel.innerHTML = `<option value="">Nessun prodotto disponibile in questo magazzino</option>`;
-                    return;
-                }
-
-                prodottiMagazzino.forEach(g => {
-                    sel.innerHTML += `<option value="${g.prodotto}|${g.modello}">${g.prodotto} - ${g.modello} (Disp: ${g.quantita})</option>`;
-                });
-
-                if (valorePrecedente) sel.value = valorePrecedente;
-            });
-        }
-
+        // GESTIONE RIGHE ORDINE MULTIPLO
         function aggiungiRigaProdotto() {
-            const magazzinoSelezionato = document.getElementById('ordine-magazzino').value;
-            let prodottiMagazzino = giacenze.filter(g => g.magazzino === magazzinoSelezionato);
-
             const container = document.getElementById('righe-prodotti-container');
             const div = document.createElement('div');
             div.className = 'flex gap-3 items-center riga-prodotto';
-            
-            let optionsHTML = '';
-            if (prodottiMagazzino.length === 0) {
-                optionsHTML = `<option value="">Nessun prodotto in stock</option>`;
-            } else {
-                prodottiMagazzino.forEach(g => {
-                    optionsHTML += `<option value="${g.prodotto}|${g.modello}">${g.prodotto} - ${g.modello} (Disp: ${g.quantita})</option>`;
-                });
-            }
-
             div.innerHTML = `
-                <select class="flex-grow border border-slate-300 rounded-lg p-2.5 text-sm bg-white select-prodotto-catalogo" required>
-                    ${optionsHTML}
-                </select>
-                <input type="number" min="1" value="1" placeholder="Q.ta" class="w-24 border border-slate-300 rounded-lg p-2.5 text-sm prod-qta" required>
-                <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-3 py-2"><i class="fa-solid fa-trash"></i></button>
+                <input type="text" placeholder="Nome Prodotto" class="flex-2 border border-slate-300 rounded-lg p-2 text-sm prod-nome" required>
+                <input type="text" placeholder="Modello" class="flex-2 border border-slate-300 rounded-lg p-2 text-sm prod-modello" required>
+                <input type="number" min="1" value="1" placeholder="Q.ta" class="w-20 border border-slate-300 rounded-lg p-2 text-sm prod-qta" required>
+                <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
             `;
             container.appendChild(div);
         }
@@ -441,18 +416,13 @@
             e.preventDefault();
             const righeNodes = document.querySelectorAll('.riga-prodotto');
             let prodottiList = [];
-            
-            for (let r of righeNodes) {
-                const valSelezionato = r.querySelector('.select-prodotto-catalogo').value;
-                if (!valSelezionato) {
-                    alert("Seleziona un prodotto valido per tutte le righe.");
-                    return;
-                }
-                const [prodotto, modello] = valSelezionato.split('|');
-                const quantita = parseInt(r.querySelector('.prod-qta').value);
-                
-                prodottiList.push({ prodotto, modello, quantita });
-            }
+            righeNodes.forEach(r => {
+                prodottiList.push({
+                    prodotto: r.querySelector('.prod-nome').value,
+                    modello: r.querySelector('.prod-modello').value,
+                    quantita: parseInt(r.querySelector('.prod-qta').value)
+                });
+            });
 
             const nuovoOrdine = {
                 id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
@@ -471,13 +441,14 @@
             ordini.unshift(nuovoOrdine);
             localStorage.setItem('mg_ordini', JSON.stringify(ordini));
             
-            mostraNotifica(`Ordine ${nuovoOrdine.id} inoltrato con successo!`);
+            mostraNotifica(`Ordine ${nuutoOrdineId = nuovoOrdine.id} creato con successo!`);
             document.getElementById('form-ordine').reset();
             document.getElementById('righe-prodotti-container').innerHTML = '';
             aggiungiRigaProdotto();
             mostraSezione('ordini');
         }
 
+        // RENDER ORDINI
         function renderOrdini() {
             const tbody = document.getElementById('tabella-ordini');
             tbody.innerHTML = '';
@@ -488,10 +459,11 @@
                 if (o.stato === 'Pronto') badgeColor = 'bg-purple-100 text-purple-800';
                 if (o.stato === 'Evaso') badgeColor = 'bg-emerald-100 text-emerald-800';
 
-                let prodottiStr = o.prodotti ? o.prodotti.map(p => `${p.prodotto} (${p.modello}) x${p.quantita}`).join(', ') : 'N.D.';
+                let prodottiStr = o.prodotti ? o.prodotti.map(p => `${p.prodotto} (${p.modello}) x${p.quantita}`).join(', ') : (o.prodotto || 'N.D.');
 
-                let azioniHTML = `<span class="text-xs text-slate-400">Solo lettura</span>`;
+                let azioniHTML = `<span class="text-xs text-slate-400">Nessuna azione</span>`;
                 
+                // Opzioni Admin per cambiare stato
                 if (statoUtente === 'admin') {
                     azioniHTML = `
                         <div class="flex items-center justify-end gap-2">
@@ -536,11 +508,13 @@
             });
         }
 
+        // AGGIORNA STATO ORDINE E SCARICA GIACENZE SE EVASO
         function aggiornaStatoOrdine(idOrdine, nuovoStato) {
             let ordine = ordini.find(o => o.id === idOrdine);
             if (!ordine) return;
 
             if (nuovoStato === 'Evaso' && ordine.stato !== 'Evaso') {
+                // Apri modale dettagli spedizione obbligatori prima di evadere
                 document.getElementById('sped-ordine-id').value = idOrdine;
                 document.getElementById('modal-spedizione').classList.remove('hidden');
                 document.getElementById('modal-spedizione').classList.add('flex');
@@ -557,7 +531,7 @@
         function chiudiModalSpedizione() {
             document.getElementById('modal-spedizione').classList.remove('flex');
             document.getElementById('modal-spedizione').classList.add('hidden');
-            renderOrdini();
+            renderOrdini(); // ripristina select
         }
 
         function confermaEvadiOrdine() {
@@ -576,7 +550,8 @@
                 ordine.stato = 'Evaso';
                 ordine.spedizione = { metodo, confezionamento, tracking };
 
-                let listaProdotti = ordine.prodotti || [];
+                // SCARICA GIACENZE MAGAZZINO
+                let listaProdotti = ordine.prodotti || [{prodotto: ordine.prodotto, modello: ordine.modello, quantita: ordine.quantita || 1}];
                 listaProdotti.forEach(item => {
                     let stock = giacenze.find(g => g.magazzino === ordine.magazzino && g.prodotto === item.prodotto && g.modello === item.modello);
                     if (stock) {
@@ -594,6 +569,7 @@
             mostraNotifica(`Ordine ${idOrdine} evaso con successo e giacenze aggiornate!`);
         }
 
+        // TRASFERIMENTO MERCE
         function popolaSelectTrasferimento() {
             const select = document.getElementById('trasf-prodotto-modello');
             select.innerHTML = '';
@@ -617,8 +593,10 @@
                 return;
             }
 
+            // Scala dal magazzino origine
             stockOrigine.quantita -= qtaDaTrasferire;
 
+            // Aggiungi al magazzino destinazione
             let stockDestinazione = giacenze.find(g => g.magazzino === magazzinoDestinazione && g.prodotto === stockOrigine.prodotto && g.modello === stockOrigine.modello);
             if (stockDestinazione) {
                 stockDestinazione.quantita += qtaDaTrasferire;
