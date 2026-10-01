@@ -187,7 +187,7 @@
                             <thead>
                                 <tr class="bg-slate-50 text-slate-400 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
                                     <th class="px-6 py-3.5">ID / Data</th>
-                                    <th class="px-6 py-3.5">Venditore / Acquirente</th>
+                                    <th class="px-6 py-3.5">SKO / Acquirente</th>
                                     <th class="px-6 py-3.5">Riferimenti & Fornitore</th>
                                     <th class="px-6 py-3.5">Prodotti (con EAN)</th>
                                     <th class="px-6 py-3.5">Stato Ordine</th>
@@ -204,28 +204,13 @@
             <div id="sezione-nuovo-ordine" class="sezione-contenuto hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
                     <h1 class="text-xl font-bold text-slate-900">Crea Nuovo Ordine</h1>
-                    <p class="text-xs text-slate-500 mt-0.5">Compila i dati dell'ordine scegliendo tra i prodotti in magazzino (collegati direttamente alla schermata Articoli)</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Compila i dati dell'ordine scegliendo tra i prodotti in magazzino</p>
                 </div>
                 <form id="form-ordine" onsubmit="salvaOrdine(event)" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Magazzino</label>
-                            <select id="ordine-magazzino" onchange="aggiornaProdottiDisponibiliSelect()" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required></select>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Venditore</label>
-                            <select id="ordine-venditore" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
-                                <option value="KRONOS">KRONOS</option>
-                                <option value="ATEC">ATEC</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Acquirente</label>
-                            <input type="text" id="ordine-acquirente" placeholder="Nome acquirente" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Fornitore</label>
-                            <input type="text" id="ordine-fornitore" placeholder="Nome fornitore" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
+                            <select id="ordine-magazzino" onchange="aggiornaSkoMagazzino(); aggiornaProdottiDisponibiliSelect();" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required></select>
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Rif. Fattura</label>
@@ -235,11 +220,23 @@
                             <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Rif. Deal</label>
                             <input type="text" id="ordine-rif-deal" placeholder="Es. DEAL-99" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
                         </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Fornitore</label>
+                            <input type="text" id="ordine-fornitore" placeholder="Nome fornitore" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">SKO</label>
+                            <input type="text" id="ordine-sko" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-100 font-semibold text-indigo-600 outline-none" readonly required>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Acquirente</label>
+                            <input type="text" id="ordine-acquirente" placeholder="Nome acquirente" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required>
+                        </div>
                     </div>
 
                     <div class="border-t border-slate-100 pt-5">
                         <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-semibold text-slate-800 text-sm">Prodotti e Modelli Ordinati (Sincronizzati)</h3>
+                            <h3 class="font-semibold text-slate-800 text-sm">Prodotti e Modelli Ordinati</h3>
                             <button type="button" onclick="aggiungiRigaProdotto()" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs px-3.5 py-2 rounded-xl font-semibold transition flex items-center gap-1.5">
                                 <i class="fa-solid fa-plus"></i> Aggiungi Prodotto
                             </button>
@@ -411,7 +408,7 @@
             {
                 id: 'ORD-1001',
                 magazzino: 'Magazzino Nord',
-                venditore: 'KRONOS',
+                sko: 'Magazzino Nord',
                 acquirente: 'Mario Rossi',
                 fornitore: 'TechSupplier SpA',
                 rifFattura: 'FAT-2026-88',
@@ -443,6 +440,7 @@
             renderMagazzini();
             renderOrdini();
             aggiungiRigaProdotto();
+            aggiornaSkoMagazzino();
         };
 
         function mostraNotifica(testo, tipo = 'success') {
@@ -522,8 +520,17 @@
                 });
                 sel.value = valCurr;
             });
+            aggiornaSkoMagazzino();
             aggiornaProdottiDisponibiliSelect();
             aggiornaProdottiTrasferimento();
+        }
+
+        function aggiornaSkoMagazzino() {
+            const selMag = document.getElementById('ordine-magazzino');
+            const inputSko = document.getElementById('ordine-sko');
+            if(selMag && inputSko) {
+                inputSko.value = selMag.value;
+            }
         }
 
         function renderDashboard() {
@@ -651,7 +658,7 @@
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50/50 transition">
                         <td class="px-6 py-4"><strong class="text-slate-900">${o.id}</strong><span class="block text-xs text-slate-400">${o.data}</span></td>
-                        <td class="px-6 py-4"><span class="font-semibold text-slate-800">${o.venditore}</span><span class="block text-xs text-slate-500">Acq: ${o.acquirente}</span></td>
+                        <td class="px-6 py-4"><span class="font-semibold text-indigo-600">${o.sko || o.magazzino}</span><span class="block text-xs text-slate-500">Acq: ${o.acquirente}</span></td>
                         <td class="px-6 py-4"><span class="text-xs text-slate-600 block">Forn: ${o.fornitore}</span><span class="text-xs font-mono text-slate-500">Fatt: ${o.rifFattura} | Deal: ${o.rifDeal}</span></td>
                         <td class="px-6 py-4 text-xs">${listaProdHtml}</td>
                         <td class="px-6 py-4"><span class="px-2.5 py-1 rounded-lg text-xs font-semibold ${badgeStato}">${o.stato}</span></td>
@@ -839,11 +846,11 @@
         function salvaOrdine(e) {
             e.preventDefault();
             const magazzino = document.getElementById('ordine-magazzino').value;
-            const venditore = document.getElementById('ordine-venditore').value;
-            const acquirente = document.getElementById('ordine-acquirente').value;
-            const fornitore = document.getElementById('ordine-fornitore').value;
             const rifFattura = document.getElementById('ordine-rif-fattura').value;
             const rifDeal = document.getElementById('ordine-rif-deal').value;
+            const fornitore = document.getElementById('ordine-fornitore').value;
+            const sko = document.getElementById('ordine-sko').value;
+            const acquirente = document.getElementById('ordine-acquirente').value;
 
             const righe = document.querySelectorAll('.riga-prodotto-ordine');
             let prodottiOrdine = [];
@@ -877,7 +884,7 @@
 
             const nuovoOrdine = {
                 id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
-                magazzino, venditore, acquirente, fornitore, rifFattura, rifDeal,
+                magazzino, rifFattura, rifDeal, fornitore, sko, acquirente,
                 data: new Date().toISOString().split('T')[0],
                 stato: 'Preso in carico',
                 prodotti: prodottiOrdine,
@@ -891,6 +898,7 @@
             mostraSezione('ordini');
             mostraNotifica('Ordine inoltrato e stock aggiornato con successo!');
             document.getElementById('form-ordine').reset();
+            aggiornaSkoMagazzino();
             document.getElementById('righe-prodotti-container').innerHTML = '';
             aggiungiRigaProdotto();
         }
@@ -1000,8 +1008,8 @@
                 let infoSped = o.spedizione ? `Trk: ${o.spedizione.tracking} - Pacco: ${o.spedizione.codPacco}` : '-';
                 tableData.push([
                     o.id,
-                    o.magazzino,
-                    `${o.venditore} / ${o.acquirente}`,
+                    o.sko || o.magazzino,
+                    o.acquirente,
                     dettagliProdotti,
                     infoSped
                 ]);
@@ -1009,7 +1017,7 @@
 
             doc.autoTable({
                 startY: 35,
-                head: [['ID Ordine', 'Sede', 'Venditore / Acquirente', 'Prodotti & EAN', 'Spedizione / Tracking']],
+                head: [['ID Ordine', 'SKO / Sede', 'Acquirente', 'Prodotti & EAN', 'Spedizione / Tracking']],
                 body: tableData,
                 theme: 'grid',
                 headStyles: { fillColor: [15, 23, 42] }
