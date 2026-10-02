@@ -30,7 +30,7 @@
                     <i class="fa-solid fa-boxes-stacked text-2xl"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-slate-900 tracking-tight">MagazzinoPro</h1>
-                <p class="text-xs text-slate-500">Accedi con le credenziali autorizzate dall'amministratore</p>
+                <p class="text-xs text-slate-500">Inserisci le credenziali fornite dall'amministratore</p>
             </div>
 
             <form onsubmit="eseguiLogin(event)" class="space-y-4">
@@ -52,12 +52,6 @@
                     Accedi al Sistema
                 </button>
             </form>
-
-            <div class="border-t border-slate-100 pt-4 text-center">
-                <p class="text-[11px] text-slate-400">Credenziali predefinite di test:</p>
-                <p class="text-[11px] text-slate-600 font-medium mt-1">Admin: <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono">admin</code> / <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono">admin123</code></p>
-                <p class="text-[11px] text-slate-600 font-medium mt-0.5">Utente: <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono">kronos</code> / <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono">user123</code></p>
-            </div>
         </div>
     </div>
 
@@ -541,7 +535,6 @@
 
         function eseguiLogin(e) {
             e.preventDefault();
-            // Rileggiamo sempre dal localStorage per avere l'elenco aggiornato in tempo reale
             utentiAutorizzati = caricaDati('mg_utenti_auth', utentiAutorizzati);
 
             const user = document.getElementById('login-username').value.trim();
