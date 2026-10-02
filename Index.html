@@ -342,7 +342,7 @@
                 <h4 class="text-xs font-bold text-slate-700 uppercase">Crea / Autorizza Nuovo Utente</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <input type="text" id="nuovo-user-name" placeholder="Username" class="border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none">
-                    <input type="password" id="nuovo-user-pass" placeholder="Password" class="border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none">
+                    <input type="text" id="nuovo-user-pass" placeholder="Password" class="border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none">
                     <select id="nuovo-user-ruolo" class="border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none">
                         <option value="utente">Utente</option>
                         <option value="admin">Admin</option>
@@ -541,10 +541,13 @@
 
         function eseguiLogin(e) {
             e.preventDefault();
-            const user = document.getElementById('login-username').value.trim().toLowerCase();
-            const pass = document.getElementById('login-password').value;
+            // Rileggiamo sempre dal localStorage per avere l'elenco aggiornato in tempo reale
+            utentiAutorizzati = caricaDati('mg_utenti_auth', utentiAutorizzati);
 
-            const trovato = utentiAutorizzati.find(u => u.username.toLowerCase() === user && u.password === pass);
+            const user = document.getElementById('login-username').value.trim();
+            const pass = document.getElementById('login-password').value.trim();
+
+            const trovato = utentiAutorizzati.find(u => u.username.trim() === user && u.password.trim() === pass);
             if(trovato) {
                 utenteLoggato = trovato;
                 statoUtente = trovato.ruolo;
@@ -590,6 +593,7 @@
                         <div>
                             <span class="font-bold text-slate-800">${u.username}</span>
                             <span class="ml-2 px-2 py-0.5 rounded text-[10px] uppercase font-semibold ${u.ruolo === 'admin' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-600'}">${u.ruolo}</span>
+                            <span class="ml-2 text-slate-400 font-mono text-[11px]">Pass: ${u.password}</span>
                         </div>
                         ${u.username !== 'admin' ? `<button onclick="eliminaUtenteAuth(${index})" class="text-rose-600 hover:text-rose-800 font-semibold px-2 py-1"><i class="fa-solid fa-trash"></i></button>` : '<span class="text-[10px] text-slate-400 italic">Principale</span>'}
                     </div>
@@ -614,6 +618,7 @@
 
             utentiAutorizzati.push({ username: user, password: pass, ruolo: ruolo });
             salvaDati('mg_utenti_auth', utentiAutorizzati);
+            
             document.getElementById('nuovo-user-name').value = '';
             document.getElementById('nuovo-user-pass').value = '';
             renderListaUtentiAuth();
@@ -1275,7 +1280,8 @@
             const dataBackup = {
                 magazzini,
                 giacenze,
-                ordini
+                ordini,
+                utentiAutorizzati
             };
             const blob = new Blob([JSON.stringify(dataBackup, null, 2)], { type: 'json' });
             const url = URL.createObjectURL(blob);
@@ -1297,6 +1303,10 @@
                         magazzini = data.magazzini;
                         giacenze = data.giacenze;
                         ordini = data.ordini;
+                        if(data.utentiAutorizzati) {
+                            utentiAutorizzati = data.utentiAutorizzati;
+                            salvaDati('mg_utenti_auth', utentiAutorizzati);
+                        }
                         salvaDati('mg_lista_magazzini', magazzini);
                         salvaDati('mg_giacenze', giacenze);
                         salvaDati('mg_ordini', ordini);
