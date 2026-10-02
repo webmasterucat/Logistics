@@ -448,7 +448,11 @@
             const container = document.getElementById('toast-container');
             if(!container) return;
             const toast = document.createElement('div');
-            const bgColor = tipo === 'success' ? 'bg-slate-900 text-white' : 'bg-indigo-600 text-white';
+            let bgColor = 'bg-slate-900 text-white';
+            if(tipo === 'error') bgColor = 'bg-rose-600 text-white';
+            if(tipo === 'warning') bgColor = 'bg-amber-600 text-white';
+            if(tipo === 'info') bgColor = 'bg-indigo-600 text-white';
+
             toast.className = `${bgColor} px-4 py-3 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-2`;
             toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${testo}</span>`;
             container.appendChild(toast);
@@ -456,7 +460,7 @@
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
-            }, 3500);
+            }, 4000);
         }
 
         function aggiornaUIUtente() {
@@ -482,7 +486,6 @@
             } else {
                 statoUtente = 'utente';
                 nomeUtenteCorrente = 'KRONOS';
-                // Se l'utente era visualizza una sezione admin, lo riportiamo alla dashboard
                 const secAttiva = document.querySelector('.sezione-contenuto:not(.hidden)');
                 if(secAttiva && (secAttiva.id === 'sezione-magazzini' || secAttiva.id === 'sezione-trasferimenti')) {
                     mostraSezione('dashboard');
@@ -498,7 +501,6 @@
         }
 
         function mostraSezione(idSezione) {
-            // Controllo di sicurezza: se utente tenta di accedere a sezioni admin
             if(statoUtente !== 'admin' && (idSezione === 'magazzini' || idSezione === 'trasferimenti')) {
                 mostraNotifica('Accesso non autorizzato.', 'error');
                 return;
@@ -572,12 +574,14 @@
             } else {
                 giacFiltrate.forEach((g, index) => {
                     const realIndex = giacenze.indexOf(g);
+                    let qtaClass = "font-bold text-indigo-600";
+                    if(g.quantita < 0) qtaClass = "font-bold text-rose-600";
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-50/50 transition">
                             <td class="px-6 py-4 font-medium text-slate-900">${g.magazzino}</td>
                             <td class="px-6 py-4 font-semibold text-slate-800">${g.prodotto} <span class="block text-xs font-normal text-slate-500">${g.modello}</span></td>
                             <td class="px-6 py-4 font-mono text-xs text-slate-600">${g.ean}</td>
-                            <td class="px-6 py-4 text-center font-bold text-indigo-600">${g.quantita}</td>
+                            <td class="px-6 py-4 text-center ${qtaClass}">${g.quantita}</td>
                             <td class="px-6 py-4 text-right admin-only ${statoUtente === 'admin' ? '' : 'hidden'}">
                                 <button onclick="modificaGiacenza(${realIndex})" class="text-indigo-600 hover:text-indigo-800 mr-2 text-xs font-semibold"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="eliminaGiacenza(${realIndex})" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>
@@ -602,10 +606,12 @@
                 } else {
                     listaProdottiHTML = `<div class="space-y-1.5 my-2 max-h-40 overflow-y-auto pr-1">`;
                     articoliMag.forEach(art => {
+                        let badgeColor = "font-bold text-indigo-600 bg-indigo-50";
+                        if(art.quantita < 0) badgeColor = "font-bold text-rose-600 bg-rose-50";
                         listaProdottiHTML += `
                             <div class="flex justify-between items-center text-xs bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
                                 <span class="font-medium text-slate-700">${art.prodotto} <span class="text-slate-400">(${art.modello})</span></span>
-                                <span class="font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">${art.quantita} pz</span>
+                                <span class="${badgeColor} px-2 py-0.5 rounded-lg">${art.quantita} pz</span>
                             </div>
                         `;
                     });
@@ -910,6 +916,7 @@
 
             const righe = document.querySelectorAll('.riga-prodotto-ordine');
             let prodottiOrdine = [];
+            let merceNonDisponibile = false;
 
             for(let riga of righe) {
                 const prodVal = riga.querySelector('.prod-select').value;
@@ -918,10 +925,12 @@
                 const [prodotto, modello, ean] = prodVal.split('|');
                 
                 const stockItem = giacenze.find(g => g.magazzino === magazzino && g.prodotto === prodotto && g.modello === modello);
+                
+                // Se il prodotto non esiste in magazzino o la giacenza è inferiore alla richiesta, segnaliamo la non disponibilità
                 if(!stockItem || stockItem.quantita < qta) {
-                    mostraNotifica(`Quantità non disponibile per: ${prodotto} (${modello})`, 'error');
-                    return;
+                    merceNonDisponibile = true;
                 }
+
                 prodottiOrdine.push({ prodotto, modello, ean, quantita: qta });
             }
 
@@ -930,10 +939,25 @@
                 return;
             }
 
+            // Se la scorta è inferiore o assente, mostriamo il messaggio a vista richiesto
+            if(merceNonDisponibile) {
+                mostraNotifica('ATTENZIONE MERCE TEMPORANEAMENTE NON DISPONIBILE', 'warning');
+            }
+
+            // Aggiorniamo le giacenze (permettendo anche di andare in negativo)
             prodottiOrdine.forEach(p => {
-                const stockItem = giacenze.find(g => g.magazzino === magazzino && g.prodotto === p.prodotto && g.modello === p.modello);
+                let stockItem = giacenze.find(g => g.magazzino === magazzino && g.prodotto === p.prodotto && g.modello === p.modello);
                 if(stockItem) {
                     stockItem.quantita -= p.quantita;
+                } else {
+                    // Se l'articolo non era proprio censito in quel magazzino, lo creiamo con quantità negativa
+                    giacenze.push({
+                        magazzino: magazzino,
+                        prodotto: p.prodotto,
+                        modello: p.modello,
+                        ean: p.ean,
+                        quantita: -p.quantita
+                    });
                 }
             });
             salvaDati('mg_giacenze', giacenze);
@@ -952,7 +976,11 @@
             renderDashboard();
             renderOrdini();
             mostraSezione('ordini');
-            mostraNotifica('Ordine inoltrato e stock aggiornato con successo!');
+            
+            if(!merceNonDisponibile) {
+                mostraNotifica('Ordine inoltrato e stock aggiornato con successo!');
+            }
+
             document.getElementById('form-ordine').reset();
             aggiornaSkoMagazzino();
             document.getElementById('righe-prodotti-container').innerHTML = '';
@@ -998,7 +1026,7 @@
             const selectProd = document.getElementById('trasf-prodotto-modello');
             if(!selectProd) return;
             selectProd.innerHTML = '';
-            const articoliMag = giacenze.filter(g => g.magazzino === magPartenza && g.quantita > 0);
+            const articoliMag = giacenze.filter(g => g.magazzino === magPartenza);
             articoliMag.forEach(g => {
                 selectProd.innerHTML += `<option value="${g.prodotto}|${g.modello}|${g.ean}">${g.prodotto} - ${g.modello} (Disp: ${g.quantita})</option>`;
             });
@@ -1023,8 +1051,8 @@
             const [prodotto, modello, ean] = prodModVal.split('|');
             const itemPartenza = giacenze.find(g => g.magazzino === da && g.prodotto === prodotto && g.modello === modello);
 
-            if(!itemPartenza || itemPartenza.quantita < qta) {
-                mostraNotifica('Quantità insufficiente nel magazzino di partenza.', 'error');
+            if(!itemPartenza) {
+                mostraNotifica('Articolo non trovato nel magazzino di partenza.', 'error');
                 return;
             }
 
