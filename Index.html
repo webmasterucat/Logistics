@@ -124,7 +124,7 @@
                     </div>
                 </div>
 
-                <!-- SEZIONE RIEPILOGO DINAMICO PER MAGAZZINO (Con dettaglio prodotti per modello) -->
+                <!-- SEZIONE RIEPILOGO DINAMICO PER MAGAZZINO -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="container-grafici"></div>
 
                 <!-- Tabella Giacenze -->
@@ -584,7 +584,6 @@
                 const articoliMag = giacenze.filter(g => g.magazzino === m.nome);
                 const pezziTot = articoliMag.reduce((acc, curr) => acc + parseInt(curr.quantita || 0), 0);
                 
-                // Generazione della lista dei singoli prodotti suddivisi per modello con relative quantità
                 let listaProdottiHTML = '';
                 if(articoliMag.length === 0) {
                     listaProdottiHTML = `<p class="text-xs text-slate-400 italic py-2">Nessun prodotto in magazzino</p>`;
@@ -697,15 +696,40 @@
         }
 
         function eliminaOrdine(idOrdine) {
-            if(confirm(`Sei sicuro di voler eliminare permanentemente l'ordine ${idOrdine}?`)) {
-                const index = ordini.findIndex(o => o.id === idOrdine);
-                if(index !== -1) {
-                    ordini.splice(index, 1);
-                    salvaDati('mg_ordini', ordini);
-                    renderDashboard();
-                    renderOrdini();
-                    mostraNotifica(`Ordine ${idOrdine} eliminato con successo.`, 'info');
+            const index = ordini.findIndex(o => o.id === idOrdine);
+            if(index === -1) return;
+
+            const ordineDaEliminare = ordini[index];
+            const msgConferma = ordineDaEliminare.stato !== 'Evaso'
+                ? `L'ordine ${idOrdine} non è stato evaso. Eliminandolo, i prodotti verranno reintegrati nel magazzino ${ordineDaEliminare.magazzino}. Procedere?`
+                : `Sei sicuro di voler eliminare permanentemente l'ordine ${idOrdine}?`;
+
+            if(confirm(msgConferma)) {
+                // Se l'ordine NON è evaso, significa che alla creazione erano stati sottratti i pezzi. 
+                // Ora li restituiamo al magazzino.
+                if(ordineDaEliminare.stato !== 'Evaso') {
+                    ordineDaEliminare.prodotti.forEach(p => {
+                        const stockItem = giacenze.find(g => g.magazzino === ordineDaEliminare.magazzino && g.prodotto === p.prodotto && g.modello === p.modello);
+                        if(stockItem) {
+                            stockItem.quantita += p.quantita;
+                        } else {
+                            giacenze.push({
+                                magazzino: ordineDaEliminare.magazzino,
+                                prodotto: p.prodotto,
+                                modello: p.modello,
+                                ean: p.ean,
+                                quantita: p.quantita
+                            });
+                        }
+                    });
+                    salvaDati('mg_giacenze', giacenze);
                 }
+
+                ordini.splice(index, 1);
+                salvaDati('mg_ordini', ordini);
+                renderDashboard();
+                renderOrdini();
+                mostraNotifica(`Ordine ${idOrdine} eliminato.${ordineDaEliminare.stato !== 'Evaso' ? ' Stock reintegrato.' : ''}`, 'info');
             }
         }
 
