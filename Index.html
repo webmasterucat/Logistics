@@ -83,8 +83,12 @@
                     <i class="fa-solid fa-users-gear"></i> <span>Gestisci Utenti</span>
                 </button>
 
-                <div id="user-info" class="text-xs font-medium bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 shadow-inner"></div>
+                <div id="user-info" class="text-xs font-medium bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 shadow-inner flex items-center gap-2"></div>
                 
+                <button onclick="apriModalModificaProfilo()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-slate-700 transition flex items-center gap-1.5" title="Modifica credenziali personali">
+                    <i class="fa-solid fa-user-pen"></i> <span>Profilo</span>
+                </button>
+
                 <button onclick="eseguiLogout()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5" title="Esci dal sistema">
                     <i class="fa-solid fa-right-from-bracket"></i> <span>Esci</span>
                 </button>
@@ -358,6 +362,26 @@
         </div>
     </div>
 
+    <!-- MODALE MODIFICA PROFILO PERSONALE -->
+    <div id="modal-modifica-profilo" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-900">Modifica Profilo Personale</h3>
+            <p class="text-xs text-slate-500">Aggiorna il tuo nome utente o la tua password di accesso</p>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Nuovo Nome Utente</label>
+                <input type="text" id="profilo-nuovo-user" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Nuova Password</label>
+                <input type="text" id="profilo-nuova-pass" placeholder="Inserisci nuova password" class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 outline-none" required>
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button type="button" onclick="chiudiModalModificaProfilo()" class="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Annulla</button>
+                <button type="button" onclick="salvaProfiloPersonale()" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-500 transition shadow-sm">Salva Modifiche</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODALE AGGIUNGI / MODIFICA MAGAZZINO (Admin) -->
     <div id="modal-magazzino" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 border border-slate-100">
@@ -574,6 +598,57 @@
         function chiudiModalGestioneUtenti() {
             document.getElementById('modal-gestione-utenti').classList.remove('flex');
             document.getElementById('modal-gestione-utenti').classList.add('hidden');
+        }
+
+        function apriModalModificaProfilo() {
+            if(!utenteLoggato) return;
+            document.getElementById('profilo-nuovo-user').value = utenteLoggato.username;
+            document.getElementById('profilo-nuova-pass').value = utenteLoggato.password;
+            document.getElementById('modal-modifica-profilo').classList.remove('hidden');
+            document.getElementById('modal-modifica-profilo').classList.add('flex');
+        }
+
+        function chiudiModalModificaProfilo() {
+            document.getElementById('modal-modifica-profilo').classList.remove('flex');
+            document.getElementById('modal-modifica-profilo').classList.add('hidden');
+        }
+
+        function salvaProfiloPersonale() {
+            const nuovoUser = document.getElementById('profilo-nuovo-user').value.trim();
+            const nuovaPass = document.getElementById('profilo-nuova-pass').value.trim();
+
+            if(!nuovoUser || !nuovaPass) {
+                mostraNotifica('Compila tutti i campi obbligatori.', 'error');
+                return;
+            }
+
+            utentiAutorizzati = caricaDati('mg_utenti_auth', utentiAutorizzati);
+
+            // Verifica se il nuovo username esiste già per un altro utente
+            const esisteAltro = utentiAutorizzati.some(u => u.username.toLowerCase() === nuovoUser.toLowerCase() && u.username !== utenteLoggato.username);
+            if(esisteAltro) {
+                mostraNotifica('Questo nome utente è già in uso.', 'error');
+                return;
+            }
+
+            // Aggiorna nell'elenco degli utenti autorizzati
+            const indiceAuth = utentiAutorizzati.findIndex(u => u.username === utenteLoggato.username);
+            if(indiceAuth !== -1) {
+                utentiAutorizzati[indiceAuth].username = nuovoUser;
+                utentiAutorizzati[indiceAuth].password = nuovaPass;
+            }
+
+            // Aggiorna utente loggato corrente
+            utenteLoggato.username = nuovoUser;
+            utenteLoggato.password = nuovaPass;
+            nomeUtenteCorrente = nuovoUser;
+
+            salvaDati('mg_utenti_auth', utentiAutorizzati);
+            salvaDati('mg_utente_corrente', utenteLoggato);
+
+            chiudiModalModificaProfilo();
+            aggiornaUIUtente();
+            mostraNotifica('Profilo aggiornato con successo!');
         }
 
         function renderListaUtentiAuth() {
