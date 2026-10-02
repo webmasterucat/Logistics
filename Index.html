@@ -64,7 +64,8 @@
                 <button onclick="mostraSezione('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-50 text-indigo-600">
                     <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard & Stock</span>
                 </button>
-                <button onclick="mostraSezione('magazzini')" id="nav-magazzini" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 admin-only">
+                <!-- Voci di menu riservate esclusivamente all'Admin -->
+                <button onclick="mostraSezione('magazzini')" id="nav-magazzini" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 admin-only hidden">
                     <i class="fa-solid fa-warehouse w-5"></i><span>Gestione Magazzini</span>
                 </button>
                 <button onclick="mostraSezione('ordini')" id="nav-ordini" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50">
@@ -73,7 +74,7 @@
                 <button onclick="mostraSezione('nuovo-ordine')" id="nav-nuovo-ordine" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50">
                     <i class="fa-solid fa-cart-plus w-5"></i><span>Crea Ordine</span>
                 </button>
-                <button onclick="mostraSezione('trasferimenti')" id="nav-trasferimenti" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 admin-only">
+                <button onclick="mostraSezione('trasferimenti')" id="nav-trasferimenti" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 admin-only hidden">
                     <i class="fa-solid fa-right-left w-5"></i><span>Trasferisci Merce</span>
                 </button>
             </nav>
@@ -481,6 +482,11 @@
             } else {
                 statoUtente = 'utente';
                 nomeUtenteCorrente = 'KRONOS';
+                // Se l'utente era visualizza una sezione admin, lo riportiamo alla dashboard
+                const secAttiva = document.querySelector('.sezione-contenuto:not(.hidden)');
+                if(secAttiva && (secAttiva.id === 'sezione-magazzini' || secAttiva.id === 'sezione-trasferimenti')) {
+                    mostraSezione('dashboard');
+                }
             }
             localStorage.setItem('mg_ruolo', statoUtente);
             localStorage.setItem('mg_nome', nomeUtenteCorrente);
@@ -492,6 +498,12 @@
         }
 
         function mostraSezione(idSezione) {
+            // Controllo di sicurezza: se utente tenta di accedere a sezioni admin
+            if(statoUtente !== 'admin' && (idSezione === 'magazzini' || idSezione === 'trasferimenti')) {
+                mostraNotifica('Accesso non autorizzato.', 'error');
+                return;
+            }
+
             document.querySelectorAll('.sezione-contenuto').forEach(sec => sec.classList.add('hidden'));
             const target = document.getElementById('sezione-' + idSezione);
             if(target) target.classList.remove('hidden');
@@ -705,8 +717,6 @@
                 : `Sei sicuro di voler eliminare permanentemente l'ordine ${idOrdine}?`;
 
             if(confirm(msgConferma)) {
-                // Se l'ordine NON è evaso, significa che alla creazione erano stati sottratti i pezzi. 
-                // Ora li restituiamo al magazzino.
                 if(ordineDaEliminare.stato !== 'Evaso') {
                     ordineDaEliminare.prodotti.forEach(p => {
                         const stockItem = giacenze.find(g => g.magazzino === ordineDaEliminare.magazzino && g.prodotto === p.prodotto && g.modello === p.modello);
