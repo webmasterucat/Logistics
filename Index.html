@@ -786,10 +786,13 @@
             const tbody = document.getElementById('tabella-giacenze');
             tbody.innerHTML = '';
 
-            let giacFiltrate = giacenze;
+            let giacFiltrate = [...giacenze];
             if(filtro !== 'tutti') {
-                giacFiltrate = giacenze.filter(g => g.magazzino === filtro);
+                giacFiltrate = giacFiltrate.filter(g => g.magazzino === filtro);
             }
+
+            // Ordinamento per raggruppare i prodotti per magazzino
+            giacFiltrate.sort((a, b) => a.magazzino.localeCompare(b.magazzino));
 
             let totUnita = 0;
             giacFiltrate.forEach(g => {
@@ -806,7 +809,7 @@
             if(giacFiltrate.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-slate-400">Nessun articolo trovato in magazzino.</td></tr>`;
             } else {
-                giacFiltrate.forEach((g, index) => {
+                giacFiltrate.forEach((g) => {
                     const realIndex = giacenze.indexOf(g);
                     let qtaClass = "font-bold text-indigo-600";
                     if(g.quantita < 0) qtaClass = "font-bold text-rose-600";
