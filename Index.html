@@ -252,7 +252,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Magazzino</label>
-                            <select id="ordine-magazzino" onchange="aggiornaSkoMagazzino(); aggiornaProdottiDisponibiliSelect();" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required></select>
+                            <select id="ordine-magazzino" onchange="aggiornaSkoMagazzino(); controlloDisponibilitaRigheOrdini();" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required></select>
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5">Rif. Fattura</label>
@@ -283,7 +283,7 @@
                                 <i class="fa-solid fa-plus"></i> Aggiungi Prodotto
                             </button>
                         </div>
-                        <div id="righe-prodotti-container" class="space-y-3"></div>
+                        <div id="righe-prodotti-container" class="space-y-4"></div>
                     </div>
 
                     <div class="flex justify-end pt-4 border-t border-slate-100">
@@ -624,21 +624,18 @@
 
             utentiAutorizzati = caricaDati('mg_utenti_auth', utentiAutorizzati);
 
-            // Verifica se il nuovo username esiste già per un altro utente
             const esisteAltro = utentiAutorizzati.some(u => u.username.toLowerCase() === nuovoUser.toLowerCase() && u.username !== utenteLoggato.username);
             if(esisteAltro) {
                 mostraNotifica('Questo nome utente è già in uso.', 'error');
                 return;
             }
 
-            // Aggiorna nell'elenco degli utenti autorizzati
             const indiceAuth = utentiAutorizzati.findIndex(u => u.username === utenteLoggato.username);
             if(indiceAuth !== -1) {
                 utentiAutorizzati[indiceAuth].username = nuovoUser;
                 utentiAutorizzati[indiceAuth].password = nuovaPass;
             }
 
-            // Aggiorna utente loggato corrente
             utenteLoggato.username = nuovoUser;
             utenteLoggato.password = nuovaPass;
             nomeUtenteCorrente = nuovoUser;
@@ -962,7 +959,7 @@
             if(confirm(msgConferma)) {
                 if(ordineDaEliminare.stato !== 'Evaso') {
                     ordineDaEliminare.prodotti.forEach(p => {
-                        const stockItem = giacenze.find(g => g.magazzino === ordineDaEliminare.magazzino && g.prodotto === p.prodotto && g.modello === p.modello);
+                        let stockItem = giacenze.find(g => g.magazzino === ordineDaEliminare.magazzino && g.prodotto === p.prodotto && g.modello === p.modello);
                         if(stockItem) {
                             stockItem.quantita += p.quantita;
                         } else {
@@ -1097,6 +1094,7 @@
             salvaDati('mg_giacenze', giacenze);
             chiudiModalProdotto();
             renderDashboard();
+            popolaSelectMagazziniDappertutto();
             mostraNotifica('Articolo salvato correttamente!');
         }
 
@@ -1109,6 +1107,7 @@
                 giacenze.splice(index, 1);
                 salvaDati('mg_giacenze', giacenze);
                 renderDashboard();
+                popolaSelectMagazziniDappertutto();
                 mostraNotifica('Articolo eliminato.', 'info');
             }
         }
@@ -1117,29 +1116,78 @@
             const container = document.getElementById('righe-prodotti-container');
             if(!container) return;
             const div = document.createElement('div');
-            div.className = "flex gap-2 items-center riga-prodotto-ordine";
+            div.className = "flex flex-col gap-1 riga-prodotto-ordine bg-slate-50 p-3 rounded-xl border border-slate-200/80";
             div.innerHTML = `
-                <select class="prod-select w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required></select>
-                <input type="number" min="1" value="1" class="qta-input w-24 border border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none" required placeholder="Qta">
-                <button type="button" onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-800 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
+                <div class="flex gap-2 items-center">
+                    <select class="prod-select w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none" onchange="verificaDisponibilitaRiga(this)" required></select>
+                    <input type="number" min="1" value="1" class="qta-input w-24 border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none" oninput="verificaDisponibilitaRiga(this)" required placeholder="Qta">
+                    <button type="button" onclick="this.closest('.riga-prodotto-ordine').remove()" class="text-rose-600 hover:text-rose-800 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
+                </div>
+                <div class="avviso-disponibilita text-[11px] font-semibold hidden px-1"></div>
             `;
             container.appendChild(div);
             aggiornaProdottiDisponibiliSelect();
         }
 
         function aggiornaProdottiDisponibiliSelect() {
-            const magSelezionato = document.getElementById('ordine-magazzino').value;
-            const selects = document.querySelectorAll('.prod-select');
-            const prodottiMag = giacenze.filter(g => g.magazzino === magSelezionato);
+            // Estrae tutti i prodotti unici presenti nell'intero gestionale (senza duplicare coppie prodotto/modello/ean uguali)
+            const mappaUnici = new Map();
+            giacenze.forEach(g => {
+                const chiave = `${g.prodotto}|${g.modello}|${g.ean}`;
+                if(!mappaUnici.haschiave) {
+                    mappaUnici.set(chiave, { prodotto: g.prodotto, modello: g.modello, ean: g.ean });
+                }
+            });
 
+            const selects = document.querySelectorAll('.prod-select');
             selects.forEach(sel => {
                 const valCurr = sel.value;
-                sel.innerHTML = '<option value="">Seleziona Prodotto e Modello</option>';
-                prodottiMag.forEach(p => {
-                    sel.innerHTML += `<option value="${p.prodotto}|${p.modello}|${p.ean}">${p.prodotto} - ${p.modello} (EAN: ${p.ean}) [Disp: ${p.quantita}]</option>`;
+                sel.innerHTML = '<option value="">Seleziona qualsiasi prodotto o modello...</option>';
+                mappaUnici.forEach((item, chiave) => {
+                    sel.innerHTML += `<option value="${chiave}">${item.prodotto} - ${item.modello} (EAN: ${item.ean})</option>`;
                 });
                 sel.value = valCurr;
+                verificaDisponibilitaRiga(sel);
             });
+        }
+
+        function controlloDisponibilitaRigheOrdini() {
+            const selects = document.querySelectorAll('.prod-select');
+            selects.forEach(sel => verificaDisponibilitaRiga(sel));
+        }
+
+        function verificaDisponibilitaRiga(elemento) {
+            const riga = elemento.closest('.riga-prodotto-ordine');
+            if(!riga) return;
+
+            const selectProd = riga.querySelector('.prod-select');
+            const inputQta = riga.querySelector('.qta-input');
+            const avvisoDiv = riga.querySelector('.avviso-disponibilita');
+            const magazzinoScelto = document.getElementById('ordine-magazzino').value;
+
+            if(!selectProd.value) {
+                selectProd.className = "prod-select w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none";
+                avvisoDiv.classList.add('hidden');
+                return;
+            }
+
+            const [prodotto, modello, ean] = selectProd.value.split('|');
+            const qtaRichiesta = parseInt(inputQta.value) || 0;
+
+            const stockItem = giacenze.find(g => g.magazzino === magazzinoScelto && g.prodotto === prodotto && g.modello === modello);
+            const giacenzaDisponibile = stockItem ? stockItem.quantita : 0;
+
+            if(giacenzaDisponibile < qtaRichiesta) {
+                // Sprovvisto o quantità insufficiente nel magazzino scelto -> ROSSO
+                selectProd.className = "prod-select w-full border border-rose-500 rounded-xl p-2.5 text-xs bg-rose-50 text-rose-700 font-medium outline-none";
+                avvisoDiv.className = "avviso-disponibilita text-[11px] font-bold text-rose-600 px-1";
+                avvisoDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> MERCE TEMPORANEAMENTE NON DISPONIBILE in questo magazzino (Disp: ${giacenzaDisponibile} pz)`;
+                avvisoDiv.classList.remove('hidden');
+            } else {
+                // Disponibile
+                selectProd.className = "prod-select w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none";
+                avvisoDiv.classList.add('hidden');
+            }
         }
 
         function salvaOrdine(e) {
@@ -1153,7 +1201,7 @@
 
             const righe = document.querySelectorAll('.riga-prodotto-ordine');
             let prodottiOrdine = [];
-            let merceNonDisponibile = false;
+            let flagNonDisponibileTrovata = false;
 
             for(let riga of righe) {
                 const prodVal = riga.querySelector('.prod-select').value;
@@ -1162,9 +1210,8 @@
                 const [prodotto, modello, ean] = prodVal.split('|');
                 
                 const stockItem = giacenze.find(g => g.magazzino === magazzino && g.prodotto === prodotto && g.modello === modello);
-                
                 if(!stockItem || stockItem.quantita < qta) {
-                    merceNonDisponibile = true;
+                    flagNonDisponibileTrovata = true;
                 }
 
                 prodottiOrdine.push({ prodotto, modello, ean, quantita: qta });
@@ -1175,10 +1222,11 @@
                 return;
             }
 
-            if(merceNonDisponibile) {
-                mostraNotifica('ATTENZIONE MERCE TEMPORANEAMENTE NON DISPONIBILE', 'warning');
+            if(flagNonDisponibileTrovata) {
+                mostraNotifica('MERCE TEMPORANEAMENTE NON DISPONIBILE - Scorte in negativo.', 'warning');
             }
 
+            // Aggiornamento scorte (consentendo valori negativi)
             prodottiOrdine.forEach(p => {
                 let stockItem = giacenze.find(g => g.magazzino === magazzino && g.prodotto === p.prodotto && g.modello === p.modello);
                 if(stockItem) {
@@ -1210,7 +1258,7 @@
             renderOrdini();
             mostraSezione('ordini');
             
-            if(!merceNonDisponibile) {
+            if(!flagNonDisponibileTrovata) {
                 mostraNotifica('Ordine inoltrato e stock aggiornato con successo!');
             }
 
