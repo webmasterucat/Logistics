@@ -22,7 +22,46 @@
     <!-- Notifiche Toast Fluttuanti -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
-    <!-- Header / Navbar Superiore -->
+    <!-- SEZIONE LOGIN (Mostrata se l'utente non è autenticato) -->
+    <div id="vista-login" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 space-y-6 border border-slate-100">
+            <div class="text-center space-y-2">
+                <div class="bg-indigo-600 w-14 h-14 rounded-2xl text-white flex items-center justify-center mx-auto shadow-md shadow-indigo-500/30">
+                    <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">MagazzinoPro</h1>
+                <p class="text-xs text-slate-500">Accedi con le credenziali autorizzate dall'amministratore</p>
+            </div>
+
+            <form onsubmit="eseguiLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Nome Utente</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400"><i class="fa-solid fa-user text-xs"></i></span>
+                        <input type="text" id="login-username" placeholder="Inserisci username" class="w-full pl-10 pr-3.5 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 outline-none focus:bg-white focus:border-indigo-600 transition" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400"><i class="fa-solid fa-lock text-xs"></i></span>
+                        <input type="password" id="login-password" placeholder="••••••••" class="w-full pl-10 pr-3.5 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 outline-none focus:bg-white focus:border-indigo-600 transition" required>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl text-sm font-semibold transition shadow-md shadow-indigo-600/20">
+                    Accedi al Sistema
+                </button>
+            </form>
+
+            <div class="border-t border-slate-100 pt-4 text-center">
+                <p class="text-[11px] text-slate-400">Credenziali predefinite di test:</p>
+                <p class="text-[11px] text-slate-600 font-medium mt-1">Admin: <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono">admin</code> / <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono">admin123</code></p>
+                <p class="text-[11px] text-slate-600 font-medium mt-0.5">Utente: <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono">kronos</code> / <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono">user123</code></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header / Navbar Superiore (Visibile dopo il login) -->
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40 border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center space-x-3">
@@ -35,7 +74,7 @@
                 </div>
             </div>
             
-            <!-- Azioni Rapide & Backup / Ruolo -->
+            <!-- Azioni Rapide & Backup / Utente / Logout -->
             <div class="flex items-center flex-wrap gap-2">
                 <!-- Pulsanti Backup protetti (visibili solo ad admin) -->
                 <button onclick="esportaBackup()" class="admin-only hidden bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5" title="Salva Backup dati su file JSON">
@@ -46,9 +85,14 @@
                     <input type="file" id="file-backup" accept=".json" onchange="importaBackup(event)" class="hidden">
                 </label>
                 
+                <button onclick="apriModalGestioneUtenti()" class="admin-only hidden bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-users-gear"></i> <span>Gestisci Utenti</span>
+                </button>
+
                 <div id="user-info" class="text-xs font-medium bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 shadow-inner"></div>
-                <button onclick="cambiaRuolo()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-2">
-                    <i class="fa-solid fa-right-left"></i> Cambia Ruolo
+                
+                <button onclick="eseguiLogout()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5" title="Esci dal sistema">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span>Esci</span>
                 </button>
             </div>
         </div>
@@ -64,7 +108,6 @@
                 <button onclick="mostraSezione('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-50 text-indigo-600">
                     <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard & Stock</span>
                 </button>
-                <!-- Voci di menu riservate esclusivamente all'Admin -->
                 <button onclick="mostraSezione('magazzini')" id="nav-magazzini" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50 admin-only hidden">
                     <i class="fa-solid fa-warehouse w-5"></i><span>Gestione Magazzini</span>
                 </button>
@@ -287,6 +330,40 @@
         </section>
     </main>
 
+    <!-- MODALE GESTIONE UTENTI (Autorizzazione Admin) -->
+    <div id="modal-gestione-utenti" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 space-y-5 border border-slate-100">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-900">Gestione Utenti Autorizzati</h3>
+                <button type="button" onclick="chiudiModalGestioneUtenti()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+                <h4 class="text-xs font-bold text-slate-700 uppercase">Crea / Autorizza Nuovo Utente</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input type="text" id="nuovo-user-name" placeholder="Username" class="border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none">
+                    <input type="password" id="nuovo-user-pass" placeholder="Password" class="border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none">
+                    <select id="nuovo-user-ruolo" class="border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none">
+                        <option value="utente">Utente</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button type="button" onclick="aggiungiUtenteAutorizzato()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl text-xs font-semibold transition shadow-sm">
+                    Autorizza e Salva Utente
+                </button>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Utenti Registrati nel Sistema</h4>
+                <div id="lista-utenti-container" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button type="button" onclick="chiudiModalGestioneUtenti()" class="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODALE AGGIUNGI / MODIFICA MAGAZZINO (Admin) -->
     <div id="modal-magazzino" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 border border-slate-100">
@@ -391,8 +468,14 @@
 
     <!-- SCRIPT LOGICA APPLICATIVA -->
     <script>
-        let statoUtente = localStorage.getItem('mg_ruolo') || 'utente'; 
-        let nomeUtenteCorrente = localStorage.getItem('mg_nome') || 'KRONOS';
+        let utentiAutorizzati = caricaDati('mg_utenti_auth', [
+            { username: 'admin', password: 'admin123', ruolo: 'admin' },
+            { username: 'kronos', password: 'user123', ruolo: 'utente' }
+        ]);
+
+        let utenteLoggato = caricaDati('mg_utente_corrente', null);
+        let statoUtente = utenteLoggato ? utenteLoggato.ruolo : 'utente'; 
+        let nomeUtenteCorrente = utenteLoggato ? utenteLoggato.username : '';
 
         let magazzini = caricaDati('mg_lista_magazzini', [
             { nome: 'Magazzino Nord', indirizzo: 'Via Industriale 12, Torino', telefono: '+39 011 555019', email: 'nord@magazzinopro.it', responsabile: 'Marco Neri' },
@@ -435,6 +518,7 @@
         }
 
         window.onload = function() {
+            verificaStatoLogin();
             aggiornaUIUtente();
             popolaSelectMagazziniDappertutto();
             renderDashboard();
@@ -443,6 +527,107 @@
             aggiungiRigaProdotto();
             aggiornaSkoMagazzino();
         };
+
+        function verificaStatoLogin() {
+            const vistaLogin = document.getElementById('vista-login');
+            if(!utenteLoggato) {
+                vistaLogin.classList.remove('hidden');
+                vistaLogin.classList.add('flex');
+            } else {
+                vistaLogin.classList.remove('flex');
+                vistaLogin.classList.add('hidden');
+            }
+        }
+
+        function eseguiLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('login-username').value.trim().toLowerCase();
+            const pass = document.getElementById('login-password').value;
+
+            const trovato = utentiAutorizzati.find(u => u.username.toLowerCase() === user && u.password === pass);
+            if(trovato) {
+                utenteLoggato = trovato;
+                statoUtente = trovato.ruolo;
+                nomeUtenteCorrente = trovato.username;
+                salvaDati('mg_utente_corrente', utenteLoggato);
+                verificaStatoLogin();
+                aggiornaUIUtente();
+                mostraNotifica(`Benvenuto, ${nomeUtenteCorrente.toUpperCase()}!`, 'success');
+                renderDashboard();
+                renderOrdini();
+            } else {
+                mostraNotifica('Credenziali non valide o utente non autorizzato.', 'error');
+            }
+        }
+
+        function eseguiLogout() {
+            utenteLoggato = null;
+            localStorage.removeItem('mg_utente_corrente');
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            verificaStatoLogin();
+            mostraNotifica('Sessione terminata.', 'info');
+        }
+
+        function apriModalGestioneUtenti() {
+            renderListaUtentiAuth();
+            document.getElementById('modal-gestione-utenti').classList.remove('hidden');
+            document.getElementById('modal-gestione-utenti').classList.add('flex');
+        }
+
+        function chiudiModalGestioneUtenti() {
+            document.getElementById('modal-gestione-utenti').classList.remove('flex');
+            document.getElementById('modal-gestione-utenti').classList.add('hidden');
+        }
+
+        function renderListaUtentiAuth() {
+            const container = document.getElementById('lista-utenti-container');
+            if(!container) return;
+            container.innerHTML = '';
+            utentiAutorizzati.forEach((u, index) => {
+                container.innerHTML += `
+                    <div class="flex justify-between items-center text-xs bg-white px-3 py-2 rounded-xl border border-slate-200">
+                        <div>
+                            <span class="font-bold text-slate-800">${u.username}</span>
+                            <span class="ml-2 px-2 py-0.5 rounded text-[10px] uppercase font-semibold ${u.ruolo === 'admin' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-600'}">${u.ruolo}</span>
+                        </div>
+                        ${u.username !== 'admin' ? `<button onclick="eliminaUtenteAuth(${index})" class="text-rose-600 hover:text-rose-800 font-semibold px-2 py-1"><i class="fa-solid fa-trash"></i></button>` : '<span class="text-[10px] text-slate-400 italic">Principale</span>'}
+                    </div>
+                `;
+            });
+        }
+
+        function aggiungiUtenteAutorizzato() {
+            const user = document.getElementById('nuovo-user-name').value.trim();
+            const pass = document.getElementById('nuovo-user-pass').value.trim();
+            const ruolo = document.getElementById('nuovo-user-ruolo').value;
+
+            if(!user || !pass) {
+                mostraNotifica('Inserisci username e password validi.', 'error');
+                return;
+            }
+
+            if(utentiAutorizzati.some(u => u.username.toLowerCase() === user.toLowerCase())) {
+                mostraNotifica('Username già esistente.', 'error');
+                return;
+            }
+
+            utentiAutorizzati.push({ username: user, password: pass, ruolo: ruolo });
+            salvaDati('mg_utenti_auth', utentiAutorizzati);
+            document.getElementById('nuovo-user-name').value = '';
+            document.getElementById('nuovo-user-pass').value = '';
+            renderListaUtentiAuth();
+            mostraNotifica(`Utente ${user} autorizzato con successo!`);
+        }
+
+        function eliminaUtenteAuth(index) {
+            if(confirm("Revocare l'autorizzazione a questo utente?")) {
+                utentiAutorizzati.splice(index, 1);
+                salvaDati('mg_utenti_auth', utentiAutorizzati);
+                renderListaUtentiAuth();
+                mostraNotifica('Utente rimosso.', 'info');
+            }
+        }
 
         function mostraNotifica(testo, tipo = 'success') {
             const container = document.getElementById('toast-container');
@@ -465,8 +650,8 @@
 
         function aggiornaUIUtente() {
             const userInfo = document.getElementById('user-info');
-            if(userInfo) {
-                userInfo.innerHTML = `Ruolo: <strong class="text-indigo-400 uppercase">${statoUtente}</strong> (${nomeUtenteCorrente})`;
+            if(userInfo && utenteLoggato) {
+                userInfo.innerHTML = `Utente: <strong class="text-indigo-400 uppercase">${utenteLoggato.username}</strong> (${statoUtente})`;
             }
             const adminElements = document.querySelectorAll('.admin-only');
             adminElements.forEach(el => {
@@ -476,27 +661,6 @@
                     el.classList.add('hidden');
                 }
             });
-            renderOrdini();
-        }
-
-        function cambiaRuolo() {
-            if(statoUtente === 'utente') {
-                statoUtente = 'admin';
-                nomeUtenteCorrente = 'Admin Master';
-            } else {
-                statoUtente = 'utente';
-                nomeUtenteCorrente = 'KRONOS';
-                const secAttiva = document.querySelector('.sezione-contenuto:not(.hidden)');
-                if(secAttiva && (secAttiva.id === 'sezione-magazzini' || secAttiva.id === 'sezione-trasferimenti')) {
-                    mostraSezione('dashboard');
-                }
-            }
-            localStorage.setItem('mg_ruolo', statoUtente);
-            localStorage.setItem('mg_nome', nomeUtenteCorrente);
-            aggiornaUIUtente();
-            mostraNotifica(`Passato al profilo: ${statoUtente.toUpperCase()}`, 'info');
-            renderDashboard();
-            renderMagazzini();
             renderOrdini();
         }
 
@@ -926,7 +1090,6 @@
                 
                 const stockItem = giacenze.find(g => g.magazzino === magazzino && g.prodotto === prodotto && g.modello === modello);
                 
-                // Se il prodotto non esiste in magazzino o la giacenza è inferiore alla richiesta, segnaliamo la non disponibilità
                 if(!stockItem || stockItem.quantita < qta) {
                     merceNonDisponibile = true;
                 }
@@ -939,18 +1102,15 @@
                 return;
             }
 
-            // Se la scorta è inferiore o assente, mostriamo il messaggio a vista richiesto
             if(merceNonDisponibile) {
                 mostraNotifica('ATTENZIONE MERCE TEMPORANEAMENTE NON DISPONIBILE', 'warning');
             }
 
-            // Aggiorniamo le giacenze (permettendo anche di andare in negativo)
             prodottiOrdine.forEach(p => {
                 let stockItem = giacenze.find(g => g.magazzino === magazzino && g.prodotto === p.prodotto && g.modello === p.modello);
                 if(stockItem) {
                     stockItem.quantita -= p.quantita;
                 } else {
-                    // Se l'articolo non era proprio censito in quel magazzino, lo creiamo con quantità negativa
                     giacenze.push({
                         magazzino: magazzino,
                         prodotto: p.prodotto,
