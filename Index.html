@@ -917,7 +917,14 @@
                 
                 let infoSpedizione = '-';
                 if(o.spedizione) {
-                    infoSpedizione = `<span class="text-xs text-slate-500 block">Data: ${o.spedizione.data} | Metodo: ${o.spedizione.metodo}</span><span class="text-xs font-mono text-slate-600">Trk: ${o.spedizione.tracking}</span>`;
+                    infoSpedizione = `
+                        <div class="text-xs text-slate-600 space-y-0.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 text-left mb-2">
+                            <div><strong class="text-slate-400 uppercase text-[10px]">Evasione:</strong> ${o.spedizione.data} | <strong class="text-slate-400 uppercase text-[10px]">Metodo:</strong> ${o.spedizione.metodo}</div>
+                            <div><strong class="text-slate-400 uppercase text-[10px]">Cod. Pacco:</strong> <span class="font-mono font-semibold text-slate-800">${o.spedizione.codPacco}</span></div>
+                            <div><strong class="text-slate-400 uppercase text-[10px]">Misure:</strong> ${o.spedizione.misure} | <strong class="text-slate-400 uppercase text-[10px]">Peso:</strong> ${o.spedizione.peso}</div>
+                            <div><strong class="text-slate-400 uppercase text-[10px]">Tracking:</strong> <span class="font-mono text-indigo-600">${o.spedizione.tracking}</span></div>
+                        </div>
+                    `;
                 }
 
                 let btnEvadi = (o.stato !== 'Evaso' && statoUtente === 'admin') 
@@ -929,7 +936,7 @@
                     : '';
 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition">
+                    <tr class="hover:bg-slate-50/50 transition align-top">
                         <td class="px-6 py-4"><strong class="text-slate-900">${o.id}</strong><span class="block text-xs text-slate-400">${o.data}</span></td>
                         <td class="px-6 py-4"><span class="font-semibold text-indigo-600">${o.sko || o.magazzino}</span><span class="block text-xs text-slate-500">Acq: ${o.acquirente}</span></td>
                         <td class="px-6 py-4"><span class="text-xs text-slate-600 block">Forn: ${o.fornitore}</span><span class="text-xs font-mono text-slate-500">Fatt: ${o.rifFattura} | Deal: ${o.rifDeal}</span></td>
@@ -937,7 +944,7 @@
                         <td class="px-6 py-4"><span class="px-2.5 py-1 rounded-lg text-xs font-semibold ${badgeStato}">${o.stato}</span></td>
                         <td class="px-6 py-4 text-right">
                             ${infoSpedizione}
-                            <div class="flex justify-end items-center gap-2 mt-2 flex-wrap">
+                            <div class="flex justify-end items-center gap-2 flex-wrap">
                                 ${btnEvadi}
                                 ${btnElimina}
                             </div>
@@ -1130,11 +1137,10 @@
         }
 
         function aggiornaProdottiDisponibiliSelect() {
-            // Estrae tutti i prodotti unici presenti nell'intero gestionale (senza duplicare coppie prodotto/modello/ean uguali)
             const mappaUnici = new Map();
             giacenze.forEach(g => {
                 const chiave = `${g.prodotto}|${g.modello}|${g.ean}`;
-                if(!mappaUnici.haschiave) {
+                if(!mappaUnici.has(chiave)) {
                     mappaUnici.set(chiave, { prodotto: g.prodotto, modello: g.modello, ean: g.ean });
                 }
             });
@@ -1178,13 +1184,11 @@
             const giacenzaDisponibile = stockItem ? stockItem.quantita : 0;
 
             if(giacenzaDisponibile < qtaRichiesta) {
-                // Sprovvisto o quantità insufficiente nel magazzino scelto -> ROSSO
                 selectProd.className = "prod-select w-full border border-rose-500 rounded-xl p-2.5 text-xs bg-rose-50 text-rose-700 font-medium outline-none";
                 avvisoDiv.className = "avviso-disponibilita text-[11px] font-bold text-rose-600 px-1";
                 avvisoDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> MERCE TEMPORANEAMENTE NON DISPONIBILE in questo magazzino (Disp: ${giacenzaDisponibile} pz)`;
                 avvisoDiv.classList.remove('hidden');
             } else {
-                // Disponibile
                 selectProd.className = "prod-select w-full border border-slate-200 rounded-xl p-2.5 text-xs bg-white outline-none";
                 avvisoDiv.classList.add('hidden');
             }
@@ -1226,7 +1230,6 @@
                 mostraNotifica('MERCE TEMPORANEAMENTE NON DISPONIBILE - Scorte in negativo.', 'warning');
             }
 
-            // Aggiornamento scorte (consentendo valori negativi)
             prodottiOrdine.forEach(p => {
                 let stockItem = giacenze.find(g => g.magazzino === magazzino && g.prodotto === p.prodotto && g.modello === p.modello);
                 if(stockItem) {
@@ -1370,7 +1373,7 @@
             const tableData = [];
             ordiniEvasi.forEach(o => {
                 let dettagliProdotti = o.prodotti.map(p => `${p.quantita}x ${p.prodotto} (${p.modello}) [EAN: ${p.ean}]`).join('\n');
-                let infoSped = o.spedizione ? `Trk: ${o.spedizione.tracking} - Pacco: ${o.spedizione.codPacco}` : '-';
+                let infoSped = o.spedizione ? `Pacco: ${o.spedizione.codPacco} | Trk: ${o.spedizione.tracking} | Misure: ${o.spedizione.misure} | Peso: ${o.spedizione.peso}` : '-';
                 tableData.push([
                     o.id,
                     o.sko || o.magazzino,
@@ -1382,7 +1385,7 @@
 
             doc.autoTable({
                 startY: 35,
-                head: [['ID Ordine', 'SKO / Sede', 'Acquirente', 'Prodotti & EAN', 'Spedizione / Tracking']],
+                head: [['ID Ordine', 'SKO / Sede', 'Acquirente', 'Prodotti & EAN', 'Dettagli Spedizione, Pacco, Misure & Peso']],
                 body: tableData,
                 theme: 'grid',
                 headStyles: { fillColor: [15, 23, 42] }
