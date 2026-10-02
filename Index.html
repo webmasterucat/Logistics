@@ -835,6 +835,10 @@
             container.innerHTML = '';
             magazzini.forEach(m => {
                 const articoliMag = giacenze.filter(g => g.magazzino === m.nome);
+                
+                // Ordinamento alfabetico dei prodotti per modello all'interno del magazzino
+                articoliMag.sort((a, b) => a.prodotto.localeCompare(b.prodotto) || a.modello.localeCompare(b.modello));
+
                 const pezziTot = articoliMag.reduce((acc, curr) => acc + parseInt(curr.quantita || 0), 0);
                 
                 let listaProdottiHTML = '';
@@ -862,15 +866,19 @@
                                 <h4 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-warehouse text-indigo-600 mr-2"></i>${m.nome}</h4>
                                 <span class="text-xs bg-emerald-50 text-emerald-600 font-semibold px-2.5 py-1 rounded-lg">Tot: ${pezziTot} pz</span>
                             </div>
-                            <p class="text-xs text-slate-500 mb-2">${m.indirizzo} - Resp: ${m.responsabile}</p>
+                            <p class="text-xs text-slate-500 mb-1"><i class="fa-solid fa-location-dot mr-1"></i>${m.indirizzo}</p>
+                            <p class="text-xs text-slate-600 mb-2 flex flex-wrap gap-x-3 gap-y-1">
+                                <span><i class="fa-solid fa-envelope mr-1 text-slate-400"></i>${m.email}</span>
+                                <span><i class="fa-solid fa-phone mr-1 text-slate-400"></i>${m.telefono}</span>
+                            </p>
                             <div class="border-t border-slate-100 pt-2">
-                                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Dettaglio Prodotti per Modello:</span>
+                                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Dettaglio Prodotti per Modello (Alfabetico):</span>
                                 ${listaProdottiHTML}
                             </div>
                         </div>
                         <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-xs text-slate-400">
                             <span>Articoli unici: ${articoliMag.length}</span>
-                            <span class="font-medium text-slate-600">${m.telefono}</span>
+                            <span class="font-medium text-slate-600">Resp: ${m.responsabile}</span>
                         </div>
                     </div>
                 `;
