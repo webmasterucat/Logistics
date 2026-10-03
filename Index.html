@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN per il grafico -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 font-sans antialiased">
 
@@ -44,7 +46,7 @@
             
             <!-- Topbar -->
             <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10">
-                <h1 class="text-xl font-semibold text-gray-800" id="page-title">Panoramica Generale</h1>
+                <h1 class="text-xl font-semibold text-gray-800" id="page-title">Dashboard</h1>
                 <div class="flex items-center space-x-3">
                     <button onclick="openAddItemModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center">
                         <i class="fa-solid fa-plus mr-2"></i> Nuovo Articolo
@@ -53,24 +55,56 @@
             </header>
 
             <!-- Main Area -->
-            <main class="p-6">
+            <main class="p-6 space-y-6">
 
                 <!-- SEZIONE DASHBOARD -->
                 <section id="sec-dashboard" class="space-y-6">
+                    <!-- Informazioni Magazzini -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-warehouse text-indigo-600 mr-2"></i> Magazzino ATEC</h3>
-                                <button onclick="switchTab('atec')" class="text-sm text-indigo-600 hover:underline">Gestisci</button>
+                        <!-- Scheda ATEC -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-warehouse text-indigo-600 mr-2"></i> Magazzino ATEC</h3>
+                                    <button onclick="switchTab('atec')" class="text-sm bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg hover:bg-indigo-100 transition">Gestisci</button>
+                                </div>
+                                <ul class="space-y-2 text-sm text-gray-600">
+                                    <li><i class="fa-solid fa-location-dot w-5 text-gray-400"></i> <strong>Indirizzo:</strong> Via Industriale 14, Milano</li>
+                                    <li><i class="fa-solid fa-phone w-5 text-gray-400"></i> <strong>Tel:</strong> +39 02 5550192</li>
+                                    <li><i class="fa-solid fa-envelope w-5 text-gray-400"></i> <strong>Email:</strong> atec.magazzino@example.com</li>
+                                    <li><i class="fa-solid fa-user-tie w-5 text-gray-400"></i> <strong>Responsabile:</strong> Marco Neri</li>
+                                </ul>
                             </div>
-                            <p class="text-sm text-gray-500">Articoli totali registrati: <span id="count-atec" class="font-bold text-gray-800">0</span></p>
+                            <div class="mt-4 pt-4 border-t text-sm font-medium text-gray-500">
+                                Articoli registrati: <span id="count-atec" class="text-gray-800 font-bold">0</span>
+                            </div>
                         </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-warehouse text-indigo-600 mr-2"></i> Magazzino KRONOS</h3>
-                                <button onclick="switchTab('kronos')" class="text-sm text-indigo-600 hover:underline">Gestisci</button>
+
+                        <!-- Scheda KRONOS -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-warehouse text-indigo-600 mr-2"></i> Magazzino KRONOS</h3>
+                                    <button onclick="switchTab('kronos')" class="text-sm bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg hover:bg-indigo-100 transition">Gestisci</button>
+                                </div>
+                                <ul class="space-y-2 text-sm text-gray-600">
+                                    <li><i class="fa-solid fa-location-dot w-5 text-gray-400"></i> <strong>Indirizzo:</strong> Via Roma 88, Torino</li>
+                                    <li><i class="fa-solid fa-phone w-5 text-gray-400"></i> <strong>Tel:</strong> +39 011 884021</li>
+                                    <li><i class="fa-solid fa-envelope w-5 text-gray-400"></i> <strong>Email:</strong> kronos.logistica@example.com</li>
+                                    <li><i class="fa-solid fa-user-tie w-5 text-gray-400"></i> <strong>Responsabile:</strong> Sara Conti</li>
+                                </ul>
                             </div>
-                            <p class="text-sm text-gray-500">Articoli totali registrati: <span id="count-kronos" class="font-bold text-gray-800">0</span></p>
+                            <div class="mt-4 pt-4 border-t text-sm font-medium text-gray-500">
+                                Articoli registrati: <span id="count-kronos" class="text-gray-800 font-bold">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grafico Disponibilità Prodotti -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fa-solid fa-chart-column text-indigo-600 mr-2"></i> Disponibilità Prodotti per Modello</h3>
+                        <div class="relative h-72 w-full">
+                            <canvas id="inventoryChart"></canvas>
                         </div>
                     </div>
                 </section>
@@ -168,7 +202,7 @@
         </div>
     </div>
 
-    <!-- Script di Gestione -->
+    <!-- Script di Gestione e Grafico -->
     <script>
         let inventory = {
             atec: [
@@ -176,9 +210,11 @@
                 { id: 2, ean: "8051234567891", name: "Cavo schermato", model: "Shield-10m", qty: 45 }
             ],
             kronos: [
-                { id: 3, ean: "8059876543210", name: "Unità di controllo", model: "K-Pro V2", qty: 15 }
+                { id: 3, ean: "8059876543210", name: "Unità di controllo", model: "K-Pro V2", qty: 75 }
             ]
         };
+
+        let myChart = null;
 
         function switchTab(tabId) {
             ['dashboard', 'atec', 'kronos', 'admin'].forEach(id => {
@@ -197,10 +233,13 @@
                 activeNav.classList.remove('hover:bg-slate-800', 'hover:text-white');
             }
 
-            const titles = { dashboard: 'Panoramica Generale', atec: 'Magazzino ATEC', kronos: 'Magazzino KRONOS', admin: 'Controllo Amministratore' };
+            const titles = { dashboard: 'Dashboard', atec: 'Magazzino ATEC', kronos: 'Magazzino KRONOS', admin: 'Controllo Amministratore' };
             document.getElementById('page-title').innerText = titles[tabId];
 
             renderTables();
+            if(tabId === 'dashboard') {
+                updateChart();
+            }
         }
 
         function renderTables() {
@@ -245,6 +284,58 @@
             document.getElementById('count-kronos').innerText = inventory.kronos.length;
         }
 
+        function updateChart() {
+            const ctx = document.getElementById('inventoryChart').getContext('2d');
+            
+            // Raccoglie tutti i prodotti e modelli combinati da entrambi i magazzini
+            let labels = [];
+            let dataValues = [];
+            let backgroundColors = [];
+
+            const colors = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
+            let colorIndex = 0;
+            ['atec', 'kronos'].forEach(wh => {
+                inventory[wh].forEach(item => {
+                    labels.push(`${item.name} (${item.model}) [${wh.toUpperCase()}]`);
+                    dataValues.push(item.qty);
+                    backgroundColors.push(colors[colorIndex % colors.length]);
+                    colorIndex++;
+                });
+            });
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Quantità Disponibile',
+                        data: dataValues,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        }
+
         function openAddItemModal() { document.getElementById('item-modal').classList.remove('hidden'); }
         function closeAddItemModal() { document.getElementById('item-modal').classList.add('hidden'); }
 
@@ -260,6 +351,7 @@
             };
             inventory[wh].push(newItem);
             renderTables();
+            updateChart();
             closeAddItemModal();
             e.target.reset();
         }
@@ -269,6 +361,7 @@
             if(item) {
                 item.qty = Math.max(0, item.qty + delta);
                 renderTables();
+                updateChart();
             }
         }
 
@@ -276,6 +369,7 @@
             if(confirm('Confermi l\'eliminazione definitiva dell\'articolo?')) {
                 inventory[wh] = inventory[wh].filter(i => i.id !== id);
                 renderTables();
+                updateChart();
             }
         }
 
@@ -285,7 +379,9 @@
             }
         }
 
+        // Inizializzazione al caricamento
         renderTables();
+        updateChart();
     </script>
 </body>
 </html>
