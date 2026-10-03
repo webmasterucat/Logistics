@@ -8,8 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js CDN per il grafico -->
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js DataLabels Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 </head>
 <body class="bg-gray-100 font-sans antialiased">
 
@@ -34,6 +36,9 @@
                     <a href="#" onclick="switchTab('admin')" id="nav-admin" class="flex items-center px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
                         <i class="fa-solid fa-user-shield w-6"></i> Controllo Admin
                     </a>
+                    <a href="#" onclick="switchTab('users')" id="nav-users" class="flex items-center px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                        <i class="fa-solid fa-users-gear w-6"></i> Gestione Utenti
+                    </a>
                 </nav>
             </div>
             <div class="p-4 bg-slate-950 text-xs text-gray-400">
@@ -48,6 +53,9 @@
             <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10">
                 <h1 class="text-xl font-semibold text-gray-800" id="page-title">Dashboard</h1>
                 <div class="flex items-center space-x-3">
+                    <button onclick="openTransferModal()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition flex items-center">
+                        <i class="fa-solid fa-right-left mr-2"></i> Trasferisci Merce
+                    </button>
                     <button onclick="openAddItemModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center">
                         <i class="fa-solid fa-plus mr-2"></i> Nuovo Articolo
                     </button>
@@ -59,7 +67,6 @@
 
                 <!-- SEZIONE DASHBOARD -->
                 <section id="sec-dashboard" class="space-y-6">
-                    <!-- Informazioni Magazzini -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Scheda ATEC -->
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
@@ -100,11 +107,19 @@
                         </div>
                     </div>
 
-                    <!-- Grafico Disponibilità Prodotti -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fa-solid fa-chart-column text-indigo-600 mr-2"></i> Disponibilità Prodotti per Modello</h3>
-                        <div class="relative h-72 w-full">
-                            <canvas id="inventoryChart"></canvas>
+                    <!-- Grafici con Barre Multicolore per Modello -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="text-base font-bold text-gray-800 mb-4"><i class="fa-solid fa-chart-column text-indigo-600 mr-2"></i> Scorte per Modello - Magazzino ATEC</h3>
+                            <div class="relative h-64 w-full">
+                                <canvas id="chartAtec"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="text-base font-bold text-gray-800 mb-4"><i class="fa-solid fa-chart-column text-indigo-600 mr-2"></i> Scorte per Modello - Magazzino KRONOS</h3>
+                            <div class="relative h-64 w-full">
+                                <canvas id="chartKronos"></canvas>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -153,12 +168,50 @@
 
                 <!-- SEZIONE ADMIN -->
                 <section id="sec-admin" class="space-y-6 hidden">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-xl">
-                        <h2 class="text-lg font-bold text-gray-800 mb-4">Pannello di Controllo Amministratore</h2>
-                        <p class="text-sm text-gray-600 mb-4">Da qui puoi forzare il reset dei dati o ripristinare le tabelle dei magazzini.</p>
-                        <button onclick="resetData()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition">
-                            <i class="fa-solid fa-triangle-exclamation mr-2"></i> Ripristina Dati Predefiniti
-                        </button>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <h2 class="text-lg font-bold text-gray-800 mb-2"><i class="fa-solid fa-right-left text-emerald-600 mr-2"></i> Trasferimenti</h2>
+                            <p class="text-sm text-gray-600 mb-4">Sposta merce tra i magazzini.</p>
+                            <button onclick="openTransferModal()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition">Avvia Trasferimento</button>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <h2 class="text-lg font-bold text-gray-800 mb-2"><i class="fa-solid fa-users-gear text-indigo-600 mr-2"></i> Utenti</h2>
+                            <p class="text-sm text-gray-600 mb-4">Gestisci gli accessi del personale.</p>
+                            <button onclick="switchTab('users')" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">Gestisci Utenti</button>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <h2 class="text-lg font-bold text-gray-800 mb-2"><i class="fa-solid fa-triangle-exclamation text-red-600 mr-2"></i> Ripristino</h2>
+                            <p class="text-sm text-gray-600 mb-4">Ripristina dati iniziali.</p>
+                            <button onclick="resetData()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition">Ripristina Dati</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEZIONE UTENTI -->
+                <section id="sec-users" class="space-y-6 hidden">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-800">Gestione Utenti e Accessi</h2>
+                                <p class="text-sm text-gray-600">Aggiungi, modifica o rimuovi gli utenti autorizzati ad accedere al sistema.</p>
+                            </div>
+                            <button onclick="openUserModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center">
+                                <i class="fa-solid fa-user-plus mr-2"></i> Nuovo Utente
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Nome Utente</th>
+                                        <th class="p-3">Email</th>
+                                        <th class="p-3">Ruolo</th>
+                                        <th class="p-3 text-right">Azioni Admin</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-users" class="divide-y text-gray-700"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </section>
 
@@ -202,7 +255,73 @@
         </div>
     </div>
 
-    <!-- Script di Gestione e Grafico -->
+    <!-- Modale Trasferimento Merce -->
+    <div id="transfer-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
+            <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fa-solid fa-right-left text-emerald-600 mr-2"></i> Trasferisci Merce</h3>
+            <form onsubmit="executeTransfer(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Magazzino di Origine</label>
+                    <select id="transfer-from" onchange="updateTransferItems()" class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                        <option value="atec">ATEC</option>
+                        <option value="kronos">KRONOS</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Magazzino di Destinazione</label>
+                    <select id="transfer-to" class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                        <option value="kronos">KRONOS</option>
+                        <option value="atec">ATEC</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Articolo</label>
+                    <select id="transfer-item-id" class="mt-1 w-full border rounded-lg p-2.5 text-sm" required></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Quantità</label>
+                    <input type="number" id="transfer-qty" required min="1" value="1" class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeTransferModal()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">Annulla</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700">Conferma</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modale Gestione Utente -->
+    <div id="user-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
+            <h3 id="user-modal-title" class="text-lg font-bold text-gray-800 mb-4">Aggiungi Nuovo Utente</h3>
+            <form onsubmit="saveUser(event)" class="space-y-4">
+                <input type="hidden" id="user-edit-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nome e Cognome</label>
+                    <input type="text" id="user-name" required class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Indirizzo Email</label>
+                    <input type="email" id="user-email" required class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Ruolo / Permessi</label>
+                    <select id="user-role" class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                        <option value="Admin Magazzino">Admin Magazzino</option>
+                        <option value="Operatore Logistica">Operatore Logistica</option>
+                        <option value="Visualizzatore">Visualizzatore</option>
+                        <option value="Super Admin">Super Admin</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">Annulla</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium">Salva Utente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script di Gestione e Grafici Multicolore -->
     <script>
         let inventory = {
             atec: [
@@ -214,11 +333,31 @@
             ]
         };
 
-        let myChart = null;
+        let users = [
+            { id: 1, name: "Marco Neri", email: "marco.neri@example.com", role: "Admin Magazzino" },
+            { id: 2, name: "Sara Conti", email: "sara.conti@example.com", role: "Admin Magazzino" },
+            { id: 3, name: "Supervisore Generale", email: "admin@example.com", role: "Super Admin" }
+        ];
+
+        let chartAtecInstance = null;
+        let chartKronosInstance = null;
+
+        // Palette di colori predefinita per differenziare i modelli a colpo d'occhio
+        const colorPalette = [
+            '#6366f1', // Indigo
+            '#10b981', // Emerald
+            '#f59e0b', // Amber
+            '#ef4444', // Red
+            '#8b5cf6', // Purple
+            '#06b6d4', // Cyan
+            '#ec4899', // Pink
+            '#14b8a6'  // Teal
+        ];
 
         function switchTab(tabId) {
-            ['dashboard', 'atec', 'kronos', 'admin'].forEach(id => {
-                document.getElementById(`sec-${id}`).classList.add('hidden');
+            ['dashboard', 'atec', 'kronos', 'admin', 'users'].forEach(id => {
+                const sec = document.getElementById(`sec-${id}`);
+                if(sec) sec.classList.add('hidden');
                 const nav = document.getElementById(`nav-${id}`);
                 if(nav) {
                     nav.classList.remove('bg-indigo-600', 'text-white');
@@ -226,19 +365,28 @@
                 }
             });
 
-            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+            const activeSec = document.getElementById(`sec-${tabId}`);
+            if(activeSec) activeSec.classList.remove('hidden');
+            
             const activeNav = document.getElementById(`nav-${tabId}`);
             if(activeNav) {
                 activeNav.classList.add('bg-indigo-600', 'text-white');
                 activeNav.classList.remove('hover:bg-slate-800', 'hover:text-white');
             }
 
-            const titles = { dashboard: 'Dashboard', atec: 'Magazzino ATEC', kronos: 'Magazzino KRONOS', admin: 'Controllo Amministratore' };
+            const titles = { 
+                dashboard: 'Dashboard', 
+                atec: 'Magazzino ATEC', 
+                kronos: 'Magazzino KRONOS', 
+                admin: 'Controllo Amministratore',
+                users: 'Gestione Utenti'
+            };
             document.getElementById('page-title').innerText = titles[tabId];
 
             renderTables();
+            renderUsersTable();
             if(tabId === 'dashboard') {
-                updateChart();
+                updateCharts();
             }
         }
 
@@ -284,39 +432,43 @@
             document.getElementById('count-kronos').innerText = inventory.kronos.length;
         }
 
-        function updateChart() {
-            const ctx = document.getElementById('inventoryChart').getContext('2d');
-            
-            // Raccoglie tutti i prodotti e modelli combinati da entrambi i magazzini
-            let labels = [];
-            let dataValues = [];
-            let backgroundColors = [];
-
-            const colors = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-
-            let colorIndex = 0;
-            ['atec', 'kronos'].forEach(wh => {
-                inventory[wh].forEach(item => {
-                    labels.push(`${item.name} (${item.model}) [${wh.toUpperCase()}]`);
-                    dataValues.push(item.qty);
-                    backgroundColors.push(colors[colorIndex % colors.length]);
-                    colorIndex++;
-                });
+        function renderUsersTable() {
+            const tbody = document.getElementById('table-users');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            users.forEach(user => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-3 font-medium text-gray-800"><i class="fa-solid fa-user-circle text-gray-400 mr-2"></i> ${user.name}</td>
+                        <td class="p-3 text-gray-600">${user.email}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-indigo-50 text-indigo-700">${user.role}</span></td>
+                        <td class="p-3 text-right space-x-2">
+                            <button onclick="editUser(${user.id})" class="text-gray-400 hover:text-indigo-600" title="Modifica"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteUser(${user.id})" class="text-gray-400 hover:text-red-600" title="Elimina"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
             });
+        }
 
-            if (myChart) {
-                myChart.destroy();
-            }
+        function updateCharts() {
+            Chart.register(ChartDataLabels);
 
-            myChart = new Chart(ctx, {
+            // 1. Grafico ATEC (Modelli suddivisi con colori diversi e quantitativi sulle barre)
+            const ctxAtec = document.getElementById('chartAtec').getContext('2d');
+            const labelsAtec = inventory.atec.map(item => `${item.name} (${item.model})`);
+            const dataAtec = inventory.atec.map(item => item.qty);
+            const colorsAtec = inventory.atec.map((_, index) => colorPalette[index % colorPalette.length]);
+
+            if (chartAtecInstance) chartAtecInstance.destroy();
+            chartAtecInstance = new Chart(ctxAtec, {
                 type: 'bar',
                 data: {
-                    labels: labels,
+                    labels: labelsAtec,
                     datasets: [{
-                        label: 'Quantità Disponibile',
-                        data: dataValues,
-                        backgroundColor: backgroundColors,
-                        borderWidth: 1,
+                        label: 'Quantità',
+                        data: dataAtec,
+                        backgroundColor: colorsAtec,
                         borderRadius: 6
                     }]
                 },
@@ -324,18 +476,54 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { precision: 0 }
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#fff',
+                            anchor: 'center',
+                            align: 'center',
+                            font: { weight: 'bold', size: 12 }
                         }
-                    }
+                    },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+
+            // 2. Grafico KRONOS (Modelli suddivisi con colori diversi e quantitativi sulle barre)
+            const ctxKronos = document.getElementById('chartKronos').getContext('2d');
+            const labelsKronos = inventory.kronos.map(item => `${item.name} (${item.model})`);
+            const dataKronos = inventory.kronos.map(item => item.qty);
+            const colorsKronos = inventory.kronos.map((_, index) => colorPalette[index % colorPalette.length]);
+
+            if (chartKronosInstance) chartKronosInstance.destroy();
+            chartKronosInstance = new Chart(ctxKronos, {
+                type: 'bar',
+                data: {
+                    labels: labelsKronos,
+                    datasets: [{
+                        label: 'Quantità',
+                        data: dataKronos,
+                        backgroundColor: colorsKronos,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#fff',
+                            anchor: 'center',
+                            align: 'center',
+                            font: { weight: 'bold', size: 12 }
+                        }
+                    },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
                 }
             });
         }
 
+        // Modale Aggiunta Articolo
         function openAddItemModal() { document.getElementById('item-modal').classList.remove('hidden'); }
         function closeAddItemModal() { document.getElementById('item-modal').classList.add('hidden'); }
 
@@ -351,9 +539,126 @@
             };
             inventory[wh].push(newItem);
             renderTables();
-            updateChart();
+            updateCharts();
             closeAddItemModal();
             e.target.reset();
+        }
+
+        // Modale Trasferimento Merce
+        function openTransferModal() {
+            updateTransferItems();
+            document.getElementById('transfer-modal').classList.remove('hidden');
+        }
+        function closeTransferModal() { document.getElementById('transfer-modal').classList.add('hidden'); }
+
+        function updateTransferItems() {
+            const fromWh = document.getElementById('transfer-from').value;
+            const selectEl = document.getElementById('transfer-item-id');
+            selectEl.innerHTML = '';
+            inventory[fromWh].forEach(item => {
+                selectEl.innerHTML += `<option value="${item.id}">${item.name} (${item.model}) - Disponibili: ${item.qty}</option>`;
+            });
+            const toWhSelect = document.getElementById('transfer-to');
+            toWhSelect.value = fromWh === 'atec' ? 'kronos' : 'atec';
+        }
+
+        function executeTransfer(e) {
+            e.preventDefault();
+            const fromWh = document.getElementById('transfer-from').value;
+            const toWh = document.getElementById('transfer-to').value;
+            const itemId = parseInt(document.getElementById('transfer-item-id').value);
+            const transferQty = parseInt(document.getElementById('transfer-qty').value);
+
+            if (fromWh === toWh) {
+                alert("Il magazzino di origine e di destinazione non possono coincidere!");
+                return;
+            }
+
+            const sourceItem = inventory[fromWh].find(i => i.id === itemId);
+            if (!sourceItem || sourceItem.qty < transferQty) {
+                alert("Quantità insufficiente nel magazzino di origine!");
+                return;
+            }
+
+            sourceItem.qty -= transferQty;
+            let destItem = inventory[toWh].find(i => i.ean === sourceItem.ean || i.model === sourceItem.model);
+
+            if (destItem) {
+                destItem.qty += transferQty;
+            } else {
+                inventory[toWh].push({
+                    id: Date.now(),
+                    ean: sourceItem.ean,
+                    name: sourceItem.name,
+                    model: sourceItem.model,
+                    qty: transferQty
+                });
+            }
+
+            renderTables();
+            updateCharts();
+            closeTransferModal();
+            alert("Trasferimento completato con successo!");
+        }
+
+        // Gestione Utenti
+        function openUserModal() {
+            document.getElementById('user-modal-title').innerText = "Aggiungi Nuovo Utente";
+            document.getElementById('user-edit-id').value = "";
+            document.getElementById('user-name').value = "";
+            document.getElementById('user-email').value = "";
+            document.getElementById('user-role').value = "Admin Magazzino";
+            document.getElementById('user-modal').classList.remove('hidden');
+        }
+
+        function closeUserModal() {
+            document.getElementById('user-modal').classList.add('hidden');
+        }
+
+        function editUser(id) {
+            const user = users.find(u => u.id === id);
+            if(user) {
+                document.getElementById('user-modal-title').innerText = "Modifica Utente";
+                document.getElementById('user-edit-id').value = user.id;
+                document.getElementById('user-name').value = user.name;
+                document.getElementById('user-email').value = user.email;
+                document.getElementById('user-role').value = user.role;
+                document.getElementById('user-modal').classList.remove('hidden');
+            }
+        }
+
+        function saveUser(e) {
+            e.preventDefault();
+            const editId = document.getElementById('user-edit-id').value;
+            const name = document.getElementById('user-name').value;
+            const email = document.getElementById('user-email').value;
+            const role = document.getElementById('user-role').value;
+
+            if(editId) {
+                const user = users.find(u => u.id === parseInt(editId));
+                if(user) {
+                    user.name = name;
+                    user.email = email;
+                    user.role = role;
+                }
+            } else {
+                users.push({
+                    id: Date.now(),
+                    name: name,
+                    email: email,
+                    role: role
+                });
+            }
+
+            renderUsersTable();
+            closeUserModal();
+        }
+
+        function deleteUser(id) {
+            if(confirm('Confermi l\'eliminazione di questo utente dal sistema?')) {
+                users = users.filter(u => u.id !== id);
+                renderUsersTable();
+            }
         }
 
         function adjustQty(wh, id, delta) {
@@ -361,7 +666,7 @@
             if(item) {
                 item.qty = Math.max(0, item.qty + delta);
                 renderTables();
-                updateChart();
+                updateCharts();
             }
         }
 
@@ -369,7 +674,7 @@
             if(confirm('Confermi l\'eliminazione definitiva dell\'articolo?')) {
                 inventory[wh] = inventory[wh].filter(i => i.id !== id);
                 renderTables();
-                updateChart();
+                updateCharts();
             }
         }
 
@@ -379,9 +684,10 @@
             }
         }
 
-        // Inizializzazione al caricamento
+        // Inizializzazione
         renderTables();
-        updateChart();
+        renderUsersTable();
+        updateCharts();
     </script>
 </body>
 </html>
