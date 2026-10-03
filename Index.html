@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pannello Admin - Dashboard</title>
+    <title>Gestionale Magazzini - ATEC & KRONOS</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome per le icone -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100 font-sans antialiased">
@@ -16,28 +16,26 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-center h-16 bg-slate-950 text-white font-bold text-xl tracking-wider">
-                    <i class="fa-solid fa-shield-halved mr-2 text-indigo-500"></i> ADMIN PANEL
+                <div class="flex items-center justify-center h-16 bg-slate-950 text-white font-bold text-lg tracking-wider">
+                    <i class="fa-solid fa-boxes-stacked mr-2 text-indigo-500"></i> ATEC & KRONOS
                 </div>
                 <nav class="mt-6 px-4 space-y-2">
-                    <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="flex items-center px-4 py-2.5 rounded-lg bg-indigo-600 text-white transition">
+                    <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center px-4 py-2.5 rounded-lg bg-indigo-600 text-white transition">
                         <i class="fa-solid fa-chart-pie w-6"></i> Dashboard
                     </a>
-                    <a href="#" onclick="showSection('users')" id="nav-users" class="flex items-center px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
-                        <i class="fa-solid fa-users w-6"></i> Utenti
+                    <a href="#" onclick="switchTab('atec')" id="nav-atec" class="flex items-center px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                        <i class="fa-solid fa-warehouse w-6"></i> Magazzino ATEC
                     </a>
-                    <a href="#" onclick="showSection('warehouse')" id="nav-warehouse" class="flex items-center px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
-                        <i class="fa-solid fa-warehouse w-6"></i> Magazzino
+                    <a href="#" onclick="switchTab('kronos')" id="nav-kronos" class="flex items-center px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                        <i class="fa-solid fa-warehouse w-6"></i> Magazzino KRONOS
                     </a>
-                    <a href="#" onclick="showSection('settings')" id="nav-settings" class="flex items-center px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
-                        <i class="fa-solid fa-gear w-6"></i> Impostazioni
+                    <a href="#" onclick="switchTab('admin')" id="nav-admin" class="flex items-center px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                        <i class="fa-solid fa-user-shield w-6"></i> Controllo Admin
                     </a>
                 </nav>
             </div>
-            <div class="p-4 bg-slate-950">
-                <button onclick="logoutAdmin()" class="w-full flex items-center justify-center px-4 py-2 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white transition">
-                    <i class="fa-solid fa-right-from-bracket mr-2"></i> Disconnetti
-                </button>
+            <div class="p-4 bg-slate-950 text-xs text-gray-400">
+                <p>Ruolo: <strong class="text-indigo-400">Super Admin</strong></p>
             </div>
         </aside>
 
@@ -46,139 +44,87 @@
             
             <!-- Topbar -->
             <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10">
+                <h1 class="text-xl font-semibold text-gray-800" id="page-title">Panoramica Generale</h1>
                 <div class="flex items-center space-x-3">
-                    <button class="md:hidden text-gray-600 focus:outline-none"><i class="fa-solid fa-bars text-xl"></i></button>
-                    <h1 class="text-xl font-semibold text-gray-800" id="page-title">Dashboard</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span id="system-clock" class="text-sm text-gray-500 font-medium"></span>
-                    <div class="relative">
-                        <div class="flex items-center space-x-2 cursor-pointer">
-                            <div class="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center font-bold justify-center">AD</div>
-                            <span class="text-sm font-medium text-gray-700 hidden sm:inline">Amministratore</span>
-                        </div>
-                    </div>
+                    <button onclick="openAddItemModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center">
+                        <i class="fa-solid fa-plus mr-2"></i> Nuovo Articolo
+                    </button>
                 </div>
             </header>
 
-            <!-- Area Dinamica dei Contenuti -->
+            <!-- Main Area -->
             <main class="p-6">
 
-                <!-- SEZIONE: DASHBOARD -->
-                <section id="section-dashboard" class="space-y-6">
-                    <!-- KPI Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Utenti Totali</p>
-                                <h3 class="text-2xl font-bold text-gray-800 mt-1" id="kpi-users">1,245</h3>
+                <!-- SEZIONE DASHBOARD -->
+                <section id="sec-dashboard" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-warehouse text-indigo-600 mr-2"></i> Magazzino ATEC</h3>
+                                <button onclick="switchTab('atec')" class="text-sm text-indigo-600 hover:underline">Gestisci</button>
                             </div>
-                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-user-group"></i></div>
+                            <p class="text-sm text-gray-500">Articoli totali registrati: <span id="count-atec" class="font-bold text-gray-800">0</span></p>
                         </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Ordini</p>
-                                <h3 class="text-2xl font-bold text-gray-800 mt-1">342</h3>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-warehouse text-indigo-600 mr-2"></i> Magazzino KRONOS</h3>
+                                <button onclick="switchTab('kronos')" class="text-sm text-indigo-600 hover:underline">Gestisci</button>
                             </div>
-                            <div class="w-12 h-12 bg-green-50 text-green-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-cart-shopping"></i></div>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Fatturato</p>
-                                <h3 class="text-2xl font-bold text-gray-800 mt-1">€ 24.890</h3>
-                            </div>
-                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-euro-sign"></i></div>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Stato Sistema</p>
-                                <h3 class="text-xl font-bold text-emerald-600 mt-1"><i class="fa-solid fa-circle text-xs mr-1 animate-pulse"></i> Attivo</h3>
-                            </div>
-                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-server"></i></div>
+                            <p class="text-sm text-gray-500">Articoli totali registrati: <span id="count-kronos" class="font-bold text-gray-800">0</span></p>
                         </div>
                     </div>
                 </section>
 
-                <!-- SEZIONE: UTENTI (Gestione attiva) -->
-                <section id="section-users" class="space-y-6 hidden">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-                            <h2 class="text-lg font-bold text-gray-800">Elenco Utenti Registrati</h2>
-                            <button onclick="openAddUserModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
-                                <i class="fa-solid fa-user-plus mr-2"></i> Nuovo Utente
-                            </button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse" id="users-table">
-                                <thead>
-                                    <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider">
-                                        <th class="py-3 px-6">Nome</th>
-                                        <th class="py-3 px-6">Email</th>
-                                        <th class="py-3 px-6">Ruolo</th>
-                                        <th class="py-3 px-6">Stato</th>
-                                        <th class="py-3 px-6 text-right">Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100 text-sm text-gray-700" id="users-tbody">
-                                    <!-- Popolato da JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- SEZIONE: MAGAZZINO -->
-                <section id="section-warehouse" class="space-y-6 hidden">
+                <!-- SEZIONE MAGAZZINO ATEC -->
+                <section id="sec-atec" class="space-y-6 hidden">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-bold text-gray-800">Stato Articoli in Magazzino</h2>
-                            <span class="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium">Aggiornato</span>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-4">Monitoraggio rapido delle scorte e dei prodotti registrati.</p>
-                        <div class="border rounded-lg overflow-hidden">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Inventario - ATEC</h2>
+                        <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm">
                                 <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
                                     <tr>
-                                        <th class="p-3">Codice Articolo</th>
+                                        <th class="p-3">Codice</th>
                                         <th class="p-3">Prodotto</th>
-                                        <th class="p-3">Quantità Disponibile</th>
+                                        <th class="p-3">Quantità</th>
                                         <th class="p-3">Categoria</th>
+                                        <th class="p-3 text-right">Azioni Admin</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y text-gray-700">
-                                    <tr>
-                                        <td class="p-3 font-mono">ART-001</td>
-                                        <td class="p-3">Smartphone Fold 7</td>
-                                        <td class="p-3 font-semibold text-emerald-600">42 pz</td>
-                                        <td class="p-3">Elettronica</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-3 font-mono">ART-002</td>
-                                        <td class="p-3">Scanner Barcode Wireless</td>
-                                        <td class="p-3 font-semibold text-amber-600">5 pz</td>
-                                        <td class="p-3">Accessori</td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="table-atec" class="divide-y text-gray-700"></tbody>
                             </table>
                         </div>
                     </div>
                 </section>
 
-                <!-- SEZIONE: IMPOSTAZIONI -->
-                <section id="section-settings" class="space-y-6 hidden">
+                <!-- SEZIONE MAGAZZINO KRONOS -->
+                <section id="sec-kronos" class="space-y-6 hidden">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <h2 class="text-lg font-bold text-gray-800 mb-4">Configurazioni Generali</h2>
-                        <form onsubmit="saveSettings(event)" class="space-y-4 max-w-lg">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Nome Piattaforma</label>
-                                <input type="text" id="setting-sitename" value="Gestionale Pro" class="mt-1 w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Email Amministratore</label>
-                                <input type="email" id="setting-email" value="admin@example.com" class="mt-1 w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            </div>
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">Salva Modifiche</button>
-                        </form>
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Inventario - KRONOS</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Codice</th>
+                                        <th class="p-3">Prodotto</th>
+                                        <th class="p-3">Quantità</th>
+                                        <th class="p-3">Categoria</th>
+                                        <th class="p-3 text-right">Azioni Admin</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-kronos" class="divide-y text-gray-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEZIONE ADMIN -->
+                <section id="sec-admin" class="space-y-6 hidden">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-xl">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Pannello di Controllo Amministratore</h2>
+                        <p class="text-sm text-gray-600 mb-4">Da qui puoi forzare il reset dei dati, sincronizzare o esportare i registri dei magazzini.</p>
+                        <button onclick="resetData()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition">
+                            <i class="fa-solid fa-triangle-exclamation mr-2"></i> Ripristina Dati Predefiniti
+                        </button>
                     </div>
                 </section>
 
@@ -186,140 +132,160 @@
         </div>
     </div>
 
-    <!-- Modale Aggiunta Utente -->
-    <div id="user-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
+    <!-- Modale Aggiunta/Modifica Articolo -->
+    <div id="item-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
         <div class="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">Aggiungi Nuovo Utente</h3>
-            <form id="add-user-form" onsubmit="addUser(event)" class="space-y-4">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Aggiungi Articolo a Magazzino</h3>
+            <form onsubmit="saveItem(event)" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Nome e Cognome</label>
-                    <input type="text" id="new-name" required class="mt-1 w-full border rounded-lg p-2.5 text-sm focus:ring-indigo-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="new-email" required class="mt-1 w-full border rounded-lg p-2.5 text-sm focus:ring-indigo-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Ruolo</label>
-                    <select id="new-role" class="mt-1 w-full border rounded-lg p-2.5 text-sm focus:ring-indigo-500 focus:outline-none">
-                        <option value="Utente">Utente</option>
-                        <option value="Moderatore">Moderatore</option>
-                        <option value="Admin">Admin</option>
+                    <label class="block text-sm font-medium text-gray-700">Magazzino di Destinazione</label>
+                    <select id="item-warehouse" class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                        <option value="atec">ATEC</option>
+                        <option value="kronos">KRONOS</option>
                     </select>
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Codice Articolo</label>
+                    <input type="text" id="item-code" required class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nome Prodotto</label>
+                    <input type="text" id="item-name" required class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Quantità</label>
+                    <input type="number" id="item-qty" required min="0" class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Categoria</label>
+                    <input type="text" id="item-category" required class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                </div>
                 <div class="flex justify-end space-x-3 mt-6">
-                    <button type="button" onclick="closeAddUserModal()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Annulla</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Salva</button>
+                    <button type="button" onclick="closeAddItemModal()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">Annulla</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium">Salva</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Script JavaScript per le Funzioni -->
+    <!-- Script di Gestione -->
     <script>
-        // Dati iniziali di esempio per gli utenti
-        let usersData = [
-            { id: 1, name: "Mario Rossi", email: "mario.rossi@example.com", role: "Admin", status: "Attivo" },
-            { id: 2, name: "Giulia Bianchi", email: "giulia.b@example.com", role: "Moderatore", status: "Attivo" },
-            { id: 3, name: "Luca Verdi", email: "luca.v@example.com", role: "Utente", status: "Sospeso" }
-        ];
+        let inventory = {
+            atec: [
+                { id: 1, code: "AT-001", name: "Sensore Industriale Atec", qty: 120, category: "Elettronica" },
+                { id: 2, code: "AT-002", name: "Cavo schermato 10m", qty: 45, category: "Cablaggi" }
+            ],
+            kronos: [
+                { id: 3, code: "KR-101", name: "Unità di controllo Kronos", qty: 15, category: "Hardware" }
+            ]
+        };
 
-        // Orologio in tempo reale
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('system-clock').innerText = now.toLocaleTimeString('it-IT');
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // Navigazione tra sezioni
-        function showSection(sectionId) {
-            ['dashboard', 'users', 'warehouse', 'settings'].forEach(id => {
-                document.getElementById(`section-${id}`).classList.add('hidden');
-                document.getElementById(`nav-${id}`).classList.remove('bg-indigo-600', 'text-white');
-                document.getElementById(`nav-${id}`).classList.add('hover:bg-slate-800', 'hover:text-white');
+        function switchTab(tabId) {
+            ['dashboard', 'atec', 'kronos', 'admin'].forEach(id => {
+                document.getElementById(`sec-${id}`).classList.add('hidden');
+                const nav = document.getElementById(`nav-${id}`);
+                if(nav) {
+                    nav.classList.remove('bg-indigo-600', 'text-white');
+                    nav.classList.add('hover:bg-slate-800', 'hover:text-white');
+                }
             });
 
-            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
-            const activeNav = document.getElementById(`nav-${sectionId}`);
-            activeNav.classList.add('bg-indigo-600', 'text-white');
-            activeNav.classList.remove('hover:bg-slate-800', 'hover:text-white');
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if(activeNav) {
+                activeNav.classList.add('bg-indigo-600', 'text-white');
+                activeNav.classList.remove('hover:bg-slate-800', 'hover:text-white');
+            }
 
-            const titles = { dashboard: 'Dashboard', users: 'Gestione Utenti', warehouse: 'Gestione Magazzino', settings: 'Impostazioni di Sistema' };
-            document.getElementById('page-title').innerText = titles[sectionId];
+            const titles = { dashboard: 'Panoramica Generale', atec: 'Magazzino ATEC', kronos: 'Magazzino KRONOS', admin: 'Controllo Amministratore' };
+            document.getElementById('page-title').innerText = titles[tabId];
 
-            if(sectionId === 'users') renderUsers();
+            renderTables();
         }
 
-        // Render tabella utenti
-        function renderUsers() {
-            const tbody = document.getElementById('users-tbody');
-            tbody.innerHTML = '';
-            usersData.forEach(user => {
-                const statusBadge = user.status === 'Attivo' 
-                    ? '<span class="px-2.5 py-1 text-xs font-semibold bg-emerald-50 text-emerald-600 rounded-full">Attivo</span>' 
-                    : '<span class="px-2.5 py-1 text-xs font-semibold bg-red-50 text-red-600 rounded-full">Sospeso</span>';
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50/50">
-                        <td class="py-3 px-6 font-medium text-gray-800">${user.name}</td>
-                        <td class="py-3 px-6 text-gray-500">${user.email}</td>
-                        <td class="py-3 px-6">${user.role}</td>
-                        <td class="py-3 px-6">${statusBadge}</td>
-                        <td class="py-3 px-6 text-right space-x-2">
-                            <button onclick="toggleStatus(${user.id})" class="text-gray-400 hover:text-indigo-600" title="Cambia stato"><i class="fa-solid fa-arrows-rotate"></i></button>
-                            <button onclick="deleteUser(${user.id})" class="text-gray-400 hover:text-red-600" title="Elimina"><i class="fa-solid fa-trash"></i></button>
+        function renderTables() {
+            // Render Atec
+            const tbodyAtec = document.getElementById('table-atec');
+            tbodyAtec.innerHTML = '';
+            inventory.atec.forEach(item => {
+                tbodyAtec.innerHTML += `
+                    <tr>
+                        <td class="p-3 font-mono">${item.code}</td>
+                        <td class="p-3 font-medium">${item.name}</td>
+                        <td class="p-3 font-semibold text-indigo-600">${item.qty} pz</td>
+                        <td class="p-3">${item.category}</td>
+                        <td class="p-3 text-right space-x-2">
+                            <button onclick="adjustQty('atec', ${item.id}, 1)" class="text-gray-400 hover:text-emerald-600" title="Aggiungi 1"><i class="fa-solid fa-plus"></i></button>
+                            <button onclick="adjustQty('atec', ${item.id}, -1)" class="text-gray-400 hover:text-amber-600" title="Rimuovi 1"><i class="fa-solid fa-minus"></i></button>
+                            <button onclick="deleteItem('atec', ${item.id})" class="text-gray-400 hover:text-red-600" title="Elimina"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             });
-            document.getElementById('kpi-users').innerText = usersData.length;
+            document.getElementById('count-atec').innerText = inventory.atec.length;
+
+            // Render Kronos
+            const tbodyKronos = document.getElementById('table-kronos');
+            tbodyKronos.innerHTML = '';
+            inventory.kronos.forEach(item => {
+                tbodyKronos.innerHTML += `
+                    <tr>
+                        <td class="p-3 font-mono">${item.code}</td>
+                        <td class="p-3 font-medium">${item.name}</td>
+                        <td class="p-3 font-semibold text-indigo-600">${item.qty} pz</td>
+                        <td class="p-3">${item.category}</td>
+                        <td class="p-3 text-right space-x-2">
+                            <button onclick="adjustQty('kronos', ${item.id}, 1)" class="text-gray-400 hover:text-emerald-600" title="Aggiungi 1"><i class="fa-solid fa-plus"></i></button>
+                            <button onclick="adjustQty('kronos', ${item.id}, -1)" class="text-gray-400 hover:text-amber-600" title="Rimuovi 1"><i class="fa-solid fa-minus"></i></button>
+                            <button onclick="deleteItem('kronos', ${item.id})" class="text-gray-400 hover:text-red-600" title="Elimina"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('count-kronos').innerText = inventory.kronos.length;
         }
 
-        // Gestione modale utenti
-        function openAddUserModal() { document.getElementById('user-modal').classList.remove('hidden'); }
-        function closeAddUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
+        function openAddItemModal() { document.getElementById('item-modal').classList.remove('hidden'); }
+        function closeAddItemModal() { document.getElementById('item-modal').classList.add('hidden'); }
 
-        function addUser(e) {
+        function saveItem(e) {
             e.preventDefault();
-            const name = document.getElementById('new-name').value;
-            const email = document.getElementById('new-email').value;
-            const role = document.getElementById('new-role').value;
-
-            usersData.push({ id: Date.now(), name, email, role, status: 'Attivo' });
-            renderUsers();
-            closeAddUserModal();
-            document.getElementById('add-user-form').reset();
+            const wh = document.getElementById('item-warehouse').value;
+            const newItem = {
+                id: Date.now(),
+                code: document.getElementById('item-code').value,
+                name: document.getElementById('item-name').value,
+                qty: parseInt(document.getElementById('item-qty').value),
+                category: document.getElementById('item-category').value
+            };
+            inventory[wh].push(newItem);
+            renderTables();
+            closeAddItemModal();
+            e.target.reset();
         }
 
-        function deleteUser(id) {
-            if(confirm('Vuoi davvero eliminare questo utente?')) {
-                usersData = usersData.filter(u => u.id !== id);
-                renderUsers();
+        function adjustQty(wh, id, delta) {
+            const item = inventory[wh].find(i => i.id === id);
+            if(item) {
+                item.qty = Math.max(0, item.qty + delta);
+                renderTables();
             }
         }
 
-        function toggleStatus(id) {
-            const user = usersData.find(u => u.id === id);
-            if(user) {
-                user.status = user.status === 'Attivo' ? 'Sospeso' : 'Attivo';
-                renderUsers();
+        function deleteItem(wh, id) {
+            if(confirm('Confermi l\'eliminazione definitiva dell\'articolo?')) {
+                inventory[wh] = inventory[wh].filter(i => i.id !== id);
+                renderTables();
             }
         }
 
-        function saveSettings(e) {
-            e.preventDefault();
-            alert('Impostazioni salvate con successo!');
-        }
-
-        function logoutAdmin() {
-            if(confirm('Vuoi effettuare il logout dal pannello?')) {
+        function resetData() {
+            if(confirm('Vuoi ripristinare i magazzini ai dati iniziali?')) {
                 window.location.reload();
             }
         }
 
-        // Inizializza tabella al caricamento se serve
-        renderUsers();
+        renderTables();
     </script>
 </body>
 </html>
