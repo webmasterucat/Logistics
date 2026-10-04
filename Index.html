@@ -96,109 +96,25 @@
 
                 <!-- 1. DASHBOARD -->
                 <section id="sec-dashboard" class="space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">
-                                <i class="fa-solid fa-warehouse"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Totale Articoli Magazzino ATEC</p>
-                                <h3 id="count-atec" class="text-2xl font-bold text-slate-800">0</h3>
-                            </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Panoramica Magazzini</h3>
+                            <p class="text-xs text-slate-500">Dati anagrafici e contatti dei magazzini attivi</p>
                         </div>
-                        <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold">
-                                <i class="fa-solid fa-warehouse"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Totale Articoli Magazzino KRONOS</p>
-                                <h3 id="count-kronos" class="text-2xl font-bold text-slate-800">0</h3>
-                            </div>
-                        </div>
+                        <div id="dashboard-warehouse-actions"></div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
-                            <div class="flex items-center justify-between border-b pb-3">
-                                <div>
-                                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-chart-bar text-indigo-600 mr-2"></i> Scorte Magazzino ATEC</h3>
-                                    <p class="text-xs text-slate-400">Quantitativi per prodotto e modello</p>
-                                </div>
-                                <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">ATEC</span>
-                            </div>
-                            <div class="relative h-80 w-full"><canvas id="chartAtec"></canvas></div>
-                        </div>
+                    <!-- Card Dinamiche dei Magazzini -->
+                    <div id="dashboard-warehouses-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
 
-                        <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
-                            <div class="flex items-center justify-between border-b pb-3">
-                                <div>
-                                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-chart-bar text-emerald-600 mr-2"></i> Scorte Magazzino KRONOS</h3>
-                                    <p class="text-xs text-slate-400">Quantitativi per prodotto e modello</p>
-                                </div>
-                                <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold">KRONOS</span>
-                            </div>
-                            <div class="relative h-80 w-full"><canvas id="chartKronos"></canvas></div>
-                        </div>
-                    </div>
+                    <!-- Grafici Scorte -->
+                    <div id="dashboard-charts-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
                 </section>
 
-                <!-- 2. MAGAZZINO ATEC -->
-                <section id="sec-atec" class="hidden space-y-6">
-                    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
-                        <div class="p-5 border-b flex justify-between items-center bg-slate-50">
-                            <div>
-                                <h3 class="font-bold text-slate-800">Inventario Prodotti - ATEC</h3>
-                                <p class="text-xs text-slate-500">Elenco completo degli articoli registrati</p>
-                            </div>
-                            <button id="header-add-atec" onclick="openAddItemModal('atec')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                                <i class="fa-solid fa-plus mr-1"></i> Nuovo Articolo
-                            </button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-sm">
-                                <thead>
-                                    <tr id="thead-atec-row" class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
-                                        <th class="p-3 font-bold">EAN</th>
-                                        <th class="p-3 font-bold">Prodotto</th>
-                                        <th class="p-3 font-bold">Modello</th>
-                                        <th class="p-3 font-bold">Quantità</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-atec" class="divide-y divide-slate-100"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
+                <!-- DINAMIC SECTIONS FOR WAREHOUSES -->
+                <div id="dynamic-warehouse-sections"></div>
 
-                <!-- 3. MAGAZZINO KRONOS -->
-                <section id="sec-kronos" class="hidden space-y-6">
-                    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
-                        <div class="p-5 border-b flex justify-between items-center bg-slate-50">
-                            <div>
-                                <h3 class="font-bold text-slate-800">Inventario Prodotti - KRONOS</h3>
-                                <p class="text-xs text-slate-500">Elenco completo degli articoli registrati</p>
-                            </div>
-                            <button id="header-add-kronos" onclick="openAddItemModal('kronos')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                                <i class="fa-solid fa-plus mr-1"></i> Nuovo Articolo
-                            </button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-sm">
-                                <thead>
-                                    <tr id="thead-kronos-row" class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
-                                        <th class="p-3 font-bold">EAN</th>
-                                        <th class="p-3 font-bold">Prodotto</th>
-                                        <th class="p-3 font-bold">Modello</th>
-                                        <th class="p-3 font-bold">Quantità</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-kronos" class="divide-y divide-slate-100"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 4. GESTIONE ORDINI -->
+                <!-- GESTIONE ORDINI -->
                 <section id="sec-orders" class="hidden space-y-6">
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -231,7 +147,7 @@
                     </div>
                 </section>
 
-                <!-- 5. TRASFERIMENTI -->
+                <!-- TRASFERIMENTI -->
                 <section id="sec-admin" class="hidden space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
@@ -241,7 +157,7 @@
                                 </div>
                                 <div>
                                     <h3 class="font-bold text-slate-800">Trasferimento Merce Interno</h3>
-                                    <p class="text-xs text-slate-400">Sposta articoli tra magazzino ATEC e KRONOS</p>
+                                    <p class="text-xs text-slate-400">Sposta articoli tra i magazzini aziendali</p>
                                 </div>
                             </div>
                             <button onclick="openTransferModal()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition shadow-sm">
@@ -251,7 +167,7 @@
                     </div>
                 </section>
 
-                <!-- 6. GESTIONE UTENTI -->
+                <!-- GESTIONE UTENTI -->
                 <section id="sec-users" class="hidden space-y-6">
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -315,6 +231,40 @@
         </div>
     </div>
 
+    <!-- Modale Configurazione Magazzino -->
+    <div id="warehouse-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h3 id="warehouse-modal-title" class="text-lg font-bold text-slate-800">Nuovo Magazzino</h3>
+            <form onsubmit="saveWarehouseConfig(event)" class="space-y-4">
+                <input type="hidden" id="wh-original-key">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome Magazzino</label>
+                    <input type="text" id="wh-name" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. Magazzino Nord">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Indirizzo</label>
+                    <input type="text" id="wh-address" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. Via Roma 10, Milano">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Telefono</label>
+                    <input type="text" id="wh-phone" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. +39 02 1234567">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email</label>
+                    <input type="email" id="wh-email" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. magazzino@azienda.it">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Responsabile</label>
+                    <input type="text" id="wh-manager" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. Mario Rossi">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeWarehouseModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Salva Magazzino</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modale Nuovo Ordine (Prodotti Multipli) -->
     <div id="order-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 space-y-4 my-8">
@@ -327,10 +277,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Riferimento</label>
-                        <select id="order-warehouse" onchange="updateAllOrderCatalogs()" class="w-full border rounded-xl p-3 text-sm bg-white">
-                            <option value="atec">Magazzino ATEC</option>
-                            <option value="kronos">Magazzino KRONOS</option>
-                        </select>
+                        <select id="order-warehouse" onchange="updateAllOrderCatalogs()" class="w-full border rounded-xl p-3 text-sm bg-white"></select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fattura</label>
@@ -410,17 +357,11 @@
             <form onsubmit="executeTransfer(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Da Magazzino Origine</label>
-                    <select id="transfer-from" onchange="updateTransferItems()" class="w-full border rounded-xl p-3 text-sm bg-white">
-                        <option value="atec">Magazzino ATEC</option>
-                        <option value="kronos">Magazzino KRONOS</option>
-                    </select>
+                    <select id="transfer-from" onchange="updateTransferItems()" class="w-full border rounded-xl p-3 text-sm bg-white"></select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">A Magazzino Destinazione</label>
-                    <select id="transfer-to" disabled class="w-full border rounded-xl p-3 text-sm bg-slate-100 text-slate-500">
-                        <option value="kronos">Magazzino KRONOS</option>
-                        <option value="atec">Magazzino ATEC</option>
-                    </select>
+                    <select id="transfer-to" class="w-full border rounded-xl p-3 text-sm bg-white"></select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seleziona Articolo</label>
@@ -476,16 +417,34 @@
                 { id: 2, username: 'm.neri', password: 'password123', role: 'Admin Magazzino' },
                 { id: 3, username: 'user', password: 'user123', role: 'Visualizzatore' }
             ],
-            atec: [
-                { id: 101, ean: '8012345678901', name: 'Sensore di Movimento IoT', model: 'ATEC-PRO-X1', qty: 45 },
-                { id: 102, ean: '8012345678902', name: 'Gateway Wi-Fi Industriale', model: 'ATEC-GW-90', qty: 12 },
-                { id: 103, ean: '8012345678903', name: 'Attuatore Elettrico 24V', model: 'ATEC-ACT-V2', qty: 28 }
-            ],
-            kronos: [
-                { id: 201, ean: '8098765432101', name: 'Terminalino Barcode Laser', model: 'KRN-SCAN-01', qty: 15 },
-                { id: 202, ean: '8098765432102', name: 'Stampante Termica Etichette', model: 'KRN-PRT-4X', qty: 8 },
-                { id: 203, ean: '8098765432103', name: 'Batteria Litio di Ricambio', model: 'KRN-BAT-500', qty: 34 }
-            ],
+            warehouses: {
+                atec: {
+                    name: 'Magazzino ATEC',
+                    address: 'Via Industriale 12, Milano',
+                    phone: '+39 02 5550192',
+                    email: 'atec.logistica@azienda.it',
+                    manager: 'Mario Neri'
+                },
+                kronos: {
+                    name: 'Magazzino KRONOS',
+                    address: 'Corso Stati Uniti 45, Torino',
+                    phone: '+39 011 8882910',
+                    email: 'kronos.magazzino@azienda.it',
+                    manager: 'Laura Bianchi'
+                }
+            },
+            inventory: {
+                atec: [
+                    { id: 101, ean: '8012345678901', name: 'Sensore di Movimento IoT', model: 'ATEC-PRO-X1', qty: 45 },
+                    { id: 102, ean: '8012345678902', name: 'Gateway Wi-Fi Industriale', model: 'ATEC-GW-90', qty: 12 },
+                    { id: 103, ean: '8012345678903', name: 'Attuatore Elettrico 24V', model: 'ATEC-ACT-V2', qty: 28 }
+                ],
+                kronos: [
+                    { id: 201, ean: '8098765432101', name: 'Terminalino Barcode Laser', model: 'KRN-SCAN-01', qty: 15 },
+                    { id: 202, ean: '8098765432102', name: 'Stampante Termica Etichette', model: 'KRN-PRT-4X', qty: 8 },
+                    { id: 203, ean: '8098765432103', name: 'Batteria Litio di Ricambio', model: 'KRN-BAT-500', qty: 34 }
+                ]
+            },
             orders: [
                 {
                     id: 'ORD-2026-001',
@@ -507,9 +466,16 @@
         };
 
         let appData = JSON.parse(localStorage.getItem('atec_kronos_db')) || defaultData;
+        // Compatibilità retroattiva se il vecchio formato era salvato
+        if (!appData.warehouses) {
+            appData.warehouses = defaultData.warehouses;
+            appData.inventory = { atec: appData.atec || [], kronos: appData.kronos || [] };
+            delete appData.atec;
+            delete appData.kronos;
+        }
+
         let currentUser = JSON.parse(localStorage.getItem('atec_kronos_user')) || null;
-        let chartAtecInstance = null;
-        let chartKronosInstance = null;
+        let chartInstances = {};
 
         function saveData() {
             localStorage.setItem('atec_kronos_db', JSON.stringify(appData));
@@ -553,76 +519,189 @@
             document.getElementById('app-container').classList.remove('hidden');
             document.getElementById('current-user-display').innerText = currentUser.username;
             document.getElementById('current-role-display').innerText = currentUser.role;
+            buildDynamicSections();
             buildSidebar();
             switchSection('sec-dashboard', 'Dashboard Generale');
         }
 
-        function buildSidebar() {
+        function buildDynamicSections() {
             const nav = document.getElementById('sidebar-nav');
-            let html = `
+            let sidebarHtml = `
                 <button onclick="switchSection('sec-dashboard', 'Dashboard Generale')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
                     <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard</span>
                 </button>
-                <button onclick="switchSection('sec-atec', 'Magazzino ATEC')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                    <i class="fa-solid fa-warehouse w-5"></i><span>Magazzino ATEC</span>
-                </button>
-                <button onclick="switchSection('sec-kronos', 'Magazzino KRONOS')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                    <i class="fa-solid fa-warehouse w-5"></i><span>Magazzino KRONOS</span>
-                </button>
+            `;
+
+            let sectionsHtml = '';
+            Object.keys(appData.warehouses).forEach(key => {
+                const wh = appData.warehouses[key];
+                sidebarHtml += `
+                    <button onclick="switchSection('sec-${key}', '${wh.name}')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
+                        <i class="fa-solid fa-warehouse w-5"></i><span>${wh.name}</span>
+                    </button>
+                `;
+
+                sectionsHtml += `
+                    <section id="sec-${key}" class="hidden space-y-6">
+                        <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+                            <div class="p-5 border-b flex justify-between items-center bg-slate-50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800">Inventario Prodotti - ${wh.name}</h3>
+                                    <p class="text-xs text-slate-500">${wh.address} | Resp: ${wh.manager}</p>
+                                </div>
+                                <button id="header-add-${key}" onclick="openAddItemModal('${key}')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                                    <i class="fa-solid fa-plus mr-1"></i> Nuovo Articolo
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse text-sm">
+                                    <thead>
+                                        <tr id="thead-${key}-row" class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
+                                            <th class="p-3 font-bold">EAN</th>
+                                            <th class="p-3 font-bold">Prodotto</th>
+                                            <th class="p-3 font-bold">Modello</th>
+                                            <th class="p-3 font-bold">Quantità</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-${key}" class="divide-y divide-slate-100"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                `;
+            });
+
+            sidebarHtml += `
                 <button onclick="switchSection('sec-orders', 'Gestione Ordini')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
                     <i class="fa-solid fa-file-invoice w-5"></i><span>Ordini & Spedizioni</span>
                 </button>
             `;
+
             if (currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino') {
-                html += `
+                sidebarHtml += `
                     <button onclick="switchSection('sec-admin', 'Area Admin & Trasferimenti')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
                         <i class="fa-solid fa-shield-halved w-5"></i><span>Trasferimenti</span>
                     </button>
                 `;
             }
             if (currentUser.role === 'Super Admin') {
-                html += `
+                sidebarHtml += `
                     <button onclick="switchSection('sec-users', 'Gestione Utenti')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
                         <i class="fa-solid fa-users-gear w-5"></i><span>Utenti</span>
                     </button>
                 `;
             }
-            nav.innerHTML = html;
+
+            nav.innerHTML = sidebarHtml;
+            document.getElementById('dynamic-warehouse-sections').innerHTML = sectionsHtml;
+        }
+
+        function buildSidebar() {
+            // Già gestito in buildDynamicSections
         }
 
         function switchSection(secId, title) {
-            ['sec-dashboard', 'sec-atec', 'sec-kronos', 'sec-orders', 'sec-admin', 'sec-users'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
+            const allSecs = ['sec-dashboard', 'sec-orders', 'sec-admin', 'sec-users'];
+            Object.keys(appData.warehouses).forEach(k => allSecs.push(`sec-${k}`));
+
+            allSecs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
             });
-            document.getElementById(secId).classList.remove('hidden');
+
+            const target = document.getElementById(secId);
+            if (target) target.classList.remove('hidden');
             document.getElementById('page-title').innerText = title;
 
             if (secId === 'sec-dashboard') renderDashboard();
-            if (secId === 'sec-atec') renderInventory('atec');
-            if (secId === 'sec-kronos') renderInventory('kronos');
-            if (secId === 'sec-orders') renderOrders();
-            if (secId === 'sec-users') renderUsers();
+            else if (secId === 'sec-orders') renderOrders();
+            else if (secId === 'sec-users') renderUsers();
+            else {
+                const whKey = secId.replace('sec-', '');
+                if (appData.warehouses[whKey]) renderInventory(whKey);
+            }
         }
 
         function renderDashboard() {
-            const totalAtec = appData.atec.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
-            const totalKronos = appData.kronos.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
-            document.getElementById('count-atec').innerText = totalAtec;
-            document.getElementById('count-kronos').innerText = totalKronos;
+            const isSuperAdmin = currentUser.role === 'Super Admin';
+            const actionContainer = document.getElementById('dashboard-warehouse-actions');
+            actionContainer.innerHTML = isSuperAdmin ? `
+                <button onclick="openWarehouseModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                    <i class="fa-solid fa-plus mr-1"></i> Aggiungi Magazzino
+                </button>
+            ` : '';
 
-            renderHorizontalBarChart('chartAtec', appData.atec, 'Scorte ATEC', ['#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff']);
-            renderHorizontalBarChart('chartKronos', appData.kronos, 'Scorte KRONOS', ['#10b981','#34d399','#6ee7b7','#a7f3d0','#ecfdf5']);
+            let gridHtml = '';
+            let chartsHtml = '';
+
+            Object.keys(appData.warehouses).forEach(key => {
+                const wh = appData.warehouses[key];
+                const items = appData.inventory[key] || [];
+                const totalQty = items.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
+
+                gridHtml += `
+                    <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
+                        <div class="flex items-start justify-between border-b pb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                                    <i class="fa-solid fa-warehouse"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-base">${wh.name}</h4>
+                                    <p class="text-xs font-semibold text-indigo-600">Totale Articoli: ${totalQty}</p>
+                                </div>
+                            </div>
+                            ${isSuperAdmin ? `
+                                <div class="flex space-x-1">
+                                    <button onclick="editWarehouse('${key}')" class="text-slate-400 hover:text-indigo-600 p-2"><i class="fa-solid fa-pen text-sm"></i></button>
+                                    <button onclick="deleteWarehouse('${key}')" class="text-slate-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash text-sm"></i></button>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600">
+                            <div><p class="font-bold text-slate-400 uppercase text-[10px]">Indirizzo</p><p class="font-medium">${wh.address}</p></div>
+                            <div><p class="font-bold text-slate-400 uppercase text-[10px]">Responsabile</p><p class="font-medium">${wh.manager}</p></div>
+                            <div><p class="font-bold text-slate-400 uppercase text-[10px]">Telefono</p><p class="font-medium">${wh.phone}</p></div>
+                            <div><p class="font-bold text-slate-400 uppercase text-[10px]">Email</p><p class="font-medium">${wh.email}</p></div>
+                        </div>
+                    </div>
+                `;
+
+                chartsHtml += `
+                    <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800"><i class="fa-solid fa-chart-bar text-indigo-600 mr-2"></i> Scorte ${wh.name}</h3>
+                                <p class="text-xs text-slate-400">Quantitativi per prodotto e modello</p>
+                            </div>
+                            <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold uppercase">${key}</span>
+                        </div>
+                        <div class="relative h-80 w-full"><canvas id="chart-${key}"></canvas></div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('dashboard-warehouses-grid').innerHTML = gridHtml;
+            document.getElementById('dashboard-charts-container').innerHTML = chartsHtml;
+
+            // Renderizza i grafici
+            Object.keys(appData.warehouses).forEach(key => {
+                renderHorizontalBarChart(`chart-${key}`, appData.inventory[key] || [], `Scorte ${appData.warehouses[key].name}`, ['#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff']);
+            });
         }
 
         function renderHorizontalBarChart(canvasId, items, labelText, colors) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
+            const canvasEl = document.getElementById(canvasId);
+            if (!canvasEl) return;
+            const ctx = canvasEl.getContext('2d');
             const labels = items.map(i => `${i.name} (${i.model})`);
             const dataVals = items.map(i => i.qty);
 
-            if (canvasId === 'chartAtec' && chartAtecInstance) chartAtecInstance.destroy();
-            if (canvasId === 'chartKronos' && chartKronosInstance) chartKronosInstance.destroy();
+            if (chartInstances[canvasId]) {
+                chartInstances[canvasId].destroy();
+            }
 
-            const chartObj = new Chart(ctx, {
+            chartInstances[canvasId] = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -643,15 +722,92 @@
                 },
                 plugins: [ChartDataLabels]
             });
+        }
 
-            if (canvasId === 'chartAtec') chartAtecInstance = chartObj;
-            if (canvasId === 'chartKronos') chartKronosInstance = chartObj;
+        let editingWarehouseKey = null;
+        function openWarehouseModal() {
+            editingWarehouseKey = null;
+            document.getElementById('warehouse-modal-title').innerText = 'Nuovo Magazzino';
+            document.getElementById('wh-original-key').value = '';
+            document.getElementById('wh-name').value = '';
+            document.getElementById('wh-address').value = '';
+            document.getElementById('wh-phone').value = '';
+            document.getElementById('wh-email').value = '';
+            document.getElementById('wh-manager').value = '';
+            document.getElementById('warehouse-modal').classList.remove('hidden');
+        }
+
+        function editWarehouse(key) {
+            const wh = appData.warehouses[key];
+            if (!wh) return;
+            editingWarehouseKey = key;
+            document.getElementById('warehouse-modal-title').innerText = `Modifica Magazzino - ${wh.name}`;
+            document.getElementById('wh-original-key').value = key;
+            document.getElementById('wh-name').value = wh.name;
+            document.getElementById('wh-address').value = wh.address;
+            document.getElementById('wh-phone').value = wh.phone;
+            document.getElementById('wh-email').value = wh.email;
+            document.getElementById('wh-manager').value = wh.manager;
+            document.getElementById('warehouse-modal').classList.remove('hidden');
+        }
+
+        function closeWarehouseModal() {
+            document.getElementById('warehouse-modal').classList.add('hidden');
+        }
+
+        function saveWarehouseConfig(e) {
+            e.preventDefault();
+            const name = document.getElementById('wh-name').value.trim();
+            const address = document.getElementById('wh-address').value.trim();
+            const phone = document.getElementById('wh-phone').value.trim();
+            const email = document.getElementById('wh-email').value.trim();
+            const manager = document.getElementById('wh-manager').value.trim();
+
+            const newKey = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+            if (editingWarehouseKey) {
+                if (editingWarehouseKey !== newKey) {
+                    appData.warehouses[newKey] = { name, address, phone, email, manager };
+                    appData.inventory[newKey] = appData.inventory[editingWarehouseKey] || [];
+                    delete appData.warehouses[editingWarehouseKey];
+                    delete appData.inventory[editingWarehouseKey];
+                } else {
+                    appData.warehouses[editingWarehouseKey] = { name, address, phone, email, manager };
+                }
+            } else {
+                if (appData.warehouses[newKey]) {
+                    alert('Esiste già un magazzino con questo nome!');
+                    return;
+                }
+                appData.warehouses[newKey] = { name, address, phone, email, manager };
+                appData.inventory[newKey] = [];
+            }
+
+            saveData();
+            closeWarehouseModal();
+            buildDynamicSections();
+            switchSection('sec-dashboard', 'Dashboard Generale');
+        }
+
+        function deleteWarehouse(key) {
+            if (Object.keys(appData.warehouses).length <= 1) {
+                alert('Impossibile eliminare l’ultimo magazzino rimasto.');
+                return;
+            }
+            if (confirm(`Eliminare il magazzino "${appData.warehouses[key].name}" e tutti i suoi articoli?`)) {
+                delete appData.warehouses[key];
+                delete appData.inventory[key];
+                saveData();
+                buildDynamicSections();
+                switchSection('sec-dashboard', 'Dashboard Generale');
+            }
         }
 
         function renderInventory(wh) {
             const tbody = document.getElementById(`table-${wh}`);
             const canEdit = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
-            document.getElementById(`header-add-${wh}`).style.display = canEdit ? 'inline-block' : 'none';
+            const btnAdd = document.getElementById(`header-add-${wh}`);
+            if (btnAdd) btnAdd.style.display = canEdit ? 'inline-block' : 'none';
 
             const theadRow = document.getElementById(`thead-${wh}-row`);
             let thActions = theadRow.querySelector('.th-actions-inv');
@@ -667,7 +823,8 @@
             }
 
             let html = '';
-            appData[wh].forEach(item => {
+            const items = appData.inventory[wh] || [];
+            items.forEach(item => {
                 html += `
                     <tr class="hover:bg-slate-50 transition">
                         <td class="p-3 font-mono text-xs text-slate-600">${item.ean}</td>
@@ -692,7 +849,7 @@
         function openAddItemModal(wh) {
             editingItemId = null;
             document.getElementById('item-warehouse').value = wh;
-            document.getElementById('item-modal-title').innerText = `Nuovo Articolo - Magazzino ${wh.toUpperCase()}`;
+            document.getElementById('item-modal-title').innerText = `Nuovo Articolo - ${appData.warehouses[wh].name}`;
             document.getElementById('item-ean').value = '';
             document.getElementById('item-name').value = '';
             document.getElementById('item-model').value = '';
@@ -701,11 +858,11 @@
         }
 
         function editItem(wh, id) {
-            const item = appData[wh].find(x => x.id === id);
+            const item = (appData.inventory[wh] || []).find(x => x.id === id);
             if (!item) return;
             editingItemId = id;
             document.getElementById('item-warehouse').value = wh;
-            document.getElementById('item-modal-title').innerText = `Modifica Articolo - Magazzino ${wh.toUpperCase()}`;
+            document.getElementById('item-modal-title').innerText = `Modifica Articolo - ${appData.warehouses[wh].name}`;
             document.getElementById('item-ean').value = item.ean;
             document.getElementById('item-name').value = item.name;
             document.getElementById('item-model').value = item.model;
@@ -727,11 +884,12 @@
                 model: document.getElementById('item-model').value,
                 qty: parseInt(document.getElementById('item-qty').value)
             };
+            if (!appData.inventory[wh]) appData.inventory[wh] = [];
             if (editingItemId) {
-                const idx = appData[wh].findIndex(x => x.id === editingItemId);
-                if (idx !== -1) appData[wh][idx] = newItem;
+                const idx = appData.inventory[wh].findIndex(x => x.id === editingItemId);
+                if (idx !== -1) appData.inventory[wh][idx] = newItem;
             } else {
-                appData[wh].push(newItem);
+                appData.inventory[wh].push(newItem);
             }
             saveData();
             closeAddItemModal();
@@ -740,7 +898,7 @@
 
         function deleteItem(wh, id) {
             if (confirm('Eliminare questo articolo dall’inventario?')) {
-                appData[wh] = appData[wh].filter(x => x.id !== id);
+                appData.inventory[wh] = (appData.inventory[wh] || []).filter(x => x.id !== id);
                 saveData();
                 renderInventory(wh);
             }
@@ -748,8 +906,6 @@
 
         function renderOrders() {
             const tbody = document.getElementById('table-orders');
-            
-            // Consenti a tutti (incluso il Visualizzatore) di creare ordini
             const btnNewOrder = document.getElementById('btn-new-order');
             if (btnNewOrder) btnNewOrder.style.display = 'inline-block';
 
@@ -772,6 +928,8 @@
             appData.orders.forEach(ord => {
                 const badgeColor = ord.status === 'Evaso' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700';
                 const itemsText = ord.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+                const whObj = appData.warehouses[ord.warehouse];
+                const whName = whObj ? whObj.name : ord.warehouse;
                 
                 html += `
                     <tr class="hover:bg-slate-50 transition">
@@ -781,7 +939,7 @@
                         <td class="p-3 text-slate-700 font-medium text-xs">${ord.sko1 || '-'}</td>
                         <td class="p-3 text-slate-700">${ord.sko2}</td>
                         <td class="p-3 text-slate-700">${ord.sko3}</td>
-                        <td class="p-3 uppercase text-xs font-bold text-indigo-600">${ord.warehouse}</td>
+                        <td class="p-3 uppercase text-xs font-bold text-indigo-600">${whName}</td>
                         <td class="p-3 text-xs text-slate-600 max-w-xs truncate">${itemsText}</td>
                         <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${ord.status}</span></td>
                 `;
@@ -803,14 +961,21 @@
 
         function openOrderModal() {
             document.getElementById('order-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('order-warehouse').value = 'atec';
+            
+            // Popola selettore magazzini nell'ordine
+            const whSelect = document.getElementById('order-warehouse');
+            let whOptHtml = '';
+            Object.keys(appData.warehouses).forEach(k => {
+                whOptHtml += `<option value="${k}">${appData.warehouses[k].name}</option>`;
+            });
+            whSelect.innerHTML = whOptHtml;
+
             document.getElementById('order-invoice').value = '';
             document.getElementById('order-deal').value = '';
             document.getElementById('order-sko1').value = '';
             document.getElementById('order-sko2').value = currentUser.username;
             document.getElementById('order-sko3').value = '';
             
-            // Inizializza il contenitore con una riga predefinita per prodotti multipli pescati dall'inventario
             document.getElementById('order-items-container').innerHTML = '';
             addOrderItemRow();
             
@@ -824,7 +989,7 @@
         function addOrderItemRow() {
             const container = document.getElementById('order-items-container');
             const wh = document.getElementById('order-warehouse').value;
-            const items = appData[wh];
+            const items = appData.inventory[wh] || [];
 
             let options = '';
             items.forEach(i => {
@@ -937,8 +1102,21 @@
         }
 
         function openTransferModal() {
-            document.getElementById('transfer-from').value = 'atec';
-            document.getElementById('transfer-to').value = 'kronos';
+            const whKeys = Object.keys(appData.warehouses);
+            if (whKeys.length < 2) {
+                alert('Sono necessari almeno 2 magazzini per effettuare un trasferimento.');
+                return;
+            }
+
+            let optHtml = '';
+            whKeys.forEach(k => {
+                optHtml += `<option value="${k}">${appData.warehouses[k].name}</option>`;
+            });
+
+            document.getElementById('transfer-from').innerHTML = optHtml;
+            document.getElementById('transfer-to').innerHTML = optHtml;
+            document.getElementById('transfer-from').value = whKeys[0];
+            document.getElementById('transfer-to').value = whKeys[1];
             updateTransferItems();
             document.getElementById('transfer-modal').classList.remove('hidden');
         }
@@ -949,12 +1127,10 @@
 
         function updateTransferItems() {
             const fromWh = document.getElementById('transfer-from').value;
-            const toWh = fromWh === 'atec' ? 'kronos' : 'atec';
-            document.getElementById('transfer-to').value = toWh;
-
             const select = document.getElementById('transfer-item-id');
             let html = '';
-            appData[fromWh].forEach(i => {
+            const items = appData.inventory[fromWh] || [];
+            items.forEach(i => {
                 html += `<option value="${i.id}">${i.name} (${i.model}) - Disponibili: ${i.qty}</option>`;
             });
             select.innerHTML = html;
@@ -964,21 +1140,26 @@
             e.preventDefault();
             const fromWh = document.getElementById('transfer-from').value;
             const toWh = document.getElementById('transfer-to').value;
+            if (fromWh === toWh) {
+                alert('Il magazzino di origine e destinazione devono essere differenti!');
+                return;
+            }
             const itemId = parseInt(document.getElementById('transfer-item-id').value);
             const qty = parseInt(document.getElementById('transfer-qty').value);
 
-            const sourceItem = appData[fromWh].find(i => i.id === itemId);
+            const sourceItem = (appData.inventory[fromWh] || []).find(i => i.id === itemId);
             if (!sourceItem || sourceItem.qty < qty) {
                 alert('Quantità non sufficiente per il trasferimento!');
                 return;
             }
 
             sourceItem.qty -= qty;
-            let destItem = appData[toWh].find(i => i.ean === sourceItem.ean);
+            if (!appData.inventory[toWh]) appData.inventory[toWh] = [];
+            let destItem = appData.inventory[toWh].find(i => i.ean === sourceItem.ean);
             if (destItem) {
                 destItem.qty += qty;
             } else {
-                appData[toWh].push({ id: Date.now(), ean: sourceItem.ean, name: sourceItem.name, model: sourceItem.model, qty: qty });
+                appData.inventory[toWh].push({ id: Date.now(), ean: sourceItem.ean, name: sourceItem.name, model: sourceItem.model, qty: qty });
             }
 
             saveData();
