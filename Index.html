@@ -42,10 +42,10 @@
 
             <div class="border-t pt-4 text-xs text-slate-400 space-y-1">
                 <p class="font-semibold text-slate-500">Credenziali di accesso:</p>
-                <p>• Super Admin: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">ADMIN</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Simone2026</code></p>
-                <p>• Admin Magazzino: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">LOGISTICA</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Simone2026</code></p>
-                <p>• Visualizzatore KRONOS: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">KRONOS</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Kronos2026</code></p>
-                <p>• Visualizzatore ATEC: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">ATEC</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Atec2026</code></p>
+                <p>• Super Admin: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">ADMIN</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Simone2026</code>[cite: 3]</p>
+                <p>• Admin Magazzino: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">LOGISTICA</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Simone2026</code>[cite: 3]</p>
+                <p>• Visualizzatore KRONOS: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">KRONOS</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Kronos2026</code>[cite: 3]</p>
+                <p>• Visualizzatore ATEC: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">ATEC</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Atec2026</code>[cite: 3]</p>
             </div>
         </div>
     </div>
@@ -97,6 +97,21 @@
 
                 <!-- 1. DASHBOARD -->
                 <section id="sec-dashboard" class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-indigo-600 mr-2"></i> Anagrafica Magazzini</h3>
+                                <p class="text-xs text-slate-400">Informazioni di contatto e ubicazione delle sedi logistiche</p>
+                            </div>
+                            <div id="dashboard-warehouse-actions" class="hidden">
+                                <button onclick="openWarehouseManageModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                                    <i class="fa-solid fa-gear mr-1"></i> Gestisci Magazzini (Super Admin)
+                                </button>
+                            </div>
+                        </div>
+                        <div id="dashboard-warehouses-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center space-x-4">
                             <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">
@@ -288,6 +303,54 @@
 
     <!-- MODALI -->
 
+    <!-- Modale Gestione Dati Magazzini -->
+    <div id="warehouse-manage-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 space-y-4 my-8">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-800">Gestione Sedi Magazzino (Super Admin)</h3>
+                <button type="button" onclick="openWarehouseForm()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i> Aggiungi Magazzino</button>
+            </div>
+            <div id="warehouse-list-container" class="space-y-3 max-h-96 overflow-y-auto pr-1"></div>
+            <div class="flex justify-end pt-3 border-t">
+                <button type="button" onclick="closeWarehouseManageModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale Inserisci/Modifica Singolo Magazzino -->
+    <div id="warehouse-form-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-60 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h3 id="wh-form-title" class="text-lg font-bold text-slate-800">Nuovo Magazzino</h3>
+            <form onsubmit="saveWarehouseData(event)" class="space-y-4">
+                <input type="hidden" id="wh-edit-id">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome Magazzino / Sede</label>
+                    <input type="text" id="wh-name" required class="w-full border rounded-xl p-3 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Indirizzo</label>
+                    <input type="text" id="wh-address" required class="w-full border rounded-xl p-3 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Telefono</label>
+                    <input type="text" id="wh-phone" required class="w-full border rounded-xl p-3 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email</label>
+                    <input type="email" id="wh-email" required class="w-full border rounded-xl p-3 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Responsabile</label>
+                    <input type="text" id="wh-manager" required class="w-full border rounded-xl p-3 text-sm">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeWarehouseForm()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Salva Magazzino</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modale Articolo -->
     <div id="item-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
@@ -296,19 +359,19 @@
                 <input type="hidden" id="item-warehouse">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Codice EAN</label>
-                    <input type="text" id="item-ean" required class="w-full border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="item-ean" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome Prodotto</label>
-                    <input type="text" id="item-name" required class="w-full border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="item-name" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Modello</label>
-                    <input type="text" id="item-model" required class="w-full border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="item-model" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Quantità</label>
-                    <input type="number" id="item-qty" min="0" required class="w-full border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="number" id="item-qty" min="0" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" onclick="closeAddItemModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla</button>
@@ -337,15 +400,15 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fattura</label>
-                        <input type="text" id="order-invoice" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. FAT-2026/045">
+                        <input type="text" id="order-invoice" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Deal</label>
-                        <input type="text" id="order-deal" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. DEAL-8832">
+                        <input type="text" id="order-deal" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fornitore (SKO1)</label>
-                        <input type="text" id="order-sko1" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. Nome Fornitore">
+                        <input type="text" id="order-sko1" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Operatore (SKO2 - Creatore)</label>
@@ -375,10 +438,10 @@
         </div>
     </div>
 
-    <!-- Modale Spedizione -->
+    <!-- Modale Spedizione & Confezionamento (Evasione) -->
     <div id="shipping-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl p-6 space-y-4 my-8">
-            <h3 class="text-lg font-bold text-slate-800">Dettagli Spedizione & Colli</h3>
+            <h3 class="text-lg font-bold text-slate-800">Dettagli Confezionamento & Spedizione</h3>
             <form onsubmit="saveShippingData(event)" class="space-y-4">
                 <input type="hidden" id="shipping-order-id">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -410,10 +473,10 @@
         </div>
     </div>
 
-    <!-- Modale Visualizzazione Dettagli Ordine -->
+    <!-- Modale Visualizzazione Dettagli Ordine (per Acquirente e Admin) -->
     <div id="view-order-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
-            <h3 class="text-lg font-bold text-slate-800">Dettagli Ordine & Spedizione</h3>
+            <h3 class="text-lg font-bold text-slate-800">Dettagli Ordine & Confezionamento</h3>
             <div id="view-order-content" class="text-sm space-y-3 text-slate-600"></div>
             <div class="flex justify-end pt-2">
                 <button type="button" onclick="closeViewOrderModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium">Chiudi</button>
@@ -495,6 +558,10 @@
                 { id: 3, username: 'KRONOS', password: 'Kronos2026', role: 'Visualizzatore' },
                 { id: 4, username: 'ATEC', password: 'Atec2026', role: 'Visualizzatore' }
             ],
+            warehousesInfo: [
+                { id: 1, name: 'Magazzino ATEC', address: 'Via Roma 10, Roma', phone: '+39 06 111111', email: 'atec@logistica.it', manager: 'Mario Rossi' },
+                { id: 2, name: 'Magazzino KRONOS', address: 'Corso Milano 22, Milano', phone: '+39 02 222222', email: 'kronos@logistica.it', manager: 'Luigi Verdi' }
+            ],
             atec: [
                 { id: 101, ean: '8012345678901', name: 'Sensore di Movimento IoT', model: 'ATEC-PRO-X1', qty: 45 },
                 { id: 102, ean: '8012345678902', name: 'Gateway Wi-Fi Industriale', model: 'ATEC-GW-90', qty: 12 },
@@ -527,6 +594,7 @@
 
         let appData = JSON.parse(localStorage.getItem('atec_kronos_db')) || defaultData;
         if (!appData.users) appData.users = defaultData.users;
+        if (!appData.warehousesInfo) appData.warehousesInfo = defaultData.warehousesInfo;
         if (!appData.atec) appData.atec = defaultData.atec;
         if (!appData.kronos) appData.kronos = defaultData.kronos;
         saveData();
@@ -629,6 +697,26 @@
         }
 
         function renderDashboard() {
+            const isSuperAdmin = currentUser && currentUser.role === 'Super Admin';
+            document.getElementById('dashboard-warehouse-actions').style.display = isSuperAdmin ? 'block' : 'none';
+
+            const whGrid = document.getElementById('dashboard-warehouses-grid');
+            let whHtml = '';
+            appData.warehousesInfo.forEach(w => {
+                whHtml += `
+                    <div class="bg-slate-50 border rounded-xl p-4 space-y-2">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-warehouse text-indigo-600 mr-2"></i> ${w.name}</h4>
+                        <div class="text-xs text-slate-600 space-y-1">
+                            <p><i class="fa-solid fa-location-dot w-4 text-slate-400 mr-1"></i> ${w.address}</p>
+                            <p><i class="fa-solid fa-phone w-4 text-slate-400 mr-1"></i> ${w.phone}</p>
+                            <p><i class="fa-solid fa-envelope w-4 text-slate-400 mr-1"></i> ${w.email}</p>
+                            <p><i class="fa-solid fa-user-tie w-4 text-slate-400 mr-1"></i> <b>Responsabile:</b> ${w.manager}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            whGrid.innerHTML = whHtml;
+
             const totalAtec = appData.atec.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
             const totalKronos = appData.kronos.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
             document.getElementById('count-atec').innerText = totalAtec;
@@ -636,6 +724,100 @@
 
             renderHorizontalBarChart('chartAtec', appData.atec, 'Scorte ATEC', ['#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff']);
             renderHorizontalBarChart('chartKronos', appData.kronos, 'Scorte KRONOS', ['#10b981','#34d399','#6ee7b7','#a7f3d0','#ecfdf5']);
+        }
+
+        function openWarehouseManageModal() {
+            renderWarehouseList();
+            document.getElementById('warehouse-manage-modal').classList.remove('hidden');
+        }
+
+        function closeWarehouseManageModal() {
+            document.getElementById('warehouse-manage-modal').classList.add('hidden');
+            renderDashboard();
+        }
+
+        function renderWarehouseList() {
+            const container = document.getElementById('warehouse-list-container');
+            let html = '';
+            appData.warehousesInfo.forEach(w => {
+                html += `
+                    <div class="border rounded-xl p-3 flex justify-between items-center bg-slate-50 text-sm">
+                        <div>
+                            <p class="font-bold text-slate-800">${w.name}</p>
+                            <p class="text-xs text-slate-500">${w.address} | Tel: ${w.phone} | Resp: ${w.manager}</p>
+                        </div>
+                        <div class="space-x-1">
+                            <button onclick="editWarehouse(${w.id})" class="text-slate-400 hover:text-indigo-600 p-1.5"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteWarehouse(${w.id})" class="text-slate-400 hover:text-red-600 p-1.5"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        let editingWarehouseId = null;
+        function openWarehouseForm() {
+            editingWarehouseId = null;
+            document.getElementById('wh-form-title').innerText = 'Nuovo Magazzino';
+            document.getElementById('wh-name').value = '';
+            document.getElementById('wh-address').value = '';
+            document.getElementById('wh-phone').value = '';
+            document.getElementById('wh-email').value = '';
+            document.getElementById('wh-manager').value = '';
+            document.getElementById('warehouse-form-modal').classList.remove('hidden');
+        }
+
+        function editWarehouse(id) {
+            const w = appData.warehousesInfo.find(x => x.id === id);
+            if (!w) return;
+            editingWarehouseId = id;
+            document.getElementById('wh-form-title').innerText = 'Modifica Magazzino';
+            document.getElementById('wh-name').value = w.name;
+            document.getElementById('wh-address').value = w.address;
+            document.getElementById('wh-phone').value = w.phone;
+            document.getElementById('wh-email').value = w.email;
+            document.getElementById('wh-manager').value = w.manager;
+            document.getElementById('warehouse-form-modal').classList.remove('hidden');
+        }
+
+        function closeWarehouseForm() {
+            document.getElementById('warehouse-form-modal').classList.add('hidden');
+        }
+
+        function saveWarehouseData(e) {
+            e.preventDefault();
+            const whData = {
+                id: editingWarehouseId ? editingWarehouseId : Date.now(),
+                name: document.getElementById('wh-name').value.trim(),
+                address: document.getElementById('wh-address').value.trim(),
+                phone: document.getElementById('wh-phone').value.trim(),
+                email: document.getElementById('wh-email').value.trim(),
+                manager: document.getElementById('wh-manager').value.trim()
+            };
+
+            if (editingWarehouseId) {
+                const idx = appData.warehousesInfo.findIndex(x => x.id === editingWarehouseId);
+                if (idx !== -1) appData.warehousesInfo[idx] = whData;
+            } else {
+                appData.warehousesInfo.push(whData);
+            }
+
+            saveData();
+            closeWarehouseForm();
+            renderWarehouseList();
+        }
+
+        function deleteWarehouse(id) {
+            if (appData.warehousesInfo.length <= 1) {
+                alert('È necessario mantenere almeno un magazzino registrato.');
+                return;
+            }
+            if (confirm('Eliminare questo magazzino dall’anagrafica?')) {
+                appData.warehousesInfo = appData.warehousesInfo.filter(x => x.id !== id);
+                saveData();
+                renderWarehouseList();
+            }
         }
 
         function renderHorizontalBarChart(canvasId, items, labelText, colors) {
@@ -754,9 +936,7 @@
 
             if (editingItemId) {
                 const idx = appData[wh].findIndex(x => x.id === editingItemId);
-                if (idx !== -1) {
-                    appData[wh][idx] = newItem;
-                }
+                if (idx !== -1) appData[wh][idx] = newItem;
             } else {
                 appData[wh].push(newItem);
             }
@@ -782,6 +962,7 @@
             let html = '';
             appData.orders.forEach(ord => {
                 let badgeColor = 'bg-amber-50 text-amber-700';
+                if (ord.status === 'Preso in carico') badgeColor = 'bg-purple-50 text-purple-700';
                 if (ord.status === 'Pronto') badgeColor = 'bg-blue-50 text-blue-700';
                 if (ord.status === 'Evaso') badgeColor = 'bg-emerald-50 text-emerald-700';
 
@@ -805,17 +986,21 @@
                 `;
 
                 if (canManageOrders) {
-                    if (ord.status === 'In Lavorazione') {
-                        html += `<button onclick="setOrderReady('${ord.id}')" class="px-2.5 py-1 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-sm">Pronto</button>`;
-                        html += `<button onclick="openShippingModal('${ord.id}')" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-sm">Evadi</button>`;
-                    } else if (ord.status === 'Pronto') {
-                        html += `<button onclick="openShippingModal('${ord.id}')" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-sm">Evadi</button>`;
-                    } else {
-                        html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium">Dettagli</button>`;
+                    // Menu a tendina o pulsanti per impostare lo stato desiderato da Admin Magazzino / Super Admin
+                    html += `
+                        <select onchange="updateOrderStatus('${ord.id}', this.value)" class="text-xs border rounded-lg p-1.5 bg-white font-semibold text-slate-700">
+                            <option value="" disabled selected>Cambia Stato...</option>
+                            <option value="Preso in carico" ${ord.status === 'Preso in carico' ? 'selected' : ''}>Preso in carico</option>
+                            <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
+                            <option value="Evaso" ${ord.status === 'Evaso' ? 'selected' : ''}>Evaso</option>
+                        </select>
+                    `;
+                    if (ord.status === 'Evaso') {
+                        html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium ml-1">Dettagli</button>`;
                     }
                 } else {
                     if (ord.status === 'Evaso' || ord.status === 'Pronto') {
-                        html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold">Visualizza Pacco</button>`;
+                        html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold">Visualizza Dati</button>`;
                     } else {
                         html += `<span class="text-xs text-slate-400 italic">In lavorazione</span>`;
                     }
@@ -826,12 +1011,17 @@
             tbody.innerHTML = html;
         }
 
-        function setOrderReady(orderId) {
-            const ord = appData.orders.find(o => o.id === orderId);
-            if (ord) {
-                ord.status = 'Pronto';
-                saveData();
-                renderOrders();
+        // Funzione per cambiare lo stato direttamente o aprire il modale di evasione se viene selezionato "Evaso"
+        function updateOrderStatus(orderId, newStatus) {
+            if (newStatus === 'Evaso') {
+                openShippingModal(orderId);
+            } else {
+                const ord = appData.orders.find(o => o.id === orderId);
+                if (ord) {
+                    ord.status = newStatus;
+                    saveData();
+                    renderOrders();
+                }
             }
         }
 
@@ -856,8 +1046,6 @@
 
         function addOrderItemRow() {
             const container = document.getElementById('order-items-container');
-            
-            // Unisce e somma le quantità di prodotti con lo stesso nome e modello in entrambi i magazzini
             const combinedMap = new Map();
             [...appData.atec, ...appData.kronos].forEach(item => {
                 const key = `${item.name.toLowerCase()}_${item.model.toLowerCase()}`;
@@ -870,7 +1058,6 @@
 
             let options = '';
             combinedMap.forEach(item => {
-                // Passiamo una stringa JSON o un identificatore chiaro per recuperare nome e modello al salvataggio
                 const valData = encodeURIComponent(JSON.stringify({ name: item.name, model: item.model }));
                 options += `<option value="${valData}">${item.name} (${item.model}) - Disp: ${item.qty}</option>`;
             });
@@ -938,6 +1125,7 @@
 
         function closeShippingModal() {
             document.getElementById('shipping-modal').classList.add('hidden');
+            renderOrders(); // Ripristina la selezione nella tabella se viene annullata l'apertura
         }
 
         function addPackageRow() {
@@ -971,9 +1159,7 @@
 
             const ord = appData.orders.find(o => o.id === currentShippingOrderId);
             if (ord) {
-                // SCARICA LA MERCE DAL MAGAZZINO SELEZIONATO
                 const targetWh = ord.warehouse;
-
                 ord.items.forEach(orderedItem => {
                     let foundItem = appData[targetWh].find(i => i.name === orderedItem.name && i.model === orderedItem.model);
                     if (foundItem) {
@@ -989,6 +1175,7 @@
 
             closeShippingModal();
             renderOrders();
+            alert('Ordine evaso con successo! I dati di confezionamento e spedizione sono stati inviati all’acquirente.');
         }
 
         function viewOrderDetails(orderId) {
@@ -1003,24 +1190,25 @@
             `;
 
             if (ord.status === 'Pronto') {
-                contentHtml += `<div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-blue-800 font-semibold mt-2"><i class="fa-solid fa-circle-check mr-1"></i> Il tuo ordine è pronto in magazzino per la spedizione o il ritiro!</div>`;
+                contentHtml += `<div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-blue-800 font-semibold mt-2"><i class="fa-solid fa-circle-check mr-1"></i> Il tuo ordine è pronto in magazzino!</div>`;
             }
 
             if (ord.shipping) {
                 contentHtml += `
                     <hr class="my-2">
+                    <p class="font-bold text-slate-700">Dati di Confezionamento e Spedizione (Inviati all'acquirente):</p>
                     <p><b>Data Spedizione:</b> ${ord.shipping.date}</p>
                     <p><b>Metodo:</b> ${ord.shipping.method}</p>
                     <p><b>Tracking:</b> ${ord.shipping.tracking}</p>
-                    <p class="font-bold mt-2">Colli Spediti:</p>
+                    <p class="font-bold mt-2">Colli Confezionati:</p>
                     <ul class="list-disc pl-5 space-y-1">
                 `;
                 ord.shipping.packages.forEach(p => {
                     contentHtml += `<li><b>Codice Pacco:</b> ${p.code} (Peso: ${p.weight}, Dimensioni: ${p.dims})</li>`;
                 });
                 contentHtml += `</ul>`;
-            } else if (ord.status !== 'Pronto') {
-                contentHtml += `<p class="italic text-slate-400 mt-2">Dettagli di spedizione non ancora disponibili.</p>`;
+            } else {
+                contentHtml += `<p class="italic text-slate-400 mt-2">Dati di confezionamento non ancora disponibili (ordine non ancora evaso).</p>`;
             }
 
             document.getElementById('view-order-content').innerHTML = contentHtml;
