@@ -221,7 +221,7 @@
                                         <th class="p-3 font-bold">Fornitore (SKO1)</th>
                                         <th class="p-3 font-bold">Creatore (SKO2)</th>
                                         <th class="p-3 font-bold">Acquirente (SKO3)</th>
-                                        <th class="p-3 font-bold">Magazzino</th>
+                                        <th class="p-3 font-bold">Magazzino scarico</th>
                                         <th class="p-3 font-bold">Prodotti</th>
                                         <th class="p-3 font-bold">Stato</th>
                                         <th class="p-3 font-bold text-right">Azioni / Dettagli</th>
@@ -317,7 +317,7 @@
         </div>
     </div>
 
-    <!-- Modale Nuovo Ordine (Prodotti Multipli) -->
+    <!-- Modale Nuovo Ordine (Prodotti Multipli da Entrambi i Magazzini Sommati) -->
     <div id="order-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 space-y-4 my-8">
             <h3 class="text-lg font-bold text-slate-800">Crea Nuovo Ordine</h3>
@@ -328,8 +328,8 @@
                         <input type="date" id="order-date" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Riferimento</label>
-                        <select id="order-warehouse" onchange="updateAllOrderCatalogs()" class="w-full border rounded-xl p-3 text-sm bg-white">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Scarico</label>
+                        <select id="order-warehouse" class="w-full border rounded-xl p-3 text-sm bg-white">
                             <option value="atec">Magazzino ATEC</option>
                             <option value="kronos">Magazzino KRONOS</option>
                         </select>
@@ -786,7 +786,6 @@
 
                 const itemsText = ord.items.map(i => `${i.name} (x${i.qty})`).join(', ');
                 const canManageOrders = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
-                const isOwnerOrViewer = currentUser.username.toLowerCase() === ord.warehouse.toLowerCase() || currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
 
                 html += `
                     <tr class="hover:bg-slate-50 transition">
@@ -812,7 +811,6 @@
                         html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium">Dettagli</button>`;
                     }
                 } else {
-                    // Visualizzatore
                     if (ord.status === 'Evaso' || ord.status === 'Pronto') {
                         html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold">Visualizza Pacco</button>`;
                     } else {
@@ -855,12 +853,21 @@
 
         function addOrderItemRow() {
             const container = document.getElementById('order-items-container');
-            const wh = document.getElementById('order-warehouse').value;
-            const items = appData[wh];
+            
+            // Unisce e somma le quantità di prodotti con lo stesso nome e modello in entrambi i magazzini
+            const combinedMap = new Map();
+            [...appData.atec, ...appData.kronos].forEach(item => {
+                const key = `${item.name.toLowerCase()}_${item.model.toLowerCase()}`;
+                if (combinedMap.has(key)) {
+                    combinedMap.get(key).qty += parseInt(item.qty || 0);
+                } else {
+                    combinedMap.set(key, { name: item.name, model: item.model, qty: parseInt(item.qty || 0) });
+                }
+            });
 
             let options = '';
-            items.forEach(i => {
-                options += `<option value="${i.name}">${i.name} (${i.model}) - Disp: ${i.qty}</option>`;
+            combinedMap.forEach(item => {
+                options += `<option value="${item.name}">${item.name} (${item.model}) - Disp: ${item.qty}</option>`;
             });
 
             const row = document.createElement('div');
@@ -871,11 +878,6 @@
                 <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash"></i></button>
             `;
             container.appendChild(row);
-        }
-
-        function updateAllOrderCatalogs() {
-            document.getElementById('order-items-container').innerHTML = '';
-            addOrderItemRow();
         }
 
         function submitOrder(e) {
@@ -963,6 +965,17 @@
 
             const ord = appData.orders.find(o => o.id === currentShippingOrderId);
             if (ord) {
+                // SCARICA LA MERCE DAL MAGAZZINO SELEZIONATO
+                const targetWh = ord.warehouse;
+
+                ord.items.forEach(orderedItem => {
+                    let foundItem = appData[targetWh].find(i => i.name === orderedItem.name);
+                    if (foundItem) {
+                        foundItem.qty -= orderedItem.qty;
+                        if (foundItem.qty < 0) foundItem.qty = 0;
+                    }
+                });
+
                 ord.status = 'Evaso';
                 ord.shipping = { date, method, tracking, packages };
                 saveData();
