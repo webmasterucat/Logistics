@@ -223,6 +223,7 @@
                                         <th class="p-3 font-bold">Acquirente (SKO3)</th>
                                         <th class="p-3 font-bold">Magazzino scarico</th>
                                         <th class="p-3 font-bold">Prodotti</th>
+                                        <th class="p-3 font-bold">Modello</th>
                                         <th class="p-3 font-bold">Stato</th>
                                         <th class="p-3 font-bold text-right">Azioni / Dettagli</th>
                                     </tr>
@@ -317,7 +318,7 @@
         </div>
     </div>
 
-    <!-- Modale Nuovo Ordine (Prodotti Multipli da Entrambi i Magazzini Sommati) -->
+    <!-- Modale Nuovo Ordine -->
     <div id="order-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 space-y-4 my-8">
             <h3 class="text-lg font-bold text-slate-800">Crea Nuovo Ordine</h3>
@@ -409,7 +410,7 @@
         </div>
     </div>
 
-    <!-- Modale Visualizzazione Dettagli Ordine (per Visualizzatore) -->
+    <!-- Modale Visualizzazione Dettagli Ordine -->
     <div id="view-order-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
             <h3 class="text-lg font-bold text-slate-800">Dettagli Ordine & Spedizione</h3>
@@ -515,8 +516,8 @@
                     sko2: 'LOGISTICA',
                     sko3: 'Cliente Finale ATEC',
                     items: [
-                        { name: 'Sensore di Movimento IoT', qty: 5 },
-                        { name: 'Gateway Wi-Fi Industriale', qty: 2 }
+                        { name: 'Sensore di Movimento IoT', model: 'ATEC-PRO-X1', qty: 5 },
+                        { name: 'Gateway Wi-Fi Industriale', model: 'ATEC-GW-90', qty: 2 }
                     ],
                     status: 'Evaso',
                     shipping: { date: '2026-10-02', method: 'Corriere Espresso', tracking: 'TRK9283192831', packages: [{ code: 'PCK-001', weight: '2.5', dims: '30x20x15' }] }
@@ -785,6 +786,7 @@
                 if (ord.status === 'Evaso') badgeColor = 'bg-emerald-50 text-emerald-700';
 
                 const itemsText = ord.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+                const modelsText = ord.items.map(i => i.model).join(', ');
                 const canManageOrders = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
 
                 html += `
@@ -797,6 +799,7 @@
                         <td class="p-3 text-slate-700">${ord.sko3}</td>
                         <td class="p-3 uppercase text-xs font-bold text-indigo-600">${ord.warehouse}</td>
                         <td class="p-3 text-xs text-slate-600 max-w-xs truncate">${itemsText}</td>
+                        <td class="p-3 text-xs font-semibold text-slate-700 max-w-xs truncate">${modelsText}</td>
                         <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${ord.status}</span></td>
                         <td class="p-3 text-right space-x-1">
                 `;
@@ -867,7 +870,9 @@
 
             let options = '';
             combinedMap.forEach(item => {
-                options += `<option value="${item.name}">${item.name} (${item.model}) - Disp: ${item.qty}</option>`;
+                // Passiamo una stringa JSON o un identificatore chiaro per recuperare nome e modello al salvataggio
+                const valData = encodeURIComponent(JSON.stringify({ name: item.name, model: item.model }));
+                options += `<option value="${valData}">${item.name} (${item.model}) - Disp: ${item.qty}</option>`;
             });
 
             const row = document.createElement('div');
@@ -887,10 +892,11 @@
             const items = [];
 
             rows.forEach(r => {
-                const name = r.querySelector('.order-item-sel').value;
+                const rawVal = r.querySelector('.order-item-sel').value;
                 const qty = parseInt(r.querySelector('.order-item-qty').value);
-                if (name && qty > 0) {
-                    items.push({ name, qty });
+                if (rawVal && qty > 0) {
+                    const parsed = JSON.parse(decodeURIComponent(rawVal));
+                    items.push({ name: parsed.name, model: parsed.model, qty });
                 }
             });
 
@@ -969,7 +975,7 @@
                 const targetWh = ord.warehouse;
 
                 ord.items.forEach(orderedItem => {
-                    let foundItem = appData[targetWh].find(i => i.name === orderedItem.name);
+                    let foundItem = appData[targetWh].find(i => i.name === orderedItem.name && i.model === orderedItem.model);
                     if (foundItem) {
                         foundItem.qty -= orderedItem.qty;
                         if (foundItem.qty < 0) foundItem.qty = 0;
