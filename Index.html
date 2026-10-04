@@ -100,12 +100,12 @@
                     <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
                         <div class="flex items-center justify-between border-b pb-3">
                             <div>
-                                <h3 class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-indigo-600 mr-2"></i> Anagrafica Magazzini</h3>
-                                <p class="text-xs text-slate-400">Informazioni di contatto e ubicazione delle sedi logistiche</p>
+                                <h3 class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-indigo-600 mr-2"></i> Anagrafica Magazzini[cite: 3]</h3>
+                                <p class="text-xs text-slate-400">Informazioni di contatto e ubicazione delle sedi logistiche[cite: 3]</p>
                             </div>
                             <div id="dashboard-warehouse-actions" class="hidden">
                                 <button onclick="openWarehouseManageModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                                    <i class="fa-solid fa-gear mr-1"></i> Gestisci Magazzini (Super Admin)
+                                    <i class="fa-solid fa-gear mr-1"></i> Gestisci Magazzini (Super Admin)[cite: 3]
                                 </button>
                             </div>
                         </div>
@@ -118,7 +118,7 @@
                                 <i class="fa-solid fa-warehouse"></i>
                             </div>
                             <div>
-                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Totale Articoli Magazzino ATEC</p>
+                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Totale Articoli Magazzino ATEC[cite: 3]</p>
                                 <h3 id="count-atec" class="text-2xl font-bold text-slate-800">0</h3>
                             </div>
                         </div>
@@ -127,7 +127,7 @@
                                 <i class="fa-solid fa-warehouse"></i>
                             </div>
                             <div>
-                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Totale Articoli Magazzino KRONOS</p>
+                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Totale Articoli Magazzino KRONOS[cite: 3]</p>
                                 <h3 id="count-kronos" class="text-2xl font-bold text-slate-800">0</h3>
                             </div>
                         </div>
@@ -137,24 +137,36 @@
                         <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
                             <div class="flex items-center justify-between border-b pb-3">
                                 <div>
-                                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-chart-bar text-indigo-600 mr-2"></i> Scorte Magazzino ATEC</h3>
-                                    <p class="text-xs text-slate-400">Quantitativi per prodotto e modello</p>
+                                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-chart-bar text-indigo-600 mr-2"></i> Scorte Magazzino ATEC[cite: 3]</h3>
+                                    <p class="text-xs text-slate-400">Quantitativi per prodotto e modello[cite: 3]</p>
                                 </div>
-                                <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">ATEC</span>
+                                <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">ATEC[cite: 3]</span>
                             </div>
-                            <div class="relative h-80 w-full"><canvas id="chartAtec"></canvas></div>
+                            <div class="relative w-full" style="height: 320px;"><canvas id="chartAtec"></canvas></div>
                         </div>
 
                         <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
                             <div class="flex items-center justify-between border-b pb-3">
                                 <div>
-                                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-chart-bar text-emerald-600 mr-2"></i> Scorte Magazzino KRONOS</h3>
-                                    <p class="text-xs text-slate-400">Quantitativi per prodotto e modello</p>
+                                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-chart-bar text-emerald-600 mr-2"></i> Scorte Magazzino KRONOS[cite: 3]</h3>
+                                    <p class="text-xs text-slate-400">Quantitativi per prodotto e modello[cite: 3]</p>
                                 </div>
-                                <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold">KRONOS</span>
+                                <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold">KRONOS[cite: 3]</span>
                             </div>
-                            <div class="relative h-80 w-full"><canvas id="chartKronos"></canvas></div>
+                            <div class="relative w-full" style="height: 320px;"><canvas id="chartKronos"></canvas></div>
                         </div>
+                    </div>
+
+                    <!-- RIEPILOGO COMPARATIVO AGGIORNATO (Barre Orizzontali con Somma Prodotti/Modelli e Valori in Nero) -->
+                    <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800"><i class="fa-solid fa-chart-bar text-indigo-600 mr-2"></i> Riepilogo Comparativo Magazzini</h3>
+                                <p class="text-xs text-slate-400">Totali combinati per Prodotto e Modello (ATEC + KRONOS)</p>
+                            </div>
+                            <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">Totali Combinati</span>
+                        </div>
+                        <div class="relative w-full" style="height: 380px;"><canvas id="chartSummaryWarehouses"></canvas></div>
                     </div>
                 </section>
 
@@ -163,21 +175,21 @@
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
                             <div>
-                                <h3 class="font-bold text-slate-800">Inventario Prodotti - ATEC</h3>
-                                <p class="text-xs text-slate-500">Elenco completo degli articoli registrati</p>
+                                <h3 class="font-bold text-slate-800">Inventario Prodotti - ATEC[cite: 3]</h3>
+                                <p class="text-xs text-slate-500">Elenco completo degli articoli registrati[cite: 3]</p>
                             </div>
                             <button id="header-add-atec" onclick="openAddItemModal('atec')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                                <i class="fa-solid fa-plus mr-1"></i> Nuovo Articolo
+                                <i class="fa-solid fa-plus mr-1"></i> Nuovo Articolo[cite: 3]
                             </button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
                                     <tr id="thead-atec-row" class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
-                                        <th class="p-3 font-bold">EAN</th>
-                                        <th class="p-3 font-bold">Prodotto</th>
-                                        <th class="p-3 font-bold">Modello</th>
-                                        <th class="p-3 font-bold">Quantità</th>
+                                        <th class="p-3 font-bold">EAN[cite: 3]</th>
+                                        <th class="p-3 font-bold">Prodotto[cite: 3]</th>
+                                        <th class="p-3 font-bold">Modello[cite: 3]</th>
+                                        <th class="p-3 font-bold">Quantità[cite: 3]</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-atec" class="divide-y divide-slate-100"></tbody>
@@ -191,21 +203,21 @@
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
                             <div>
-                                <h3 class="font-bold text-slate-800">Inventario Prodotti - KRONOS</h3>
-                                <p class="text-xs text-slate-500">Elenco completo degli articoli registrati</p>
+                                <h3 class="font-bold text-slate-800">Inventario Prodotti - KRONOS[cite: 3]</h3>
+                                <p class="text-xs text-slate-500">Elenco completo degli articoli registrati[cite: 3]</p>
                             </div>
                             <button id="header-add-kronos" onclick="openAddItemModal('kronos')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                                <i class="fa-solid fa-plus mr-1"></i> Nuovo Articolo
+                                <i class="fa-solid fa-plus mr-1"></i> Nuovo Articolo[cite: 3]
                             </button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
                                     <tr id="thead-kronos-row" class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
-                                        <th class="p-3 font-bold">EAN</th>
-                                        <th class="p-3 font-bold">Prodotto</th>
-                                        <th class="p-3 font-bold">Modello</th>
-                                        <th class="p-3 font-bold">Quantità</th>
+                                        <th class="p-3 font-bold">EAN[cite: 3]</th>
+                                        <th class="p-3 font-bold">Prodotto[cite: 3]</th>
+                                        <th class="p-3 font-bold">Modello[cite: 3]</th>
+                                        <th class="p-3 font-bold">Quantità[cite: 3]</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-kronos" class="divide-y divide-slate-100"></tbody>
@@ -214,34 +226,34 @@
                     </div>
                 </section>
 
-                <!-- 4. GESTIONE ORDINI (AGGIORNATA) -->
+                <!-- 4. GESTIONE ORDINI -->
                 <section id="sec-orders" class="hidden space-y-6">
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
                             <div>
-                                <h3 class="font-bold text-slate-800">Gestione Ordini Prodotti</h3>
-                                <p class="text-xs text-slate-500">Tracciamento fatture, deal, spedizioni, colli e stati di lavorazione</p>
+                                <h3 class="font-bold text-slate-800">Gestione Ordini Prodotti[cite: 3]</h3>
+                                <p class="text-xs text-slate-500">Tracciamento fatture, deal, spedizioni, colli e stati di lavorazione[cite: 3]</p>
                             </div>
                             <button id="btn-new-order" onclick="openOrderModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                                <i class="fa-solid fa-plus mr-1"></i> Nuovo Ordine
+                                <i class="fa-solid fa-plus mr-1"></i> Nuovo Ordine[cite: 3]
                             </button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
-                                        <th class="p-3 font-bold">Data</th>
-                                        <th class="p-3 font-bold">Fattura</th>
-                                        <th class="p-3 font-bold">Deal</th>
-                                        <th class="p-3 font-bold">Fornitore (SKO1)</th>
-                                        <th class="p-3 font-bold">Creatore (SKO2)</th>
-                                        <th class="p-3 font-bold">Acquirente (SKO3)</th>
-                                        <th class="p-3 font-bold">Magazzino scarico</th>
-                                        <th class="p-3 font-bold">Prodotto</th>
-                                        <th class="p-3 font-bold">Modello</th>
-                                        <th class="p-3 font-bold">Quantità</th>
-                                        <th class="p-3 font-bold">Stato</th>
-                                        <th class="p-3 font-bold text-right">Azioni/Dettagli</th>
+                                        <th class="p-3 font-bold">Data[cite: 3]</th>
+                                        <th class="p-3 font-bold">Fattura[cite: 3]</th>
+                                        <th class="p-3 font-bold">Deal[cite: 3]</th>
+                                        <th class="p-3 font-bold">Fornitore (SKO1)[cite: 3]</th>
+                                        <th class="p-3 font-bold">Creatore (SKO2)[cite: 3]</th>
+                                        <th class="p-3 font-bold">Acquirente (SKO3)[cite: 3]</th>
+                                        <th class="p-3 font-bold">Magazzino scarico[cite: 3]</th>
+                                        <th class="p-3 font-bold">Prodotto[cite: 3]</th>
+                                        <th class="p-3 font-bold">Modello[cite: 3]</th>
+                                        <th class="p-3 font-bold">Quantità[cite: 3]</th>
+                                        <th class="p-3 font-bold">Stato[cite: 3]</th>
+                                        <th class="p-3 font-bold text-right">Azioni/Dettagli[cite: 3]</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-orders" class="divide-y divide-slate-100"></tbody>
@@ -259,12 +271,12 @@
                                     <i class="fa-solid fa-right-left"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-slate-800">Trasferimento Merce Interno</h3>
-                                    <p class="text-xs text-slate-400">Sposta articoli tra magazzino ATEC e KRONOS</p>
+                                    <h3 class="font-bold text-slate-800">Trasferimento Merce Interno[cite: 3]</h3>
+                                    <p class="text-xs text-slate-400">Sposta articoli tra magazzino ATEC e KRONOS[cite: 3]</p>
                                 </div>
                             </div>
                             <button onclick="openTransferModal()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition shadow-sm">
-                                Avvia Nuovo Trasferimento
+                                Avvia Nuovo Trasferimento[cite: 3]
                             </button>
                         </div>
                     </div>
@@ -275,21 +287,21 @@
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
                             <div>
-                                <h3 class="font-bold text-slate-800">Gestione Utenti e Accessi</h3>
-                                <p class="text-xs text-slate-500">Gestisci profili e ruoli di autorizzazione</p>
+                                <h3 class="font-bold text-slate-800">Gestione Utenti e Accessi[cite: 3]</h3>
+                                <p class="text-xs text-slate-500">Gestisci profili e ruoli di autorizzazione[cite: 3]</p>
                             </div>
                             <button onclick="openUserModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                                <i class="fa-solid fa-user-plus mr-1"></i> Nuovo Utente
+                                <i class="fa-solid fa-user-plus mr-1"></i> Nuovo Utente[cite: 3]
                             </button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
-                                        <th class="p-3 font-bold">Username</th>
-                                        <th class="p-3 font-bold">Password</th>
-                                        <th class="p-3 font-bold">Ruolo</th>
-                                        <th class="p-3 font-bold text-right">Azioni</th>
+                                        <th class="p-3 font-bold">Username[cite: 3]</th>
+                                        <th class="p-3 font-bold">Password[cite: 3]</th>
+                                        <th class="p-3 font-bold">Ruolo[cite: 3]</th>
+                                        <th class="p-3 font-bold text-right">Azioni[cite: 3]</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-users" class="divide-y divide-slate-100"></tbody>
@@ -308,12 +320,12 @@
     <div id="warehouse-manage-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 space-y-4 my-8">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-slate-800">Gestione Sedi Magazzino (Super Admin)</h3>
-                <button type="button" onclick="openWarehouseForm()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i> Aggiungi Magazzino</button>
+                <h3 class="text-lg font-bold text-slate-800">Gestione Sedi Magazzino (Super Admin)[cite: 3]</h3>
+                <button type="button" onclick="openWarehouseForm()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i> Aggiungi Magazzino[cite: 3]</button>
             </div>
             <div id="warehouse-list-container" class="space-y-3 max-h-96 overflow-y-auto pr-1"></div>
             <div class="flex justify-end pt-3 border-t">
-                <button type="button" onclick="closeWarehouseManageModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Chiudi</button>
+                <button type="button" onclick="closeWarehouseManageModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Chiudi[cite: 3]</button>
             </div>
         </div>
     </div>
@@ -321,32 +333,32 @@
     <!-- Modale Inserisci/Modifica Singolo Magazzino -->
     <div id="warehouse-form-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-60 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h3 id="wh-form-title" class="text-lg font-bold text-slate-800">Nuovo Magazzino</h3>
+            <h3 id="wh-form-title" class="text-lg font-bold text-slate-800">Nuovo Magazzino[cite: 3]</h3>
             <form onsubmit="saveWarehouseData(event)" class="space-y-4">
                 <input type="hidden" id="wh-edit-id">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome Magazzino / Sede</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome Magazzino / Sede[cite: 3]</label>
                     <input type="text" id="wh-name" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Indirizzo</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Indirizzo[cite: 3]</label>
                     <input type="text" id="wh-address" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Telefono</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Telefono[cite: 3]</label>
                     <input type="text" id="wh-phone" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email[cite: 3]</label>
                     <input type="email" id="wh-email" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Responsabile</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Responsabile[cite: 3]</label>
                     <input type="text" id="wh-manager" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="closeWarehouseForm()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Salva Magazzino</button>
+                    <button type="button" onclick="closeWarehouseForm()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla[cite: 3]</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Salva Magazzino[cite: 3]</button>
                 </div>
             </form>
         </div>
@@ -355,28 +367,28 @@
     <!-- Modale Articolo -->
     <div id="item-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
-            <h3 id="item-modal-title" class="text-lg font-bold text-slate-800">Gestione Articolo</h3>
+            <h3 id="item-modal-title" class="text-lg font-bold text-slate-800">Gestione Articolo[cite: 3]</h3>
             <form onsubmit="saveItem(event)" class="space-y-4">
                 <input type="hidden" id="item-warehouse">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Codice EAN</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Codice EAN[cite: 3]</label>
                     <input type="text" id="item-ean" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome Prodotto</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome Prodotto[cite: 3]</label>
                     <input type="text" id="item-name" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Modello</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Modello[cite: 3]</label>
                     <input type="text" id="item-model" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Quantità</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Quantità[cite: 3]</label>
                     <input type="number" id="item-qty" min="0" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="closeAddItemModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Salva Articolo</button>
+                    <button type="button" onclick="closeAddItemModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla[cite: 3]</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Salva Articolo[cite: 3]</button>
                 </div>
             </form>
         </div>
@@ -385,55 +397,55 @@
     <!-- Modale Nuovo Ordine -->
     <div id="order-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 space-y-4 my-8">
-            <h3 class="text-lg font-bold text-slate-800">Crea Nuovo Ordine</h3>
+            <h3 class="text-lg font-bold text-slate-800">Crea Nuovo Ordine[cite: 3]</h3>
             <form onsubmit="submitOrder(event)" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Data Ordine</label>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Data Ordine[cite: 3]</label>
                         <input type="date" id="order-date" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Scarico</label>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Scarico[cite: 3]</label>
                         <select id="order-warehouse" class="w-full border rounded-xl p-3 text-sm bg-white">
-                            <option value="atec">Magazzino ATEC</option>
-                            <option value="kronos">Magazzino KRONOS</option>
+                            <option value="atec">Magazzino ATEC[cite: 3]</option>
+                            <option value="kronos">Magazzino KRONOS[cite: 3]</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fattura</label>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fattura[cite: 3]</label>
                         <input type="text" id="order-invoice" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Deal</label>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Deal[cite: 3]</label>
                         <input type="text" id="order-deal" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fornitore (SKO1)</label>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fornitore (SKO1)[cite: 3]</label>
                         <input type="text" id="order-sko1" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Operatore (SKO2 - Creatore)</label>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Operatore (SKO2 - Creatore)[cite: 3]</label>
                         <input type="text" id="order-sko2" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Acquirente (SKO3)</label>
-                        <input type="text" id="order-sko3" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. Nome Acquirente">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Acquirente (SKO3)[cite: 3]</label>
+                        <input type="text" id="order-sko3" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. Nome Acquirente[cite: 3]">
                     </div>
                 </div>
 
                 <div class="border-t pt-4 space-y-3">
                     <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-700 uppercase">Prodotti Ordinati</span>
+                        <span class="text-xs font-bold text-slate-700 uppercase">Prodotti Ordinati[cite: 3]</span>
                         <button type="button" onclick="addOrderItemRow()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">
-                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi Riga Prodotto
+                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi Riga Prodotto[cite: 3]
                         </button>
                     </div>
                     <div id="order-items-container" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
                 </div>
 
                 <div class="flex justify-end space-x-3 pt-4 border-t">
-                    <button type="button" onclick="closeOrderModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Crea Ordine</button>
+                    <button type="button" onclick="closeOrderModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla[cite: 3]</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Crea Ordine[cite: 3]</button>
                 </div>
             </form>
         </div>
@@ -442,201 +454,196 @@
     <!-- Modale Spedizione & Confezionamento (Evasione) -->
     <div id="shipping-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl p-6 space-y-4 my-8">
-            <h3 class="text-lg font-bold text-slate-800">Dettagli Confezionamento & Spedizione</h3>
+            <h3 class="text-lg font-bold text-slate-800">Dettagli Confezionamento & Spedizione[cite: 3]</h3>
             <form onsubmit="saveShippingData(event)" class="space-y-4">
                 <input type="hidden" id="shipping-order-id">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Data Spedizione</label>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Data Spedizione[cite: 3]</label>
                         <input type="date" id="shipping-date" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Metodo di Spedizione</label>
-                        <input type="text" id="shipping-method" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. Corriere Espresso">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Metodo di Spedizione[cite: 3]</label>
+                        <input type="text" id="shipping-method" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. Corriere Espresso[cite: 3]">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Codice Tracking</label>
-                        <input type="text" id="shipping-tracking" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. TRK9283192831">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Codice Tracking[cite: 3]</label>
+                        <input type="text" id="shipping-tracking" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. TRK9283192831[cite: 3]">
                     </div>
                 </div>
+
                 <div class="border-t pt-4 space-y-3">
                     <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-700 uppercase">Gestione Colli (Codice, Peso e Dimensioni)</span>
-                        <button type="button" onclick="addPackageRow()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold"><i class="fa-solid fa-box mr-1"></i> Aggiungi Collo</button>
+                        <span class="text-xs font-bold text-slate-700 uppercase">Dettaglio Colli / Imballaggio[cite: 3]</span>
+                        <button type="button" onclick="addBoxRow()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">
+                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi Collo[cite: 3]
+                        </button>
                     </div>
-                    <div id="packages-container" class="space-y-3 max-h-60 overflow-y-auto pr-1"></div>
+                    <div id="shipping-boxes-container" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
                 </div>
+
                 <div class="flex justify-end space-x-3 pt-4 border-t">
-                    <button type="button" onclick="closeShippingModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla</button>
-                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium shadow-sm">Conferma & Evadi</button>
+                    <button type="button" onclick="closeShippingModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla[cite: 3]</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Salva e Segna Spedito[cite: 3]</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modale Visualizzazione Dettagli Ordine (per Acquirente e Admin) -->
-    <div id="view-order-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
-            <h3 class="text-lg font-bold text-slate-800">Dettagli Ordine & Confezionamento</h3>
-            <div id="view-order-content" class="text-sm space-y-3 text-slate-600"></div>
-            <div class="flex justify-end pt-2">
-                <button type="button" onclick="closeViewOrderModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium">Chiudi</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Trasferimento -->
+    <!-- Modale Trasferimento Interno -->
     <div id="transfer-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h3 class="text-lg font-bold text-slate-800">Trasferimento Interno</h3>
-            <form onsubmit="executeTransfer(event)" class="space-y-4">
+            <h3 class="text-lg font-bold text-slate-800">Trasferimento Merce Interno[cite: 3]</h3>
+            <form onsubmit="submitTransfer(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Da Magazzino Origine</label>
-                    <select id="transfer-from" onchange="updateTransferItems()" class="w-full border rounded-xl p-3 text-sm bg-white">
-                        <option value="atec">Magazzino ATEC</option>
-                        <option value="kronos">Magazzino KRONOS</option>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Origine[cite: 3]</label>
+                    <select id="transfer-from" onchange="updateTransferProducts()" class="w-full border rounded-xl p-3 text-sm bg-white">
+                        <option value="atec">Magazzino ATEC[cite: 3]</option>
+                        <option value="kronos">Magazzino KRONOS[cite: 3]</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">A Magazzino Destinazione</label>
-                    <select id="transfer-to" disabled class="w-full border rounded-xl p-3 text-sm bg-slate-100 text-slate-500">
-                        <option value="kronos">Magazzino KRONOS</option>
-                        <option value="atec">Magazzino ATEC</option>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Magazzino di Destinazione[cite: 3]</label>
+                    <select id="transfer-to" class="w-full border rounded-xl p-3 text-sm bg-white">
+                        <option value="kronos">Magazzino KRONOS[cite: 3]</option>
+                        <option value="atec">Magazzino ATEC[cite: 3]</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seleziona Articolo</label>
-                    <select id="transfer-item-id" required class="w-full border rounded-xl p-3 text-sm bg-white"></select>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Articolo[cite: 3]</label>
+                    <select id="transfer-item" class="w-full border rounded-xl p-3 text-sm bg-white"></select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Quantità da Trasferire</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Quantità da Trasferire[cite: 3]</label>
                     <input type="number" id="transfer-qty" min="1" value="1" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="closeTransferModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Esegui Trasferimento</button>
+                    <button type="button" onclick="closeTransferModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla[cite: 3]</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Conferma Trasferimento[cite: 3]</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modale Utenti -->
+    <!-- Modale Utente -->
     <div id="user-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h3 id="user-modal-title" class="text-lg font-bold text-slate-800">Nuovo Utente</h3>
+            <h3 id="user-modal-title" class="text-lg font-bold text-slate-800">Gestione Utente[cite: 3]</h3>
             <form onsubmit="saveUser(event)" class="space-y-4">
-                <input type="hidden" id="user-edit-id">
+                <input type="hidden" id="user-edit-index">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Username</label>
-                    <input type="text" id="user-name" required class="w-full border rounded-xl p-3 text-sm">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Username[cite: 3]</label>
+                    <input type="text" id="user-username" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Password</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Password[cite: 3]</label>
                     <input type="text" id="user-password" required class="w-full border rounded-xl p-3 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ruolo</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ruolo[cite: 3]</label>
                     <select id="user-role" class="w-full border rounded-xl p-3 text-sm bg-white">
-                        <option value="Super Admin">Super Admin</option>
-                        <option value="Admin Magazzino">Admin Magazzino</option>
-                        <option value="Visualizzatore">Visualizzatore</option>
+                        <option value="Super Admin">Super Admin[cite: 3]</option>
+                        <option value="Admin Magazzino">Admin Magazzino[cite: 3]</option>
+                        <option value="Visualizzatore KRONOS">Visualizzatore KRONOS[cite: 3]</option>
+                        <option value="Visualizzatore ATEC">Visualizzatore ATEC[cite: 3]</option>
                     </select>
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Salva Utente</button>
+                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla[cite: 3]</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm">Salva Utente[cite: 3]</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- JAVASCRIPT -->
+    <!-- SCRIPT LOGICA APPLICAZIONE -->
     <script>
-        const defaultData = {
-            users: [
-                { id: 1, username: 'ADMIN', password: 'Simone2026', role: 'Super Admin' },
-                { id: 2, username: 'LOGISTICA', password: 'Simone2026', role: 'Admin Magazzino' },
-                { id: 3, username: 'KRONOS', password: 'Kronos2026', role: 'Visualizzatore' },
-                { id: 4, username: 'ATEC', password: 'Atec2026', role: 'Visualizzatore' }
-            ],
-            warehousesInfo: [
-                { id: 1, name: 'Magazzino ATEC', address: 'Via Roma 10, Roma', phone: '+39 06 111111', email: 'atec@logistica.it', manager: 'Mario Rossi' },
-                { id: 2, name: 'Magazzino KRONOS', address: 'Corso Milano 22, Milano', phone: '+39 02 222222', email: 'kronos@logistica.it', manager: 'Luigi Verdi' }
-            ],
-            atec: [
-                { id: 101, ean: '8012345678901', name: 'Sensore di Movimento IoT', model: 'ATEC-PRO-X1', qty: 45 },
-                { id: 102, ean: '8012345678902', name: 'Gateway Wi-Fi Industriale', model: 'ATEC-GW-90', qty: 12 },
-                { id: 103, ean: '8012345678903', name: 'Attuatore Elettrico 24V', model: 'ATEC-ACT-V2', qty: 28 }
-            ],
-            kronos: [
-                { id: 201, ean: '8098765432101', name: 'Terminalino Barcode Laser', model: 'KRN-SCAN-01', qty: 15 },
-                { id: 202, ean: '8098765432102', name: 'Stampante Termica Etichette', model: 'KRN-PRT-4X', qty: 8 },
-                { id: 203, ean: '8098765432103', name: 'Batteria Litio di Ricambio', model: 'KRN-BAT-500', qty: 34 }
-            ],
-            orders: [
-                {
-                    id: 'ORD-2026-001',
-                    date: '2026-10-01',
-                    warehouse: 'atec',
-                    invoice: 'FAT-2026/045',
-                    deal: 'DEAL-8832',
-                    sko1: 'Fornitore Esempio S.r.l.',
-                    sko2: 'LOGISTICA',
-                    sko3: 'Cliente Finale ATEC',
-                    items: [
-                        { name: 'Sensore di Movimento IoT', model: 'ATEC-PRO-X1', qty: 5 },
-                        { name: 'Gateway Wi-Fi Industriale', model: 'ATEC-GW-90', qty: 2 }
-                    ],
-                    status: 'Evaso',
-                    shipping: { date: '2026-10-02', method: 'Corriere Espresso', tracking: 'TRK9283192831', packages: [{ code: 'PCK-001', weight: '2.5', dims: '30x20x15' }] }
+        // Dati Iniziali di Default
+        const defaultWarehouses = [
+            { id: 'atec', name: 'Magazzino Centrale ATEC', address: 'Via Industriale 12, Civitavecchia (RM)', phone: '+39 0766 554433', email: 'atec.logistica@example.com', manager: 'Simone' },
+            { id: 'kronos', name: 'Magazzino Logistico KRONOS', address: 'Via della Logistica 45, Roma (RM)', phone: '+39 06 99887766', email: 'kronos.ordini@example.com', manager: 'Marco Rossi' }
+        ];
+
+        const defaultAtecItems = [
+            { ean: '8050012345671', name: 'Dispositivo Smart A1', model: 'Gen-1', qty: 45 },
+            { ean: '8050012345672', name: 'Sensore IoT Pro', model: 'v2.1', qty: 120 },
+            { ean: '8050012345673', name: 'Gateway Wireless', model: 'GW-900', qty: 30 }
+        ];
+
+        const defaultKronosItems = [
+            { ean: '8050098765431', name: 'Terminal Mobile K1', model: 'Lite', qty: 60 },
+            { ean: '8050098765432', name: 'Scanner Barcode Laser', model: 'BC-X', qty: 85 },
+            { ean: '8050098765433', name: 'Stampante Termica', model: 'TH-200', qty: 15 }
+        ];
+
+        const defaultUsers = [
+            { username: 'ADMIN', password: 'Simone2026', role: 'Super Admin' },
+            { username: 'LOGISTICA', password: 'Simone2026', role: 'Admin Magazzino' },
+            { username: 'KRONOS', password: 'Kronos2026', role: 'Visualizzatore KRONOS' },
+            { username: 'ATEC', password: 'Atec2026', role: 'Visualizzatore ATEC' }
+        ];
+
+        const defaultOrders = [
+            {
+                id: 'ORD-2026-001',
+                date: '2026-10-01',
+                invoice: 'FA-2026/104',
+                deal: 'DEAL-9982',
+                sko1: 'TechSupplier Srl',
+                sko2: 'Simone',
+                sko3: 'Cliente Rossi SpA',
+                warehouse: 'atec',
+                items: [{ name: 'Dispositivo Smart A1', model: 'Gen-1', qty: 5 }],
+                status: 'Spedito',
+                shipping: {
+                    date: '2026-10-02',
+                    method: 'Corriere Espresso',
+                    tracking: 'TRK9283192831',
+                    boxes: [
+                        { boxNumber: 1, weight: '4.5 kg', dimensions: '30x20x15 cm', contentSummary: '5x Dispositivo Smart A1' }
+                    ]
                 }
-            ]
-        };
+            }
+        ];
 
-        let appData = JSON.parse(localStorage.getItem('atec_kronos_db')) || defaultData;
-        if (!appData.users) appData.users = defaultData.users;
-        if (!appData.warehousesInfo) appData.warehousesInfo = defaultData.warehousesInfo;
-        if (!appData.atec) appData.atec = defaultData.atec;
-        if (!appData.kronos) appData.kronos = defaultData.kronos;
-        saveData();
+        // Stato Globale
+        let currentUser = null;
+        let warehouses = JSON.parse(localStorage.getItem('ak_warehouses')) || defaultWarehouses;
+        let atecItems = JSON.parse(localStorage.getItem('ak_atec')) || defaultAtecItems;
+        let kronosItems = JSON.parse(localStorage.getItem('ak_kronos')) || defaultKronosItems;
+        let users = JSON.parse(localStorage.getItem('ak_users')) || defaultUsers;
+        let orders = JSON.parse(localStorage.getItem('ak_orders')) || defaultOrders;
 
-        let currentUser = JSON.parse(localStorage.getItem('atec_kronos_user')) || null;
         let chartAtecInstance = null;
         let chartKronosInstance = null;
+        let chartSummaryInstance = null;
 
-        function saveData() {
-            localStorage.setItem('atec_kronos_db', JSON.stringify(appData));
-        }
-
-        function resetData() {
-            if (confirm('Vuoi davvero ripristinare i dati iniziali di fabbrica?')) {
-                localStorage.removeItem('atec_kronos_db');
-                localStorage.removeItem('atec_kronos_user');
-                location.reload();
+        // Inizializzazione
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = sessionStorage.getItem('ak_current_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showApp();
             }
-        }
-
-        window.onload = function() {
-            if (currentUser) showApp();
-        };
+        });
 
         function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('login-username').value.trim();
-            const p = document.getElementById('login-password').value.trim();
-            const found = appData.users.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
+            const p = document.getElementById('login-password').value;
+            const found = users.find(x => x.username === u && x.password === p);
             if (found) {
                 currentUser = found;
-                localStorage.setItem('atec_kronos_user', JSON.stringify(currentUser));
+                sessionStorage.setItem('ak_current_user', JSON.stringify(currentUser));
                 showApp();
             } else {
-                alert('Credenziali non valide. Riprova.');
+                alert('Credenziali non valide o errate.');
             }
         }
 
         function handleLogout() {
             currentUser = null;
-            localStorage.removeItem('atec_kronos_user');
+            sessionStorage.removeItem('ak_current_user');
             document.getElementById('app-container').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
         }
@@ -644,279 +651,330 @@
         function showApp() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
-            document.getElementById('current-user-display').innerText = currentUser.username;
-            document.getElementById('current-role-display').innerText = currentUser.role;
+            document.getElementById('current-user-display').textContent = currentUser.username;
+            document.getElementById('current-role-display').textContent = currentUser.role;
             buildSidebar();
-            switchSection('sec-dashboard', 'Dashboard Generale');
+            initNavigation();
+            renderAll();
         }
 
+        function resetData() {
+            if (confirm('Sei sicuro di voler ripristinare i dati di fabbrica iniziali?')) {
+                localStorage.clear();
+                warehouses = [...defaultWarehouses];
+                atecItems = [...defaultAtecItems];
+                kronosItems = [...defaultKronosItems];
+                users = [...defaultUsers];
+                orders = [...defaultOrders];
+                renderAll();
+                alert('Dati ripristinati con successo.');
+            }
+        }
+
+        function saveDataToStorage() {
+            localStorage.setItem('ak_warehouses', JSON.stringify(warehouses));
+            localStorage.setItem('ak_atec', JSON.stringify(atecItems));
+            localStorage.setItem('ak_kronos', JSON.stringify(kronosItems));
+            localStorage.setItem('ak_users', JSON.stringify(users));
+            localStorage.setItem('ak_orders', JSON.stringify(orders));
+        }
+
+        // Sidebar & Navigazione in base ai permessi
         function buildSidebar() {
             const nav = document.getElementById('sidebar-nav');
-            let html = `
-                <button onclick="switchSection('sec-dashboard', 'Dashboard Generale')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                    <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard</span>
-                </button>
-                <button onclick="switchSection('sec-atec', 'Magazzino ATEC')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                    <i class="fa-solid fa-warehouse w-5"></i><span>Magazzino ATEC</span>
-                </button>
-                <button onclick="switchSection('sec-kronos', 'Magazzino KRONOS')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                    <i class="fa-solid fa-warehouse w-5"></i><span>Magazzino KRONOS</span>
-                </button>
-                <button onclick="switchSection('sec-orders', 'Gestione Ordini')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                    <i class="fa-solid fa-file-invoice w-5"></i><span>Ordini & Spedizioni</span>
-                </button>
-            `;
-            if (currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino') {
-                html += `
-                    <button onclick="switchSection('sec-admin', 'Area Admin & Trasferimenti')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                        <i class="fa-solid fa-shield-halved w-5"></i><span>Trasferimenti</span>
-                    </button>
-                `;
+            let links = [
+                { id: 'dashboard', label: 'Dashboard', icon: 'fa-chart-pie', roles: ['Super Admin', 'Admin Magazzino', 'Visualizzatore KRONOS', 'Visualizzatore ATEC'] },
+                { id: 'atec', label: 'Magazzino ATEC', icon: 'fa-warehouse', roles: ['Super Admin', 'Admin Magazzino', 'Visualizzatore ATEC'] },
+                { id: 'kronos', label: 'Magazzino KRONOS', icon: 'fa-warehouse', roles: ['Super Admin', 'Admin Magazzino', 'Visualizzatore KRONOS'] },
+                { id: 'orders', label: 'Gestione Ordini', icon: 'fa-clipboard-list', roles: ['Super Admin', 'Admin Magazzino'] },
+                { id: 'admin', label: 'Trasferimenti', icon: 'fa-right-left', roles: ['Super Admin', 'Admin Magazzino'] },
+                { id: 'users', label: 'Gestione Utenti', icon: 'fa-users', roles: ['Super Admin'] }
+            ];
+
+            nav.innerHTML = '';
+            links.forEach(l => {
+                if (l.roles.includes(currentUser.role)) {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white';
+                    btn.dataset.section = l.id;
+                    btn.innerHTML = `<i class="fa-solid ${l.icon} w-5 text-indigo-400"></i><span>${l.label}</span>`;
+                    btn.onclick = () => switchSection(l.id);
+                    nav.appendChild(btn);
+                }
+            });
+        }
+
+        function initNavigation() {
+            const allowed = document.querySelectorAll('#sidebar-nav button');
+            if (allowed.length > 0) {
+                allowed[0].click();
             }
-            if (currentUser.role === 'Super Admin') {
-                html += `
-                    <button onclick="switchSection('sec-users', 'Gestione Utenti')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                        <i class="fa-solid fa-users-gear w-5"></i><span>Utenti</span>
-                    </button>
-                `;
-            }
-            nav.innerHTML = html;
         }
 
-        function switchSection(secId, title) {
-            ['sec-dashboard', 'sec-atec', 'sec-kronos', 'sec-orders', 'sec-admin', 'sec-users'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
+        function switchSection(secId) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            const target = document.getElementById(`sec-${secId}`);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('#sidebar-nav button').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
+                if (b.dataset.section === secId) {
+                    b.classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
+                }
             });
-            document.getElementById(secId).classList.remove('hidden');
-            document.getElementById('page-title').innerText = title;
 
-            if (secId === 'sec-dashboard') renderDashboard();
-            if (secId === 'sec-atec') renderInventory('atec');
-            if (secId === 'sec-kronos') renderInventory('kronos');
-            if (secId === 'sec-orders') renderOrders();
-            if (secId === 'sec-users') renderUsers();
-        }
-
-        function renderDashboard() {
-            const isSuperAdmin = currentUser && currentUser.role === 'Super Admin';
-            document.getElementById('dashboard-warehouse-actions').style.display = isSuperAdmin ? 'block' : 'none';
-
-            const whGrid = document.getElementById('dashboard-warehouses-grid');
-            let whHtml = '';
-            appData.warehousesInfo.forEach(w => {
-                whHtml += `
-                    <div class="bg-slate-50 border rounded-xl p-4 space-y-2">
-                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-warehouse text-indigo-600 mr-2"></i> ${w.name}</h4>
-                        <div class="text-xs text-slate-600 space-y-1">
-                            <p><i class="fa-solid fa-location-dot w-4 text-slate-400 mr-1"></i> ${w.address}</p>
-                            <p><i class="fa-solid fa-phone w-4 text-slate-400 mr-1"></i> ${w.phone}</p>
-                            <p><i class="fa-solid fa-envelope w-4 text-slate-400 mr-1"></i> ${w.email}</p>
-                            <p><i class="fa-solid fa-user-tie w-4 text-slate-400 mr-1"></i> <b>Responsabile:</b> ${w.manager}</p>
-                        </div>
-                    </div>
-                `;
-            });
-            whGrid.innerHTML = whHtml;
-
-            const totalAtec = appData.atec.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
-            const totalKronos = appData.kronos.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
-            document.getElementById('count-atec').innerText = totalAtec;
-            document.getElementById('count-kronos').innerText = totalKronos;
-
-            renderHorizontalBarChart('chartAtec', appData.atec, 'Scorte ATEC', ['#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff']);
-            renderHorizontalBarChart('chartKronos', appData.kronos, 'Scorte KRONOS', ['#10b981','#34d399','#6ee7b7','#a7f3d0','#ecfdf5']);
-        }
-
-        function openWarehouseManageModal() {
-            renderWarehouseList();
-            document.getElementById('warehouse-manage-modal').classList.remove('hidden');
-        }
-
-        function closeWarehouseManageModal() {
-            document.getElementById('warehouse-manage-modal').classList.add('hidden');
-            renderDashboard();
-        }
-
-        function renderWarehouseList() {
-            const container = document.getElementById('warehouse-list-container');
-            let html = '';
-            appData.warehousesInfo.forEach(w => {
-                html += `
-                    <div class="border rounded-xl p-3 flex justify-between items-center bg-slate-50 text-sm">
-                        <div>
-                            <p class="font-bold text-slate-800">${w.name}</p>
-                            <p class="text-xs text-slate-500">${w.address} | Tel: ${w.phone} | Resp: ${w.manager}</p>
-                        </div>
-                        <div class="space-x-1">
-                            <button onclick="editWarehouse(${w.id})" class="text-slate-400 hover:text-indigo-600 p-1.5"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteWarehouse(${w.id})" class="text-slate-400 hover:text-red-600 p-1.5"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        let editingWarehouseId = null;
-        function openWarehouseForm() {
-            editingWarehouseId = null;
-            document.getElementById('wh-form-title').innerText = 'Nuovo Magazzino';
-            document.getElementById('wh-name').value = '';
-            document.getElementById('wh-address').value = '';
-            document.getElementById('wh-phone').value = '';
-            document.getElementById('wh-email').value = '';
-            document.getElementById('wh-manager').value = '';
-            document.getElementById('warehouse-form-modal').classList.remove('hidden');
-        }
-
-        function editWarehouse(id) {
-            const w = appData.warehousesInfo.find(x => x.id === id);
-            if (!w) return;
-            editingWarehouseId = id;
-            document.getElementById('wh-form-title').innerText = 'Modifica Magazzino';
-            document.getElementById('wh-name').value = w.name;
-            document.getElementById('wh-address').value = w.address;
-            document.getElementById('wh-phone').value = w.phone;
-            document.getElementById('wh-email').value = w.email;
-            document.getElementById('wh-manager').value = w.manager;
-            document.getElementById('warehouse-form-modal').classList.remove('hidden');
-        }
-
-        function closeWarehouseForm() {
-            document.getElementById('warehouse-form-modal').classList.add('hidden');
-        }
-
-        function saveWarehouseData(e) {
-            e.preventDefault();
-            const whData = {
-                id: editingWarehouseId ? editingWarehouseId : Date.now(),
-                name: document.getElementById('wh-name').value.trim(),
-                address: document.getElementById('wh-address').value.trim(),
-                phone: document.getElementById('wh-phone').value.trim(),
-                email: document.getElementById('wh-email').value.trim(),
-                manager: document.getElementById('wh-manager').value.trim()
+            const titles = {
+                dashboard: 'Dashboard Generale',
+                atec: 'Inventario Magazzino ATEC',
+                kronos: 'Inventario Magazzino KRONOS',
+                orders: 'Gestione Ordini Prodotti',
+                admin: 'Trasferimenti Merce Interno',
+                users: 'Gestione Utenti e Accessi'
             };
+            document.getElementById('page-title').textContent = titles[secId] || 'Gestionale';
+        }
 
-            if (editingWarehouseId) {
-                const idx = appData.warehousesInfo.findIndex(x => x.id === editingWarehouseId);
-                if (idx !== -1) appData.warehousesInfo[idx] = whData;
+        function renderAll() {
+            saveDataToStorage();
+            renderDashboard();
+            renderTableAtec();
+            renderTableKronos();
+            renderTableOrders();
+            renderTableUsers();
+        }
+
+        // Dashboard & Grafici
+        function renderDashboard() {
+            const grid = document.getElementById('dashboard-warehouses-grid');
+            grid.innerHTML = '';
+            warehouses.forEach(w => {
+                grid.innerHTML += `
+                    <div class="border rounded-xl p-4 bg-slate-50 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-location-dot text-indigo-600 mr-1"></i> ${w.name}</h4>
+                            <span class="text-[10px] px-2 py-0.5 bg-indigo-100 text-indigo-700 font-bold rounded-full uppercase">${w.id}</span>
+                        </div>
+                        <p class="text-xs text-slate-600"><span class="font-semibold">Indirizzo:</span> ${w.address}</p>
+                        <p class="text-xs text-slate-600"><span class="font-semibold">Contatti:</span> ${w.phone} | ${w.email}</p>
+                        <p class="text-xs text-slate-600"><span class="font-semibold">Responsabile:</span> ${w.manager}</p>
+                    </div>
+                `;
+            });
+
+            const whActions = document.getElementById('dashboard-warehouse-actions');
+            if (currentUser.role === 'Super Admin') {
+                whActions.classList.remove('hidden');
             } else {
-                appData.warehousesInfo.push(whData);
+                whActions.classList.add('hidden');
             }
 
-            saveData();
-            closeWarehouseForm();
-            renderWarehouseList();
+            const totalAtecQty = atecItems.reduce((acc, item) => acc + Number(item.qty), 0);
+            const totalKronosQty = kronosItems.reduce((acc, item) => acc + Number(item.qty), 0);
+            document.getElementById('count-atec').textContent = totalAtecQty;
+            document.getElementById('count-kronos').textContent = totalKronosQty;
+
+            renderCharts();
         }
 
-        function deleteWarehouse(id) {
-            if (appData.warehousesInfo.length <= 1) {
-                alert('È necessario mantenere almeno un magazzino registrato.');
-                return;
-            }
-            if (confirm('Eliminare questo magazzino dall’anagrafica?')) {
-                appData.warehousesInfo = appData.warehousesInfo.filter(x => x.id !== id);
-                saveData();
-                renderWarehouseList();
-            }
-        }
-
-        function renderHorizontalBarChart(canvasId, items, labelText, colors) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            const labels = items.map(i => `${i.name} (${i.model})`);
-            const dataVals = items.map(i => i.qty);
-
-            if (canvasId === 'chartAtec' && chartAtecInstance) chartAtecInstance.destroy();
-            if (canvasId === 'chartKronos' && chartKronosInstance) chartKronosInstance.destroy();
-
-            const chartObj = new Chart(ctx, {
+        function renderCharts() {
+            // Chart Atec (Barre Orizzontali con Valori in Nero)
+            const ctxAtec = document.getElementById('chartAtec').getContext('2d');
+            if (chartAtecInstance) chartAtecInstance.destroy();
+            chartAtecInstance = new Chart(ctxAtec, {
                 type: 'bar',
                 data: {
-                    labels: labels,
-                    datasets: [{ label: labelText, data: dataVals, backgroundColor: colors, borderRadius: 8 }]
+                    labels: atecItems.map(i => `${i.name} (${i.model})`),
+                    datasets: [{
+                        label: 'Quantità ATEC',
+                        data: atecItems.map(i => i.qty),
+                        backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
                 },
                 options: {
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        y: { grid: { display: false } }
+                    },
                     plugins: {
                         legend: { display: false },
-                        datalabels: { anchor: 'center', align: 'center', color: '#000000', font: { weight: 'bold', size: 12 } }
-                    },
-                    scales: {
-                        x: { grid: { display: false }, beginAtZero: true },
-                        y: { grid: { display: false } }
+                        datalabels: {
+                            anchor: 'center',
+                            align: 'center',
+                            color: '#000000',
+                            font: { weight: 'bold', size: 12 },
+                            formatter: value => value
+                        }
                     }
                 },
                 plugins: [ChartDataLabels]
             });
 
-            if (canvasId === 'chartAtec') chartAtecInstance = chartObj;
-            if (canvasId === 'chartKronos') chartKronosInstance = chartObj;
+            // Chart Kronos (Barre Orizzontali con Valori in Nero)
+            const ctxKronos = document.getElementById('chartKronos').getContext('2d');
+            if (chartKronosInstance) chartKronosInstance.destroy();
+            chartKronosInstance = new Chart(ctxKronos, {
+                type: 'bar',
+                data: {
+                    labels: kronosItems.map(i => `${i.name} (${i.model})`),
+                    datasets: [{
+                        label: 'Quantità KRONOS',
+                        data: kronosItems.map(i => i.qty),
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        y: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'center',
+                            align: 'center',
+                            color: '#000000',
+                            font: { weight: 'bold', size: 12 },
+                            formatter: value => value
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+            // Riepilogo Comparativo (Barre Orizzontali con Somma Prodotti/Modelli e Valori in Nero)
+            const combinedMap = {};
+            [...atecItems, ...kronosItems].forEach(item => {
+                const key = `${item.name} - ${item.model}`;
+                if (!combinedMap[key]) combinedMap[key] = 0;
+                combinedMap[key] += Number(item.qty);
+            });
+
+            const summaryLabels = Object.keys(combinedMap);
+            const summaryData = Object.values(combinedMap);
+
+            const ctxSummary = document.getElementById('chartSummaryWarehouses').getContext('2d');
+            if (chartSummaryInstance) chartSummaryInstance.destroy();
+            
+            chartSummaryInstance = new Chart(ctxSummary, {
+                type: 'bar',
+                data: {
+                    labels: summaryLabels,
+                    datasets: [{
+                        label: 'Totale Complessivo (ATEC + KRONOS)',
+                        data: summaryData,
+                        backgroundColor: 'rgba(79, 70, 229, 0.75)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        y: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'center',
+                            align: 'center',
+                            color: '#000000',
+                            font: { weight: 'bold', size: 12 },
+                            formatter: value => value
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
         }
 
-        function renderInventory(wh) {
-            const tbody = document.getElementById(`table-${wh}`);
-            const canEdit = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
-            document.getElementById(`header-add-${wh}`).style.display = canEdit ? 'inline-block' : 'none';
-
-            const theadRow = document.getElementById(`thead-${wh}-row`);
-            let thActions = theadRow.querySelector('.th-actions-inv');
-            if (canEdit) {
-                if (!thActions) {
-                    const th = document.createElement('th');
-                    th.className = 'p-3 font-bold text-right th-actions-inv';
-                    th.innerText = 'Azioni';
-                    theadRow.appendChild(th);
-                }
-            } else {
-                if (thActions) thActions.remove();
+        // Tabelle Inventari
+        function renderTableAtec() {
+            const tbody = document.getElementById('table-atec');
+            tbody.innerHTML = '';
+            const canEdit = ['Super Admin', 'Admin Magazzino'].includes(currentUser.role);
+            
+            const theadRow = document.getElementById('thead-atec-row');
+            if (canEdit && theadRow.cells.length === 4) {
+                theadRow.innerHTML += `<th class="p-3 font-bold text-right">Azioni[cite: 3]</th>`;
             }
 
-            let html = '';
-            appData[wh].forEach(item => {
-                html += `
+            atecItems.forEach((item, idx) => {
+                let actionHtml = '';
+                if (canEdit) {
+                    actionHtml = `
+                        <td class="p-3 text-right space-x-2">
+                            <button onclick="editItem('atec', ${idx})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteItem('atec', ${idx})" class="text-red-600 hover:text-red-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                }
+                tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
                         <td class="p-3 font-mono text-xs text-slate-600">${item.ean}</td>
                         <td class="p-3 font-semibold text-slate-800">${item.name}</td>
                         <td class="p-3 text-slate-600">${item.model}</td>
-                        <td class="p-3 font-bold text-indigo-600">${item.qty}</td>
+                        <td class="p-3 font-bold text-slate-800">${item.qty}</td>
+                        ${canEdit ? actionHtml : ''}
+                    </tr>
                 `;
+            });
+        }
+
+        function renderTableKronos() {
+            const tbody = document.getElementById('table-kronos');
+            tbody.innerHTML = '';
+            const canEdit = ['Super Admin', 'Admin Magazzino'].includes(currentUser.role);
+
+            const theadRow = document.getElementById('thead-kronos-row');
+            if (canEdit && theadRow.cells.length === 4) {
+                theadRow.innerHTML += `<th class="p-3 font-bold text-right">Azioni[cite: 3]</th>`;
+            }
+
+            kronosItems.forEach((item, idx) => {
+                let actionHtml = '';
                 if (canEdit) {
-                    html += `
-                        <td class="p-3 text-right">
-                            <button onclick="editItem('${wh}', ${item.id})" class="text-slate-400 hover:text-indigo-600 p-1"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteItem('${wh}', ${item.id})" class="text-slate-400 hover:text-red-600 p-1 ml-2"><i class="fa-solid fa-trash"></i></button>
+                    actionHtml = `
+                        <td class="p-3 text-right space-x-2">
+                            <button onclick="editItem('kronos', ${idx})" class="text-emerald-600 hover:text-emerald-800 text-xs font-semibold"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteItem('kronos', ${idx})" class="text-red-600 hover:text-red-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     `;
                 }
-                html += `</tr>`;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-mono text-xs text-slate-600">${item.ean}</td>
+                        <td class="p-3 font-semibold text-slate-800">${item.name}</td>
+                        <td class="p-3 text-slate-600">${item.model}</td>
+                        <td class="p-3 font-bold text-slate-800">${item.qty}</td>
+                        ${canEdit ? actionHtml : ''}
+                    </tr>
+                `;
             });
-            tbody.innerHTML = html;
         }
 
-        let editingItemId = null;
         function openAddItemModal(wh) {
-            editingItemId = null;
             document.getElementById('item-warehouse').value = wh;
-            document.getElementById('item-modal-title').innerText = `Nuovo Articolo - Magazzino ${wh.toUpperCase()}`;
+            document.getElementById('item-modal-title').textContent = `Nuovo Articolo - ${wh.toUpperCase()}`;
             document.getElementById('item-ean').value = '';
             document.getElementById('item-name').value = '';
             document.getElementById('item-model').value = '';
-            document.getElementById('item-qty').value = '1';
-            document.getElementById('item-modal').classList.remove('hidden');
-        }
-
-        function editItem(wh, id) {
-            const item = appData[wh].find(x => x.id === id);
-            if (!item) return;
-            editingItemId = id;
-            document.getElementById('item-warehouse').value = wh;
-            document.getElementById('item-modal-title').innerText = `Modifica Articolo - Magazzino ${wh.toUpperCase()}`;
-            document.getElementById('item-ean').value = item.ean;
-            document.getElementById('item-name').value = item.name;
-            document.getElementById('item-model').value = item.model;
-            document.getElementById('item-qty').value = item.qty;
+            document.getElementById('item-qty').value = '';
             document.getElementById('item-modal').classList.remove('hidden');
         }
 
@@ -928,135 +986,149 @@
             e.preventDefault();
             const wh = document.getElementById('item-warehouse').value;
             const newItem = {
-                id: editingItemId ? editingItemId : Date.now(),
-                ean: document.getElementById('item-ean').value.trim(),
-                name: document.getElementById('item-name').value.trim(),
-                model: document.getElementById('item-model').value.trim(),
-                qty: parseInt(document.getElementById('item-qty').value) || 0
+                ean: document.getElementById('item-ean').value,
+                name: document.getElementById('item-name').value,
+                model: document.getElementById('item-model').value,
+                qty: Number(document.getElementById('item-qty').value)
             };
 
-            if (editingItemId) {
-                const idx = appData[wh].findIndex(x => x.id === editingItemId);
-                if (idx !== -1) appData[wh][idx] = newItem;
+            if (wh === 'atec') {
+                atecItems.push(newItem);
             } else {
-                appData[wh].push(newItem);
+                kronosItems.push(newItem);
             }
 
-            saveData();
             closeAddItemModal();
-            renderInventory(wh);
+            renderAll();
         }
 
-        function deleteItem(wh, id) {
-            if (confirm('Eliminare questo articolo dall’inventario?')) {
-                appData[wh] = appData[wh].filter(x => x.id !== id);
-                saveData();
-                renderInventory(wh);
+        function deleteItem(wh, idx) {
+            if (confirm('Eliminare questo articolo?')) {
+                if (wh === 'atec') atecItems.splice(idx, 1);
+                else kronosItems.splice(idx, 1);
+                renderAll();
             }
         }
 
-        // --- FUNZIONE RENDERING ORDINI AGGIORNATA CON RIGHE MULTIPLE E RAGGRUPPAMENTO ---
-        function renderOrders() {
-            const tbody = document.getElementById('table-orders');
-            const btnNewOrder = document.getElementById('btn-new-order');
-            if (btnNewOrder) btnNewOrder.style.display = 'inline-block';
-
-            let html = '';
-            appData.orders.forEach((ord, index) => {
-                let badgeColor = 'bg-amber-50 text-amber-700';
-                if (ord.status === 'Preso in carico') badgeColor = 'bg-purple-50 text-purple-700';
-                if (ord.status === 'Pronto') badgeColor = 'bg-blue-50 text-blue-700';
-                if (ord.status === 'Evaso') badgeColor = 'bg-emerald-50 text-emerald-700';
-
-                const canManageOrders = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
-                const totalItems = ord.items.length;
-
-                ord.items.forEach((item, itemIdx) => {
-                    const isFirst = (itemIdx === 0);
-                    // Linea di separazione orizzontale marcata tra gruppi di ordini diversi
-                    const rowBorderClass = (isFirst && index > 0) ? 'border-t-2 border-slate-200' : 'border-t border-slate-100';
-
-                    html += `<tr class="hover:bg-slate-50 transition ${rowBorderClass}">`;
-
-                    if (isFirst) {
-                        html += `
-                            <td class="p-3 text-xs text-slate-600" rowspan="${totalItems}">${ord.date}</td>
-                            <td class="p-3 text-xs font-bold text-slate-800" rowspan="${totalItems}">${ord.invoice}</td>
-                            <td class="p-3 text-xs text-slate-600" rowspan="${totalItems}">${ord.deal}</td>
-                            <td class="p-3 text-slate-700 font-medium text-xs" rowspan="${totalItems}">${ord.sko1 || '-'}</td>
-                            <td class="p-3 text-slate-700 text-xs" rowspan="${totalItems}">${ord.sko2}</td>
-                            <td class="p-3 text-slate-700 text-xs" rowspan="${totalItems}">${ord.sko3}</td>
-                            <td class="p-3 uppercase text-xs font-bold text-indigo-600" rowspan="${totalItems}">${ord.warehouse}</td>
-                        `;
-                    }
-
-                    // Colonne specifiche per ogni singolo prodotto dell'ordine
-                    html += `
-                        <td class="p-3 text-xs font-semibold text-slate-800">${item.name}</td>
-                        <td class="p-3 text-xs text-slate-600">${item.model}</td>
-                        <td class="p-3 text-xs font-bold text-indigo-600">${item.qty}</td>
-                    `;
-
-                    if (isFirst) {
-                        html += `
-                            <td class="p-3" rowspan="${totalItems}"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${ord.status}</span></td>
-                            <td class="p-3 text-right space-x-1" rowspan="${totalItems}">
-                        `;
-
-                        if (canManageOrders) {
-                            html += `
-                                <select onchange="updateOrderStatus('${ord.id}', this.value)" class="text-xs border rounded-lg p-1.5 bg-white font-semibold text-slate-700">
-                                    <option value="" disabled selected>Cambia Stato...</option>
-                                    <option value="Preso in carico" ${ord.status === 'Preso in carico' ? 'selected' : ''}>Preso in carico</option>
-                                    <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
-                                    <option value="Evaso" ${ord.status === 'Evaso' ? 'selected' : ''}>Evaso</option>
-                                </select>
-                            `;
-                            if (ord.status === 'Evaso') {
-                                html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium ml-1">Dettagli</button>`;
-                            }
-                        } else {
-                            if (ord.status === 'Evaso' || ord.status === 'Pronto') {
-                                html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold">Visualizza Dati</button>`;
-                            } else {
-                                html += `<span class="text-xs text-slate-400 italic">In lavorazione</span>`;
-                            }
-                        }
-
-                        html += `</td>`;
-                    }
-
-                    html += `</tr>`;
-                });
+        function openWarehouseManageModal() {
+            const container = document.getElementById('warehouse-list-container');
+            container.innerHTML = '';
+            warehouses.forEach((w, idx) => {
+                container.innerHTML += `
+                    <div class="border rounded-xl p-3 flex justify-between items-center bg-slate-50">
+                        <div>
+                            <h5 class="font-bold text-slate-800 text-sm">${w.name} (${w.id.toUpperCase()})</h5>
+                            <p class="text-xs text-slate-500">${w.address} - Tel: ${w.phone}</p>
+                        </div>
+                        <button onclick="editWarehouse(${idx})" class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100">Modifica[cite: 3]</button>
+                    </div>
+                `;
             });
-            tbody.innerHTML = html;
+            document.getElementById('warehouse-manage-modal').classList.remove('hidden');
         }
 
-        function updateOrderStatus(orderId, newStatus) {
-            if (newStatus === 'Evaso') {
-                openShippingModal(orderId);
+        function closeWarehouseManageModal() {
+            document.getElementById('warehouse-manage-modal').classList.add('hidden');
+        }
+
+        function openWarehouseForm(idx = null) {
+            if (idx !== null) {
+                const w = warehouses[idx];
+                document.getElementById('wh-edit-id').value = idx;
+                document.getElementById('wh-name').value = w.name;
+                document.getElementById('wh-address').value = w.address;
+                document.getElementById('wh-phone').value = w.phone;
+                document.getElementById('wh-email').value = w.email;
+                document.getElementById('wh-manager').value = w.manager;
+                document.getElementById('wh-form-title').textContent = 'Modifica Magazzino[cite: 3]';
             } else {
-                const ord = appData.orders.find(o => o.id === orderId);
-                if (ord) {
-                    ord.status = newStatus;
-                    saveData();
-                    renderOrders();
-                }
+                document.getElementById('wh-edit-id').value = '';
+                document.getElementById('wh-name').value = '';
+                document.getElementById('wh-address').value = '';
+                document.getElementById('wh-phone').value = '';
+                document.getElementById('wh-email').value = '';
+                document.getElementById('wh-manager').value = '';
+                document.getElementById('wh-form-title').textContent = 'Nuovo Magazzino[cite: 3]';
             }
+            document.getElementById('warehouse-form-modal').classList.remove('hidden');
+        }
+
+        function editWarehouse(idx) {
+            openWarehouseForm(idx);
+        }
+
+        function closeWarehouseForm() {
+            document.getElementById('warehouse-form-modal').classList.add('hidden');
+        }
+
+        function saveWarehouseData(e) {
+            e.preventDefault();
+            const idx = document.getElementById('wh-edit-id').value;
+            const data = {
+                id: idx !== '' ? warehouses[idx].id : 'wh_' + Date.now(),
+                name: document.getElementById('wh-name').value,
+                address: document.getElementById('wh-address').value,
+                phone: document.getElementById('wh-phone').value,
+                email: document.getElementById('wh-email').value,
+                manager: document.getElementById('wh-manager').value
+            };
+
+            if (idx !== '') {
+                warehouses[idx] = data;
+            } else {
+                warehouses.push(data);
+            }
+
+            closeWarehouseForm();
+            closeWarehouseManageModal();
+            renderAll();
+        }
+
+        function renderTableOrders() {
+            const tbody = document.getElementById('table-orders');
+            tbody.innerHTML = '';
+            orders.forEach((ord, idx) => {
+                const firstItem = ord.items[0] || {};
+                let statusBadge = '';
+                if (ord.status === 'Spedito') {
+                    statusBadge = `<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold">Spedito[cite: 3]</span>`;
+                } else {
+                    statusBadge = `<span class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold">In Lavorazione[cite: 3]</span>`;
+                }
+
+                let actionBtns = `<button onclick="openShippingModal(${idx})" class="px-2.5 py-1 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700">Evadi / Spedisci[cite: 3]</button>`;
+                if (ord.status === 'Spedito') {
+                    actionBtns = `<button onclick="viewShippingDetails(${idx})" class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-200">Dettagli Colli[cite: 3]</button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 text-xs text-slate-600">${ord.date}</td>
+                        <td class="p-3 font-bold text-slate-800">${ord.invoice}</td>
+                        <td class="p-3 text-slate-600">${ord.deal}</td>
+                        <td class="p-3 text-slate-600">${ord.sko1}</td>
+                        <td class="p-3 text-slate-600">${ord.sko2}</td>
+                        <td class="p-3 text-slate-600">${ord.sko3}</td>
+                        <td class="p-3 uppercase font-mono text-xs text-indigo-600">${ord.warehouse}</td>
+                        <td class="p-3 font-semibold text-slate-800">${firstItem.name || '-'}</td>
+                        <td class="p-3 text-slate-600">${firstItem.model || '-'}</td>
+                        <td class="p-3 font-bold text-slate-800">${firstItem.qty || 0}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 text-right">${actionBtns}</td>
+                    </tr>
+                `;
+            });
         }
 
         function openOrderModal() {
             document.getElementById('order-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('order-warehouse').value = 'atec';
-            document.getElementById('order-invoice').value = '';
-            document.getElementById('order-deal').value = '';
+            document.getElementById('order-invoice').value = 'FA-2026/';
+            document.getElementById('order-deal').value = 'DEAL-';
             document.getElementById('order-sko1').value = '';
             document.getElementById('order-sko2').value = currentUser.username;
             document.getElementById('order-sko3').value = '';
-            
             document.getElementById('order-items-container').innerHTML = '';
             addOrderItemRow();
-            
             document.getElementById('order-modal').classList.remove('hidden');
         }
 
@@ -1066,183 +1138,120 @@
 
         function addOrderItemRow() {
             const container = document.getElementById('order-items-container');
-            const combinedMap = new Map();
-            [...appData.atec, ...appData.kronos].forEach(item => {
-                const key = `${item.name.toLowerCase()}_${item.model.toLowerCase()}`;
-                if (combinedMap.has(key)) {
-                    combinedMap.get(key).qty += parseInt(item.qty || 0);
-                } else {
-                    combinedMap.set(key, { name: item.name, model: item.model, qty: parseInt(item.qty || 0) });
-                }
-            });
-
-            let options = '';
-            combinedMap.forEach(item => {
-                const valData = encodeURIComponent(JSON.stringify({ name: item.name, model: item.model }));
-                options += `<option value="${valData}">${item.name} (${item.model}) - Disp: ${item.qty}</option>`;
-            });
-
-            const row = document.createElement('div');
-            row.className = 'flex items-center space-x-2';
-            row.innerHTML = `
-                <select class="order-item-sel flex-1 border rounded-xl p-2.5 text-sm bg-white">${options}</select>
-                <input type="number" min="1" value="1" class="order-item-qty w-24 border rounded-xl p-2.5 text-sm" placeholder="Quantità">
-                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash"></i></button>
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center';
+            div.innerHTML = `
+                <input type="text" placeholder="Nome Prodotto[cite: 3]" required class="flex-1 border rounded-xl p-2 text-sm order-item-name">
+                <input type="text" placeholder="Modello[cite: 3]" required class="w-32 border rounded-xl p-2 text-sm order-item-model">
+                <input type="number" placeholder="Quantità[cite: 3]" min="1" value="1" required class="w-24 border rounded-xl p-2 text-sm order-item-qty">
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 p-2"><i class="fa-solid fa-trash"></i></button>
             `;
-            container.appendChild(row);
+            container.appendChild(div);
         }
 
         function submitOrder(e) {
             e.preventDefault();
-            const wh = document.getElementById('order-warehouse').value;
-            const rows = document.querySelectorAll('#order-items-container > div');
             const items = [];
-
-            rows.forEach(r => {
-                const rawVal = r.querySelector('.order-item-sel').value;
-                const qty = parseInt(r.querySelector('.order-item-qty').value);
-                if (rawVal && qty > 0) {
-                    const parsed = JSON.parse(decodeURIComponent(rawVal));
-                    items.push({ name: parsed.name, model: parsed.model, qty });
-                }
+            document.querySelectorAll('#order-items-container > div').forEach(row => {
+                items.push({
+                    name: row.querySelector('.order-item-name').value,
+                    model: row.querySelector('.order-item-model').value,
+                    qty: Number(row.querySelector('.order-item-qty').value)
+                });
             });
 
-            if (items.length === 0) {
-                alert('Aggiungi almeno un prodotto valido all’ordine.');
-                return;
-            }
-
             const newOrd = {
-                id: 'ORD-2026-' + Math.floor(100 + Math.random() * 900),
+                id: 'ORD-2026-' + String(orders.length + 1).padStart(3, '0'),
                 date: document.getElementById('order-date').value,
-                warehouse: wh,
                 invoice: document.getElementById('order-invoice').value,
                 deal: document.getElementById('order-deal').value,
                 sko1: document.getElementById('order-sko1').value,
                 sko2: document.getElementById('order-sko2').value,
                 sko3: document.getElementById('order-sko3').value,
+                warehouse: document.getElementById('order-warehouse').value,
                 items: items,
-                status: 'In Lavorazione',
-                shipping: null
+                status: 'In Lavorazione'
             };
 
-            appData.orders.unshift(newOrd);
-            saveData();
+            orders.push(newOrd);
             closeOrderModal();
-            renderOrders();
+            renderAll();
         }
 
-        let currentShippingOrderId = null;
-        function openShippingModal(orderId) {
-            currentShippingOrderId = orderId;
+        let activeShippingOrderIdx = null;
+
+        function openShippingModal(idx) {
+            activeShippingOrderIdx = idx;
             document.getElementById('shipping-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('shipping-method').value = '';
-            document.getElementById('shipping-tracking').value = '';
-            document.getElementById('packages-container').innerHTML = '';
-            addPackageRow();
+            document.getElementById('shipping-method').value = 'Corriere Espresso';
+            document.getElementById('shipping-tracking').value = 'TRK' + Math.floor(Math.random() * 900000000 + 100000000);
+            document.getElementById('shipping-boxes-container').innerHTML = '';
+            addBoxRow();
             document.getElementById('shipping-modal').classList.remove('hidden');
         }
 
         function closeShippingModal() {
             document.getElementById('shipping-modal').classList.add('hidden');
-            renderOrders();
         }
 
-        function addPackageRow() {
-            const container = document.getElementById('packages-container');
-            const row = document.createElement('div');
-            row.className = 'flex items-center space-x-2 bg-slate-50 p-2.5 rounded-xl border';
-            row.innerHTML = `
-                <input type="text" class="pkg-code w-32 border rounded-lg p-2 text-xs" placeholder="Codice Pacco (es. PCK-01)" required>
-                <input type="text" class="pkg-weight flex-1 border rounded-lg p-2 text-xs" placeholder="Peso (es. 3.2 kg)">
-                <input type="text" class="pkg-dims flex-1 border rounded-lg p-2 text-xs" placeholder="Dimensioni (es. 40x30x20)">
-                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash"></i></button>
+        function addBoxRow() {
+            const container = document.getElementById('shipping-boxes-container');
+            const boxNum = container.children.length + 1;
+            const div = document.createElement('div');
+            div.className = 'border p-3 rounded-xl space-y-2 bg-slate-50 relative shipping-box-row';
+            div.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-700">Collo #<span class="box-number">${boxNum}</span></span>
+                    <button type="button" onclick="this.closest('.shipping-box-row').remove()" class="text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i> Rimuovi[cite: 3]</button>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="text" placeholder="Peso (es. 5 kg)[cite: 3]" required class="border rounded-lg p-2 text-xs box-weight">
+                    <input type="text" placeholder="Dimensioni (es. 40x30x20)[cite: 3]" required class="border rounded-lg p-2 text-xs box-dims">
+                    <input type="text" placeholder="Contenuto collo[cite: 3]" required class="border rounded-lg p-2 text-xs box-content">
+                </div>
             `;
-            container.appendChild(row);
+            container.appendChild(div);
         }
 
         function saveShippingData(e) {
             e.preventDefault();
-            const date = document.getElementById('shipping-date').value;
-            const method = document.getElementById('shipping-method').value;
-            const tracking = document.getElementById('shipping-tracking').value;
-            const pkgRows = document.querySelectorAll('#packages-container > div');
-            const packages = [];
-
-            pkgRows.forEach(r => {
-                packages.push({
-                    code: r.querySelector('.pkg-code').value.trim(),
-                    weight: r.querySelector('.pkg-weight').value.trim(),
-                    dims: r.querySelector('.pkg-dims').value.trim()
+            const boxes = [];
+            document.querySelectorAll('.shipping-box-row').forEach((row, idx) => {
+                boxes.push({
+                    boxNumber: idx + 1,
+                    weight: row.querySelector('.box-weight').value,
+                    dimensions: row.querySelector('.box-dims').value,
+                    contentSummary: row.querySelector('.box-content').value
                 });
             });
 
-            const ord = appData.orders.find(o => o.id === currentShippingOrderId);
-            if (ord) {
-                const targetWh = ord.warehouse;
-                ord.items.forEach(orderedItem => {
-                    let foundItem = appData[targetWh].find(i => i.name === orderedItem.name && i.model === orderedItem.model);
-                    if (foundItem) {
-                        foundItem.qty -= orderedItem.qty;
-                        if (foundItem.qty < 0) foundItem.qty = 0;
-                    }
-                });
+            const shippingInfo = {
+                date: document.getElementById('shipping-date').value,
+                method: document.getElementById('shipping-method').value,
+                tracking: document.getElementById('shipping-tracking').value,
+                boxes: boxes
+            };
 
-                ord.status = 'Evaso';
-                ord.shipping = { date, method, tracking, packages };
-                saveData();
-            }
+            orders[activeShippingOrderIdx].status = 'Spedito';
+            orders[activeShippingOrderIdx].shipping = shippingInfo;
 
             closeShippingModal();
-            renderOrders();
-            alert('Ordine evaso con successo! I dati di confezionamento e spedizione sono stati inviati all’acquirente.');
+            renderAll();
+            alert('Ordine evaso e segnato come spedito con successo.');
         }
 
-        function viewOrderDetails(orderId) {
-            const ord = appData.orders.find(o => o.id === orderId);
-            if (!ord) return;
-
-            let contentHtml = `
-                <p><b>ID Ordine:</b> ${ord.id}</p>
-                <p><b>Stato:</b> <span class="uppercase font-bold text-indigo-600">${ord.status}</span></p>
-                <p><b>Fattura / Deal:</b> ${ord.invoice} / ${ord.deal}</p>
-                <p><b>Acquirente (SKO3):</b> ${ord.sko3}</p>
-            `;
-
-            if (ord.status === 'Pronto') {
-                contentHtml += `<div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-blue-800 font-semibold mt-2"><i class="fa-solid fa-circle-check mr-1"></i> Il tuo ordine è pronto in magazzino!</div>`;
-            }
-
-            if (ord.shipping) {
-                contentHtml += `
-                    <hr class="my-2">
-                    <p class="font-bold text-slate-700">Dati di Confezionamento e Spedizione (Inviati all'acquirente):</p>
-                    <p><b>Data Spedizione:</b> ${ord.shipping.date}</p>
-                    <p><b>Metodo:</b> ${ord.shipping.method}</p>
-                    <p><b>Tracking:</b> ${ord.shipping.tracking}</p>
-                    <p class="font-bold mt-2">Colli Confezionati:</p>
-                    <ul class="list-disc pl-5 space-y-1">
-                `;
-                ord.shipping.packages.forEach(p => {
-                    contentHtml += `<li><b>Codice Pacco:</b> ${p.code} (Peso: ${p.weight}, Dimensioni: ${p.dims})</li>`;
-                });
-                contentHtml += `</ul>`;
-            } else {
-                contentHtml += `<p class="italic text-slate-400 mt-2">Dati di confezionamento non ancora disponibili (ordine non ancora evaso).</p>`;
-            }
-
-            document.getElementById('view-order-content').innerHTML = contentHtml;
-            document.getElementById('view-order-modal').classList.remove('hidden');
-        }
-
-        function closeViewOrderModal() {
-            document.getElementById('view-order-modal').classList.add('hidden');
+        function viewShippingDetails(idx) {
+            const ord = orders[idx];
+            if (!ord.shipping) return alert('Nessun dettaglio di spedizione disponibile.');
+            let msg = `Dettagli Spedizione - Ordine ${ord.id}\nData: ${ord.shipping.date}\nMetodo: ${ord.shipping.method}\nTracking: ${ord.shipping.tracking}\n\nColli (${ord.shipping.boxes.length}):\n`;
+            ord.shipping.boxes.forEach(b => {
+                msg += `- Collo #${b.boxNumber}: ${b.weight}, ${b.dimensions}, Contenuto: ${b.contentSummary}\n`;
+            });
+            alert(msg);
         }
 
         function openTransferModal() {
-            document.getElementById('transfer-from').value = 'atec';
-            document.getElementById('transfer-to').value = 'kronos';
-            updateTransferItems();
+            updateTransferProducts();
             document.getElementById('transfer-modal').classList.remove('hidden');
         }
 
@@ -1250,87 +1259,91 @@
             document.getElementById('transfer-modal').classList.add('hidden');
         }
 
-        function updateTransferItems() {
+        function updateTransferProducts() {
             const fromWh = document.getElementById('transfer-from').value;
-            const toWh = fromWh === 'atec' ? 'kronos' : 'atec';
-            document.getElementById('transfer-to').value = toWh;
-
-            const select = document.getElementById('transfer-item-id');
-            let html = '';
-            appData[fromWh].forEach(i => {
-                html += `<option value="${i.id}">${i.name} (${i.model}) - Disponibili: ${i.qty}</option>`;
+            const selectItem = document.getElementById('transfer-item');
+            selectItem.innerHTML = '';
+            const itemsList = fromWh === 'atec' ? atecItems : kronosItems;
+            itemsList.forEach((item, idx) => {
+                selectItem.innerHTML += `<option value="${idx}">${item.name} (${item.model}) - Disp: ${item.qty}</option>`;
             });
-            select.innerHTML = html;
         }
 
-        function executeTransfer(e) {
+        function submitTransfer(e) {
             e.preventDefault();
             const fromWh = document.getElementById('transfer-from').value;
             const toWh = document.getElementById('transfer-to').value;
-            const itemId = parseInt(document.getElementById('transfer-item-id').value);
-            const qty = parseInt(document.getElementById('transfer-qty').value);
+            const itemIdx = Number(document.getElementById('transfer-item').value);
+            const qty = Number(document.getElementById('transfer-qty').value);
 
-            const sourceItem = appData[fromWh].find(i => i.id === itemId);
-            if (!sourceItem || sourceItem.qty < qty) {
-                alert('Quantità non sufficiente per il trasferimento!');
+            if (fromWh === toWh) {
+                alert('Il magazzino di origine e destinazione devono essere differenti.');
                 return;
             }
 
-            sourceItem.qty -= qty;
-            let destItem = appData[toWh].find(i => i.ean === sourceItem.ean);
-            if (destItem) {
-                destItem.qty += qty;
-            } else {
-                appData[toWh].push({ id: Date.now(), ean: sourceItem.ean, name: sourceItem.name, model: sourceItem.model, qty: qty });
+            const sourceList = fromWh === 'atec' ? atecItems : kronosItems;
+            const destList = toWh === 'atec' ? atecItems : kronosItems;
+
+            if (sourceList[itemIdx].qty < qty) {
+                alert('Quantità insufficiente nel magazzino di origine.');
+                return;
             }
 
-            saveData();
+            sourceList[itemIdx].qty -= qty;
+            if (sourceList[itemIdx].qty <= 0) {
+                sourceList.splice(itemIdx, 1);
+            }
+
+            const targetItem = destList.find(i => i.ean === sourceList[itemIdx]?.ean);
+            if (targetItem) {
+                targetItem.qty += qty;
+            } else {
+                destList.push({
+                    ean: sourceList[itemIdx] ? sourceList[itemIdx].ean : '8050000000000',
+                    name: sourceList[itemIdx] ? sourceList[itemIdx].name : 'Articolo Trasferito',
+                    model: sourceList[itemIdx] ? sourceList[itemIdx].model : 'Std',
+                    qty: qty
+                });
+            }
+
             closeTransferModal();
-            alert('Trasferimento completato con successo!');
-            renderDashboard();
+            renderAll();
+            alert('Trasferimento completato con successo tra i magazzini.');
         }
 
-        function renderUsers() {
+        function renderTableUsers() {
             const tbody = document.getElementById('table-users');
-            let html = '';
-            appData.users.forEach(u => {
-                html += `
+            tbody.innerHTML = '';
+            users.forEach((u, idx) => {
+                tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
                         <td class="p-3 font-bold text-slate-800">${u.username}</td>
-                        <td class="p-3 font-mono text-xs text-slate-500">${u.password}</td>
+                        <td class="p-3 font-mono text-xs text-slate-600">${u.password}</td>
                         <td class="p-3"><span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">${u.role}</span></td>
-                        <td class="p-3 text-right">
-                            <button onclick="editUser(${u.id})" class="text-slate-400 hover:text-indigo-600 p-1"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteUser(${u.id})" class="text-slate-400 hover:text-red-600 p-1 ml-2"><i class="fa-solid fa-trash"></i></button>
+                        <td class="p-3 text-right space-x-2">
+                            <button onclick="editUser(${idx})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteUser(${idx})" class="text-red-600 hover:text-red-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             });
-            tbody.innerHTML = html;
         }
 
-        let editingUserId = null;
-        function openUserManagerModal() {
-            // Se necessario
-        }
-
-        function openUserModal() {
-            editingUserId = null;
-            document.getElementById('user-modal-title').innerText = 'Nuovo Utente';
-            document.getElementById('user-name').value = '';
-            document.getElementById('user-password').value = '';
-            document.getElementById('user-role').value = 'Visualizzatore';
-            document.getElementById('user-modal').classList.remove('hidden');
-        }
-
-        function editUser(id) {
-            const u = appData.users.find(x => x.id === id);
-            if (!u) return;
-            editingUserId = id;
-            document.getElementById('user-modal-title').innerText = 'Modifica Utente';
-            document.getElementById('user-name').value = u.username;
-            document.getElementById('user-password').value = u.password;
-            document.getElementById('user-role').value = u.role;
+        function openUserModal(idx = null) {
+            if (idx !== null) {
+                const u = users[idx];
+                document.getElementById('user-edit-index').value = idx;
+                document.getElementById('user-username').value = u.username;
+                document.getElementById('user-password').value = u.password;
+                document.getElementById('user-role').value = u.role;
+                document.getElementById('user-modal-title').textContent = 'Modifica Utente[cite: 3]';
+            } else {
+                document.getElementById('user-edit-index').value = '';
+                document.getElementById('user-username').value = '';
+                document.getElementById('user-password').value = '';
+                document.getElementById('user-role').value = 'Admin Magazzino';
+                document.getElementById('user-modal-title').textContent = 'Nuovo Utente[cite: 3]';
+            }
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
@@ -1338,33 +1351,37 @@
             document.getElementById('user-modal').classList.add('hidden');
         }
 
-        function saveUser(e) {
-            e.preventDefault();
-            const username = document.getElementById('user-name').value.trim();
-            const password = document.getElementById('user-password').value.trim();
-            const role = document.getElementById('user-role').value;
-
-            if (editingUserId) {
-                const u = appData.users.find(x => x.id === editingUserId);
-                if (u) { u.username = username; u.password = password; u.role = role; }
-            } else {
-                appData.users.push({ id: Date.now(), username, password, role });
-            }
-
-            saveData();
-            closeUserModal();
-            renderUsers();
+        function editUser(idx) {
+            openUserModal(idx);
         }
 
-        function deleteUser(id) {
-            if (appData.users.length <= 1) {
-                alert('Impossibile eliminare l’ultimo utente amministratore.');
+        function saveUser(e) {
+            e.preventDefault();
+            const idx = document.getElementById('user-edit-index').value;
+            const data = {
+                username: document.getElementById('user-username').value,
+                password: document.getElementById('user-password').value,
+                role: document.getElementById('user-role').value
+            };
+
+            if (idx !== '') {
+                users[idx] = data;
+            } else {
+                users.push(data);
+            }
+
+            closeUserModal();
+            renderAll();
+        }
+
+        function deleteUser(idx) {
+            if (users.length <= 1) {
+                alert('Impossibile eliminare l\'ultimo utente rimasto.');
                 return;
             }
             if (confirm('Eliminare questo utente?')) {
-                appData.users = appData.users.filter(x => x.id !== id);
-                saveData();
-                renderUsers();
+                users.splice(idx, 1);
+                renderAll();
             }
         }
     </script>
