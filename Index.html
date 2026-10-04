@@ -86,11 +86,6 @@
                     <button class="md:hidden text-slate-600 hover:text-slate-900"><i class="fa-solid fa-bars text-xl"></i></button>
                     <h2 id="page-title" class="text-lg font-bold text-slate-800">Dashboard Generale</h2>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <button onclick="resetData()" title="Ripristina Dati di Fabbrica" class="text-slate-400 hover:text-slate-600 text-xs px-2.5 py-1.5 rounded border border-slate-200 transition">
-                        <i class="fa-solid fa-rotate-right mr-1"></i> Reset Dati
-                    </button>
-                </div>
             </header>
 
             <main class="flex-1 p-6 overflow-y-auto space-y-6">
@@ -157,7 +152,7 @@
                         </div>
                     </div>
 
-                    <!-- NUOVO GRAFICO IN BASSO: Somme dei prodotti di entrambi i magazzini per modello -->
+                    <!-- GRAFICO IN BASSO: Somme dei prodotti di entrambi i magazzini per modello -->
                     <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
                         <div class="flex items-center justify-between border-b pb-3">
                             <div>
@@ -615,18 +610,10 @@
         let currentUser = JSON.parse(localStorage.getItem('atec_kronos_user')) || null;
         let chartAtecInstance = null;
         let chartKronosInstance = null;
-        let chartCombinedModelsInstance = null; // Variabile per il nuovo grafico combinato
+        let chartCombinedModelsInstance = null;
 
         function saveData() {
             localStorage.setItem('atec_kronos_db', JSON.stringify(appData));
-        }
-
-        function resetData() {
-            if (confirm('Vuoi davvero ripristinare i dati iniziali di fabbrica?')) {
-                localStorage.removeItem('atec_kronos_db');
-                localStorage.removeItem('atec_kronos_user');
-                location.reload();
-            }
         }
 
         window.onload = function() {
@@ -739,12 +726,10 @@
             renderHorizontalBarChart('chartAtec', appData.atec, 'Scorte ATEC', ['#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff']);
             renderHorizontalBarChart('chartKronos', appData.kronos, 'Scorte KRONOS', ['#10b981','#34d399','#6ee7b7','#a7f3d0','#ecfdf5']);
 
-            // Calcolo e rendering del grafico combinato per modello (ATEC + KRONOS)
             renderCombinedModelsChart();
         }
 
         function renderCombinedModelsChart() {
-            // Uniamo e sommiamo le quantità per modello (o nome + modello)
             const combinedMap = new Map();
             [...appData.atec, ...appData.kronos].forEach(item => {
                 const key = `${item.name} (${item.model})`;
