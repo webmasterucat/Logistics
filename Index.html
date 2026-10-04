@@ -509,8 +509,6 @@
         };
 
         let appData = JSON.parse(localStorage.getItem('atec_kronos_db')) || defaultData;
-        
-        // Sincronizza sempre la lista utenti di default con le credenziali richieste
         appData.users = defaultData.users;
         saveData();
 
@@ -657,6 +655,7 @@
 
         function renderInventory(wh) {
             const tbody = document.getElementById(`table-${wh}`);
+            // Super Admin e Admin Magazzino possono aggiungere/modificare prodotti
             const canEdit = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
             document.getElementById(`header-add-${wh}`).style.display = canEdit ? 'inline-block' : 'none';
 
