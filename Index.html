@@ -49,13 +49,12 @@
         </div>
     </div>
 
-    <!-- APPLICAZIONE PRINCIPALE (Nascosta prima del login) -->
+    <!-- APPLICAZIONE PRINCIPALE -->
     <div id="app-container" class="hidden min-h-screen flex">
         
-        <!-- SIDEBAR DI NAVIGAZIONE -->
+        <!-- SIDEBAR -->
         <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between hidden md:flex">
             <div>
-                <!-- Logo Header -->
                 <div class="p-6 flex items-center space-x-3 border-b border-slate-800">
                     <div class="bg-indigo-600 text-white p-2.5 rounded-xl text-lg font-bold">
                         <i class="fa-solid fa-boxes-stacked"></i>
@@ -65,14 +64,9 @@
                         <span class="text-xs text-slate-400">Gestionale Magazzino</span>
                     </div>
                 </div>
-
-                <!-- Menu di Navigazione -->
-                <nav id="sidebar-nav" class="p-4 space-y-1.5">
-                    <!-- Generato dinamicamente via JS in base al ruolo -->
-                </nav>
+                <nav id="sidebar-nav" class="p-4 space-y-1.5"></nav>
             </div>
 
-            <!-- Profilo utente in basso nella sidebar -->
             <div class="p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-between">
                 <div class="overflow-hidden pr-2">
                     <p id="current-user-display" class="text-xs font-bold text-white truncate">-</p>
@@ -86,8 +80,6 @@
 
         <!-- CONTENUTO PRINCIPALE -->
         <div class="flex-1 flex flex-col min-w-0">
-            
-            <!-- Topbar Superiore -->
             <header class="bg-white border-b h-16 flex items-center justify-between px-6 shadow-sm z-10">
                 <div class="flex items-center space-x-4">
                     <button class="md:hidden text-slate-600 hover:text-slate-900"><i class="fa-solid fa-bars text-xl"></i></button>
@@ -100,10 +92,9 @@
                 </div>
             </header>
 
-            <!-- Area Dinamica delle sezioni -->
             <main class="flex-1 p-6 overflow-y-auto space-y-6">
 
-                <!-- 1. SEZIONE DASHBOARD GENERALE -->
+                <!-- 1. DASHBOARD -->
                 <section id="sec-dashboard" class="space-y-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center space-x-4">
@@ -131,31 +122,27 @@
                             <div class="flex items-center justify-between border-b pb-3">
                                 <div>
                                     <h3 class="font-bold text-slate-800"><i class="fa-solid fa-chart-bar text-indigo-600 mr-2"></i> Scorte Magazzino ATEC</h3>
-                                    <p class="text-xs text-slate-400">Quantitativi per prodotto e modello (Orizzontale)</p>
+                                    <p class="text-xs text-slate-400">Quantitativi per prodotto e modello</p>
                                 </div>
                                 <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">ATEC</span>
                             </div>
-                            <div class="relative h-80 w-full">
-                                <canvas id="chartAtec"></canvas>
-                            </div>
+                            <div class="relative h-80 w-full"><canvas id="chartAtec"></canvas></div>
                         </div>
 
                         <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
                             <div class="flex items-center justify-between border-b pb-3">
                                 <div>
                                     <h3 class="font-bold text-slate-800"><i class="fa-solid fa-chart-bar text-emerald-600 mr-2"></i> Scorte Magazzino KRONOS</h3>
-                                    <p class="text-xs text-slate-400">Quantitativi per prodotto e modello (Orizzontale)</p>
+                                    <p class="text-xs text-slate-400">Quantitativi per prodotto e modello</p>
                                 </div>
                                 <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold">KRONOS</span>
                             </div>
-                            <div class="relative h-80 w-full">
-                                <canvas id="chartKronos"></canvas>
-                            </div>
+                            <div class="relative h-80 w-full"><canvas id="chartKronos"></canvas></div>
                         </div>
                     </div>
                 </section>
 
-                <!-- 2. SEZIONE MAGAZZINO ATEC -->
+                <!-- 2. MAGAZZINO ATEC -->
                 <section id="sec-atec" class="hidden space-y-6">
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -170,12 +157,11 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
-                                    <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
+                                    <tr id="thead-atec-row" class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
                                         <th class="p-3 font-bold">EAN</th>
                                         <th class="p-3 font-bold">Prodotto</th>
                                         <th class="p-3 font-bold">Modello</th>
                                         <th class="p-3 font-bold">Quantità</th>
-                                        <th id="th-actions-atec" class="p-3 font-bold text-right">Azioni</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-atec" class="divide-y divide-slate-100"></tbody>
@@ -184,7 +170,7 @@
                     </div>
                 </section>
 
-                <!-- 3. SEZIONE MAGAZZINO KRONOS -->
+                <!-- 3. MAGAZZINO KRONOS -->
                 <section id="sec-kronos" class="hidden space-y-6">
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -199,12 +185,11 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
-                                    <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
+                                    <tr id="thead-kronos-row" class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
                                         <th class="p-3 font-bold">EAN</th>
                                         <th class="p-3 font-bold">Prodotto</th>
                                         <th class="p-3 font-bold">Modello</th>
                                         <th class="p-3 font-bold">Quantità</th>
-                                        <th id="th-actions-kronos" class="p-3 font-bold text-right">Azioni</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-kronos" class="divide-y divide-slate-100"></tbody>
@@ -213,7 +198,7 @@
                     </div>
                 </section>
 
-                <!-- 4. SEZIONE ORDINI PRODOTTI -->
+                <!-- 4. GESTIONE ORDINI -->
                 <section id="sec-orders" class="hidden space-y-6">
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -232,6 +217,7 @@
                                         <th class="p-3 font-bold">ID Ordine</th>
                                         <th class="p-3 font-bold">Data</th>
                                         <th class="p-3 font-bold">Fattura / Deal</th>
+                                        <th class="p-3 font-bold">Fornitore (SKO1)</th>
                                         <th class="p-3 font-bold">Operatore (SKO2)</th>
                                         <th class="p-3 font-bold">Corriere (SKO3)</th>
                                         <th class="p-3 font-bold">Magazzino</th>
@@ -245,7 +231,7 @@
                     </div>
                 </section>
 
-                <!-- 5. SEZIONE AREA ADMIN (Trasferimenti magazzini) -->
+                <!-- 5. TRASFERIMENTI -->
                 <section id="sec-admin" class="hidden space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
@@ -265,7 +251,7 @@
                     </div>
                 </section>
 
-                <!-- 6. SEZIONE GESTIONE UTENTI -->
+                <!-- 6. GESTIONE UTENTI -->
                 <section id="sec-users" class="hidden space-y-6">
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -297,9 +283,9 @@
         </div>
     </div>
 
-    <!-- MODALI DI SISTEMA -->
+    <!-- MODALI -->
 
-    <!-- Modale Aggiunta/Modifica Articolo Inventario -->
+    <!-- Modale Articolo -->
     <div id="item-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
             <h3 id="item-modal-title" class="text-lg font-bold text-slate-800">Gestione Articolo</h3>
@@ -329,7 +315,7 @@
         </div>
     </div>
 
-    <!-- Modale Nuovo Ordine -->
+    <!-- Modale Nuovo Ordine (Prodotti Multipli) -->
     <div id="order-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 space-y-4 my-8">
             <h3 class="text-lg font-bold text-slate-800">Crea Nuovo Ordine</h3>
@@ -347,33 +333,35 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fattura (es. FAT-2026/045)</label>
-                        <input type="text" id="order-invoice" required class="w-full border rounded-xl p-3 text-sm" placeholder="Numero fattura">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fattura</label>
+                        <input type="text" id="order-invoice" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. FAT-2026/045">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Deal (es. DEAL-8832)</label>
-                        <input type="text" id="order-deal" required class="w-full border rounded-xl p-3 text-sm" placeholder="Riferimento deal">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Deal</label>
+                        <input type="text" id="order-deal" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. DEAL-8832">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nota SKO1 (es. Urgente cantiere)</label>
-                        <input type="text" id="order-sko1" class="w-full border rounded-xl p-3 text-sm">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fornitore (SKO1)</label>
+                        <input type="text" id="order-sko1" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. Nome Fornitore">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Operatore SKO2</label>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Operatore (SKO2)</label>
                         <input type="text" id="order-sko2" required class="w-full border rounded-xl p-3 text-sm">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Corriere SKO3 (es. Rossi Spedizioni)</label>
-                        <input type="text" id="order-sko3" required class="w-full border rounded-xl p-3 text-sm">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Corriere (SKO3)</label>
+                        <input type="text" id="order-sko3" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. Rossi Spedizioni">
                     </div>
                 </div>
 
                 <div class="border-t pt-4 space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-slate-700 uppercase">Prodotti Ordinati</span>
-                        <button type="button" onclick="addOrderItemRow()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold"><i class="fa-solid fa-plus mr-1"></i> Aggiungi Riga Prodotto</button>
+                        <button type="button" onclick="addOrderItemRow()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">
+                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi Riga Prodotto
+                        </button>
                     </div>
-                    <div id="order-items-container" class="space-y-2"></div>
+                    <div id="order-items-container" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
                 </div>
 
                 <div class="flex justify-end space-x-3 pt-4 border-t">
@@ -384,7 +372,7 @@
         </div>
     </div>
 
-    <!-- Modale Spedizione & Colli -->
+    <!-- Modale Spedizione -->
     <div id="shipping-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl p-6 space-y-4 my-8">
             <h3 class="text-lg font-bold text-slate-800">Dettagli Spedizione & Colli</h3>
@@ -400,7 +388,6 @@
                         <input type="text" id="shipping-tracking" required class="w-full border rounded-xl p-3 text-sm" placeholder="es. TRK9283192831">
                     </div>
                 </div>
-
                 <div class="border-t pt-4 space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-slate-700 uppercase">Gestione Colli (Peso e Dimensioni)</span>
@@ -408,7 +395,6 @@
                     </div>
                     <div id="packages-container" class="space-y-3 max-h-60 overflow-y-auto pr-1"></div>
                 </div>
-
                 <div class="flex justify-end space-x-3 pt-4 border-t">
                     <button type="button" onclick="closeShippingModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">Annulla</button>
                     <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium shadow-sm">Conferma & Evadi</button>
@@ -417,7 +403,7 @@
         </div>
     </div>
 
-    <!-- Modale Trasferimento Merce -->
+    <!-- Modale Trasferimento -->
     <div id="transfer-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
             <h3 class="text-lg font-bold text-slate-800">Trasferimento Interno</h3>
@@ -482,9 +468,8 @@
         </div>
     </div>
 
-    <!-- LOGICA JAVASCRIPT -->
+    <!-- JAVASCRIPT -->
     <script>
-        // Dati di default iniziali
         const defaultData = {
             users: [
                 { id: 1, username: 'admin', password: 'admin123', role: 'Super Admin' },
@@ -508,10 +493,13 @@
                     warehouse: 'atec',
                     invoice: 'FAT-2026/045',
                     deal: 'DEAL-8832',
-                    sko1: 'Urgente cantiere Roma',
+                    sko1: 'Fornitore Esempio S.r.l.',
                     sko2: 'M. Neri',
                     sko3: 'Rossi Spedizioni',
-                    items: [{ name: 'Sensore di Movimento IoT', qty: 5 }],
+                    items: [
+                        { name: 'Sensore di Movimento IoT', qty: 5 },
+                        { name: 'Gateway Wi-Fi Industriale', qty: 2 }
+                    ],
                     status: 'Evaso',
                     shipping: { method: 'Corriere Espresso', tracking: 'TRK9283192831', packages: [{ weight: '2.5', dims: '30x20x15' }] }
                 }
@@ -535,11 +523,8 @@
             }
         }
 
-        // Avvio applicazione
         window.onload = function() {
-            if (currentUser) {
-                showApp();
-            }
+            if (currentUser) showApp();
         };
 
         function handleLogin(e) {
@@ -619,7 +604,6 @@
             if (secId === 'sec-users') renderUsers();
         }
 
-        // --- DASHBOARD E GRAFICI ---
         function renderDashboard() {
             const totalAtec = appData.atec.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
             const totalKronos = appData.kronos.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
@@ -642,12 +626,7 @@
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: labelText,
-                        data: dataVals,
-                        backgroundColor: colors,
-                        borderRadius: 8
-                    }]
+                    datasets: [{ label: labelText, data: dataVals, backgroundColor: colors, borderRadius: 8 }]
                 },
                 options: {
                     indexAxis: 'y',
@@ -655,12 +634,7 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'right',
-                            color: '#334155',
-                            font: { weight: 'bold', size: 11 }
-                        }
+                        datalabels: { anchor: 'end', align: 'right', color: '#334155', font: { weight: 'bold', size: 11 } }
                     },
                     scales: {
                         x: { grid: { display: false }, beginAtZero: true },
@@ -674,11 +648,23 @@
             if (canvasId === 'chartKronos') chartKronosInstance = chartObj;
         }
 
-        // --- INVENTARIO ATEC / KRONOS ---
         function renderInventory(wh) {
             const tbody = document.getElementById(`table-${wh}`);
             const canEdit = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
             document.getElementById(`header-add-${wh}`).style.display = canEdit ? 'inline-block' : 'none';
+
+            const theadRow = document.getElementById(`thead-${wh}-row`);
+            let thActions = theadRow.querySelector('.th-actions-inv');
+            if (canEdit) {
+                if (!thActions) {
+                    const th = document.createElement('th');
+                    th.className = 'p-3 font-bold text-right th-actions-inv';
+                    th.innerText = 'Azioni';
+                    theadRow.appendChild(th);
+                }
+            } else {
+                if (thActions) thActions.remove();
+            }
 
             let html = '';
             appData[wh].forEach(item => {
@@ -688,14 +674,16 @@
                         <td class="p-3 font-semibold text-slate-800">${item.name}</td>
                         <td class="p-3 text-slate-600">${item.model}</td>
                         <td class="p-3 font-bold text-indigo-600">${item.qty}</td>
-                        <td class="p-3 text-right">
-                            ${canEdit ? `
-                                <button onclick="editItem('${wh}',${item.id})" class="text-slate-400 hover:text-indigo-600 p-1"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteItem('${wh}',${item.id})" class="text-slate-400 hover:text-red-600 p-1 ml-2"><i class="fa-solid fa-trash"></i></button>
-                            ` : '<span class="text-xs text-slate-400">Solo lettura</span>'}
-                        </td>
-                    </tr>
                 `;
+                if (canEdit) {
+                    html += `
+                        <td class="p-3 text-right">
+                            <button onclick="editItem('${wh}', ${item.id})" class="text-slate-400 hover:text-indigo-600 p-1"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteItem('${wh}', ${item.id})" class="text-slate-400 hover:text-red-600 p-1 ml-2"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                }
+                html += `</tr>`;
             });
             tbody.innerHTML = html;
         }
@@ -739,7 +727,6 @@
                 model: document.getElementById('item-model').value,
                 qty: parseInt(document.getElementById('item-qty').value)
             };
-
             if (editingItemId) {
                 const idx = appData[wh].findIndex(x => x.id === editingItemId);
                 if (idx !== -1) appData[wh][idx] = newItem;
@@ -759,18 +746,17 @@
             }
         }
 
-        // --- ORDINI E SPEDIZIONI ---
         function renderOrders() {
             const tbody = document.getElementById('table-orders');
-            const canManageOrders = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
             
-            // Gestione visibilità pulsante "Nuovo Ordine"
+            // Consenti a tutti (incluso il Visualizzatore) di creare ordini
             const btnNewOrder = document.getElementById('btn-new-order');
-            if (btnNewOrder) btnNewOrder.style.display = canManageOrders ? 'inline-block' : 'none';
+            if (btnNewOrder) btnNewOrder.style.display = 'inline-block';
 
-            // Gestione visibilità colonna "Azioni" nell'intestazione della tabella
             const theadRow = document.querySelector('#sec-orders thead tr');
             let thActions = theadRow.querySelector('.th-actions-order');
+            const canManageOrders = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
+
             if (canManageOrders) {
                 if (!thActions) {
                     const th = document.createElement('th');
@@ -792,13 +778,13 @@
                         <td class="p-3 font-mono text-xs font-bold text-slate-800">${ord.id}</td>
                         <td class="p-3 text-xs text-slate-600">${ord.date}</td>
                         <td class="p-3 text-xs"><b>${ord.invoice}</b><br><span class="text-slate-400">${ord.deal}</span></td>
+                        <td class="p-3 text-slate-700 font-medium text-xs">${ord.sko1 || '-'}</td>
                         <td class="p-3 text-slate-700">${ord.sko2}</td>
                         <td class="p-3 text-slate-700">${ord.sko3}</td>
                         <td class="p-3 uppercase text-xs font-bold text-indigo-600">${ord.warehouse}</td>
                         <td class="p-3 text-xs text-slate-600 max-w-xs truncate">${itemsText}</td>
                         <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${ord.status}</span></td>
                 `;
-
                 if (canManageOrders) {
                     html += `
                         <td class="p-3 text-right">
@@ -810,7 +796,6 @@
                         </td>
                     `;
                 }
-
                 html += `</tr>`;
             });
             tbody.innerHTML = html;
@@ -818,13 +803,17 @@
 
         function openOrderModal() {
             document.getElementById('order-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('order-warehouse').value = 'atec';
             document.getElementById('order-invoice').value = '';
             document.getElementById('order-deal').value = '';
             document.getElementById('order-sko1').value = '';
             document.getElementById('order-sko2').value = currentUser.username;
             document.getElementById('order-sko3').value = '';
+            
+            // Inizializza il contenitore con una riga predefinita per prodotti multipli pescati dall'inventario
             document.getElementById('order-items-container').innerHTML = '';
             addOrderItemRow();
+            
             document.getElementById('order-modal').classList.remove('hidden');
         }
 
@@ -866,11 +855,13 @@
             rows.forEach(r => {
                 const name = r.querySelector('.order-item-sel').value;
                 const qty = parseInt(r.querySelector('.order-item-qty').value);
-                items.push({ name, qty });
+                if (name && qty > 0) {
+                    items.push({ name, qty });
+                }
             });
 
             if (items.length === 0) {
-                alert('Aggiungi almeno un prodotto all’ordine.');
+                alert('Aggiungi almeno un prodotto valido all’ordine.');
                 return;
             }
 
@@ -894,7 +885,6 @@
             renderOrders();
         }
 
-        // Spedizione & Colli
         let currentShippingOrderId = null;
         function openShippingModal(orderId) {
             currentShippingOrderId = orderId;
@@ -946,7 +936,6 @@
             renderOrders();
         }
 
-        // --- TRASFERIMENTO MERCE INTERNO ---
         function openTransferModal() {
             document.getElementById('transfer-from').value = 'atec';
             document.getElementById('transfer-to').value = 'kronos';
@@ -985,18 +974,11 @@
             }
 
             sourceItem.qty -= qty;
-
             let destItem = appData[toWh].find(i => i.ean === sourceItem.ean);
             if (destItem) {
                 destItem.qty += qty;
             } else {
-                appData[toWh].push({
-                    id: Date.now(),
-                    ean: sourceItem.ean,
-                    name: sourceItem.name,
-                    model: sourceItem.model,
-                    qty: qty
-                });
+                appData[toWh].push({ id: Date.now(), ean: sourceItem.ean, name: sourceItem.name, model: sourceItem.model, qty: qty });
             }
 
             saveData();
@@ -1005,7 +987,6 @@
             renderDashboard();
         }
 
-        // --- GESTIONE UTENTI ---
         function renderUsers() {
             const tbody = document.getElementById('table-users');
             let html = '';
@@ -1058,18 +1039,9 @@
 
             if (editingUserId) {
                 const u = appData.users.find(x => x.id === editingUserId);
-                if (u) {
-                    u.username = username;
-                    u.password = password;
-                    u.role = role;
-                }
+                if (u) { u.username = username; u.password = password; u.role = role; }
             } else {
-                appData.users.push({
-                    id: Date.now(),
-                    username,
-                    password,
-                    role
-                });
+                appData.users.push({ id: Date.now(), username, password, role });
             }
 
             saveData();
