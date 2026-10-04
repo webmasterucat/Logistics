@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -104,9 +103,8 @@
             <!-- Area Dinamica delle sezioni -->
             <main class="flex-1 p-6 overflow-y-auto space-y-6">
 
-                <!-- 1. SEZIONE DASHBOARD GENERALE (Grafici a barre orizzontali multicolore) -->
+                <!-- 1. SEZIONE DASHBOARD GENERALE -->
                 <section id="sec-dashboard" class="space-y-6">
-                    <!-- KPI Cards di Riepilogo -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center space-x-4">
                             <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">
@@ -128,9 +126,7 @@
                         </div>
                     </div>
 
-                    <!-- Grafici Scorte Orizzontali per Prodotto e Modello -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Grafico Scorte ATEC -->
                         <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
                             <div class="flex items-center justify-between border-b pb-3">
                                 <div>
@@ -144,7 +140,6 @@
                             </div>
                         </div>
 
-                        <!-- Grafico Scorte KRONOS -->
                         <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
                             <div class="flex items-center justify-between border-b pb-3">
                                 <div>
@@ -226,7 +221,7 @@
                                 <h3 class="font-bold text-slate-800">Gestione Ordini Prodotti</h3>
                                 <p class="text-xs text-slate-500">Tracciamento fatture, deal, spedizioni e colli</p>
                             </div>
-                            <button onclick="openOrderModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                            <button id="btn-new-order" onclick="openOrderModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
                                 <i class="fa-solid fa-plus mr-1"></i> Nuovo Ordine
                             </button>
                         </div>
@@ -242,7 +237,6 @@
                                         <th class="p-3 font-bold">Magazzino</th>
                                         <th class="p-3 font-bold">Prodotti</th>
                                         <th class="p-3 font-bold">Stato</th>
-                                        <th class="p-3 font-bold text-right">Azioni</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-orders" class="divide-y divide-slate-100"></tbody>
@@ -488,92 +482,74 @@
         </div>
     </div>
 
-    <!-- SCRIPT JAVASCRIPT -->
+    <!-- LOGICA JAVASCRIPT -->
     <script>
-        let currentUser = null;
-        let currentRole = null;
-
-        let usersData = JSON.parse(localStorage.getItem('atec_users')) || [
-            { id: 1, username: 'admin', password: 'admin123', role: 'Super Admin' },
-            { id: 2, username: 'm.neri', password: 'password123', role: 'Admin Magazzino' },
-            { id: 3, username: 'user', password: 'user123', role: 'Visualizzatore' }
-        ];
-
-        let atecItems = JSON.parse(localStorage.getItem('atec_items')) || [
-            { id: 1, ean: '8012345678901', name: 'Trapano a Percussione', model: 'ATEC-TP900', qty: 24 },
-            { id: 2, ean: '8012345678902', name: 'Smerigliatrice Angolare', model: 'ATEC-SM500', qty: 15 },
-            { id: 3, ean: '8012345678903', name: 'Avvitatore a Batteria', model: 'ATEC-AV18V', qty: 42 }
-        ];
-
-        let kronosItems = JSON.parse(localStorage.getItem('kronos_items')) || [
-            { id: 1, ean: '8098765432101', name: 'Generatore di Corrente', model: 'KRN-GEN3000', qty: 8 },
-            { id: 2, ean: '8098765432102', name: 'Idropulitrice Alta Pressione', model: 'KRN-ID150', qty: 12 },
-            { id: 3, ean: '8098765432103', name: 'Saldatrice Inverter', model: 'KRN-INV200', qty: 19 }
-        ];
-
-        let ordersData = JSON.parse(localStorage.getItem('atec_orders')) || [
-            {
-                id: 'ORD-2026-001',
-                date: '2026-08-12',
-                invoice: 'FAT-2026/045',
-                deal: 'DEAL-8832',
-                sko1: 'Urgente cantiere',
-                sko2: 'm.neri',
-                sko3: 'Rossi Spedizioni',
-                warehouse: 'atec',
-                items: [{ name: 'Trapano a Percussione (ATEC-TP900)', qty: 4 }],
-                status: 'Evaso',
-                shipping: {
-                    method: 'Corriere Espresso (GLS/BRT/DHL)',
-                    tracking: 'TRK9283192831',
-                    packages: [{ weight: '12.5 kg', dimensions: '40x30x25 cm' }]
+        // Dati di default iniziali
+        const defaultData = {
+            users: [
+                { id: 1, username: 'admin', password: 'admin123', role: 'Super Admin' },
+                { id: 2, username: 'm.neri', password: 'password123', role: 'Admin Magazzino' },
+                { id: 3, username: 'user', password: 'user123', role: 'Visualizzatore' }
+            ],
+            atec: [
+                { id: 101, ean: '8012345678901', name: 'Sensore di Movimento IoT', model: 'ATEC-PRO-X1', qty: 45 },
+                { id: 102, ean: '8012345678902', name: 'Gateway Wi-Fi Industriale', model: 'ATEC-GW-90', qty: 12 },
+                { id: 103, ean: '8012345678903', name: 'Attuatore Elettrico 24V', model: 'ATEC-ACT-V2', qty: 28 }
+            ],
+            kronos: [
+                { id: 201, ean: '8098765432101', name: 'Terminalino Barcode Laser', model: 'KRN-SCAN-01', qty: 15 },
+                { id: 202, ean: '8098765432102', name: 'Stampante Termica Etichette', model: 'KRN-PRT-4X', qty: 8 },
+                { id: 203, ean: '8098765432103', name: 'Batteria Litio di Ricambio', model: 'KRN-BAT-500', qty: 34 }
+            ],
+            orders: [
+                {
+                    id: 'ORD-2026-001',
+                    date: '2026-10-01',
+                    warehouse: 'atec',
+                    invoice: 'FAT-2026/045',
+                    deal: 'DEAL-8832',
+                    sko1: 'Urgente cantiere Roma',
+                    sko2: 'M. Neri',
+                    sko3: 'Rossi Spedizioni',
+                    items: [{ name: 'Sensore di Movimento IoT', qty: 5 }],
+                    status: 'Evaso',
+                    shipping: { method: 'Corriere Espresso', tracking: 'TRK9283192831', packages: [{ weight: '2.5', dims: '30x20x15' }] }
                 }
+            ]
+        };
+
+        let appData = JSON.parse(localStorage.getItem('atec_kronos_db')) || defaultData;
+        let currentUser = JSON.parse(localStorage.getItem('atec_kronos_user')) || null;
+        let chartAtecInstance = null;
+        let chartKronosInstance = null;
+
+        function saveData() {
+            localStorage.setItem('atec_kronos_db', JSON.stringify(appData));
+        }
+
+        function resetData() {
+            if (confirm('Vuoi davvero ripristinare i dati iniziali di fabbrica?')) {
+                appData = JSON.parse(JSON.stringify(defaultData));
+                saveData();
+                location.reload();
             }
-        ];
+        }
 
-        // Palette di colori predefiniti per identificare ogni barra con un colore diverso
-        const colorPalette = [
-            'rgba(79, 70, 229, 0.85)',   // Indaco
-            'rgba(14, 165, 233, 0.85)',  // Celeste
-            'rgba(16, 185, 129, 0.85)',  // Verde smeraldo
-            'rgba(245, 158, 11, 0.85)',  // Ambra
-            'rgba(239, 68, 68, 0.85)',   // Rosso
-            'rgba(168, 85, 247, 0.85)',  // Viola
-            'rgba(236, 72, 153, 0.85)',  // Rosa
-            'rgba(20, 184, 166, 0.85)'   // Turchese
-        ];
-
-        const borderPalette = [
-            'rgb(79, 70, 229)',
-            'rgb(14, 165, 233)',
-            'rgb(16, 185, 129)',
-            'rgb(245, 158, 11)',
-            'rgb(239, 68, 68)',
-            'rgb(168, 85, 247)',
-            'rgb(236, 72, 153)',
-            'rgb(20, 184, 166)'
-        ];
-
+        // Avvio applicazione
         window.onload = function() {
-            const savedSession = sessionStorage.getItem('atec_current_user');
-            if (savedSession) {
-                const userObj = JSON.parse(savedSession);
-                currentUser = userObj.username;
-                currentRole = userObj.role;
+            if (currentUser) {
                 showApp();
             }
         };
 
-        function handleLogin(event) {
-            event.preventDefault();
-            const userIn = document.getElementById('login-username').value.trim();
-            const passIn = document.getElementById('login-password').value.trim();
-
-            const found = usersData.find(u => u.username === userIn && u.password === passIn);
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value.trim();
+            const p = document.getElementById('login-password').value.trim();
+            const found = appData.users.find(x => x.username === u && x.password === p);
             if (found) {
-                currentUser = found.username;
-                currentRole = found.role;
-                sessionStorage.setItem('atec_current_user', JSON.stringify({ username: currentUser, role: currentRole }));
+                currentUser = found;
+                localStorage.setItem('atec_kronos_user', JSON.stringify(currentUser));
                 showApp();
             } else {
                 alert('Credenziali non valide. Riprova.');
@@ -581,192 +557,167 @@
         }
 
         function handleLogout() {
-            sessionStorage.removeItem('atec_current_user');
             currentUser = null;
-            currentRole = null;
+            localStorage.removeItem('atec_kronos_user');
             document.getElementById('app-container').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('login-username').value = '';
-            document.getElementById('login-password').value = '';
         }
 
         function showApp() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
-            
-            document.getElementById('current-user-display').innerText = currentUser;
-            document.getElementById('current-role-display').innerText = currentRole;
-
-            buildNavigation();
-            renderDashboard();
-            renderTables();
-            renderOrders();
-            renderUsers();
-            initCharts();
-            
-            switchTab('dashboard');
+            document.getElementById('current-user-display').innerText = currentUser.username;
+            document.getElementById('current-role-display').innerText = currentUser.role;
+            buildSidebar();
+            switchSection('sec-dashboard', 'Dashboard Generale');
         }
 
-        function buildNavigation() {
+        function buildSidebar() {
             const nav = document.getElementById('sidebar-nav');
             let html = `
-                <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                    <i class="fa-solid fa-chart-pie w-6"></i> Dashboard
-                </a>
-                <a href="#" onclick="switchTab('atec')" id="nav-atec" class="flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                    <i class="fa-solid fa-warehouse w-6"></i> Magazzino ATEC
-                </a>
-                <a href="#" onclick="switchTab('kronos')" id="nav-kronos" class="flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                    <i class="fa-solid fa-warehouse w-6"></i> Magazzino KRONOS
-                </a>
-                <a href="#" onclick="switchTab('orders')" id="nav-orders" class="flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                    <i class="fa-solid fa-cart-shopping w-6"></i> Ordini Prodotti
-                </a>
+                <button onclick="switchSection('sec-dashboard', 'Dashboard Generale')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
+                    <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard</span>
+                </button>
+                <button onclick="switchSection('sec-atec', 'Magazzino ATEC')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
+                    <i class="fa-solid fa-warehouse w-5"></i><span>Magazzino ATEC</span>
+                </button>
+                <button onclick="switchSection('sec-kronos', 'Magazzino KRONOS')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
+                    <i class="fa-solid fa-warehouse w-5"></i><span>Magazzino KRONOS</span>
+                </button>
+                <button onclick="switchSection('sec-orders', 'Gestione Ordini')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
+                    <i class="fa-solid fa-file-invoice w-5"></i><span>Ordini & Spedizioni</span>
+                </button>
             `;
-
-            if (currentRole === 'Super Admin' || currentRole === 'Admin Magazzino') {
+            if (currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino') {
                 html += `
-                    <a href="#" onclick="switchTab('admin')" id="nav-admin" class="flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                        <i class="fa-solid fa-screwdriver-wrench w-6"></i> Area Admin
-                    </a>
+                    <button onclick="switchSection('sec-admin', 'Area Admin & Trasferimenti')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
+                        <i class="fa-solid fa-shield-halved w-5"></i><span>Trasferimenti</span>
+                    </button>
                 `;
             }
-
-            if (currentRole === 'Super Admin') {
+            if (currentUser.role === 'Super Admin') {
                 html += `
-                    <a href="#" onclick="switchTab('users')" id="nav-users" class="flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
-                        <i class="fa-solid fa-users w-6"></i> Gestione Utenti
-                    </a>
+                    <button onclick="switchSection('sec-users', 'Gestione Utenti')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-slate-800 text-slate-300">
+                        <i class="fa-solid fa-users-gear w-5"></i><span>Utenti</span>
+                    </button>
                 `;
             }
-
             nav.innerHTML = html;
-
-            const canEdit = (currentRole === 'Super Admin' || currentRole === 'Admin Magazzino');
-            if (canEdit) {
-                document.getElementById('header-add-atec').classList.remove('hidden');
-                document.getElementById('header-add-kronos').classList.remove('hidden');
-            } else {
-                document.getElementById('header-add-atec').classList.add('hidden');
-                document.getElementById('header-add-kronos').classList.add('hidden');
-            }
         }
 
-        function switchTab(tabId) {
-            const sections = ['dashboard', 'atec', 'kronos', 'orders', 'admin', 'users'];
-            sections.forEach(s => {
-                const el = document.getElementById('sec-' + s);
-                if (el) el.classList.add('hidden');
-                const navEl = document.getElementById('nav-' + s);
-                if (navEl) navEl.classList.remove('bg-slate-800', 'text-white');
+        function switchSection(secId, title) {
+            ['sec-dashboard', 'sec-atec', 'sec-kronos', 'sec-orders', 'sec-admin', 'sec-users'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
             });
+            document.getElementById(secId).classList.remove('hidden');
+            document.getElementById('page-title').innerText = title;
 
-            const targetSec = document.getElementById('sec-' + tabId);
-            if (targetSec) targetSec.classList.remove('hidden');
-
-            const targetNav = document.getElementById('nav-' + tabId);
-            if (targetNav) targetNav.classList.add('bg-slate-800', 'text-white');
-
-            const titles = {
-                dashboard: 'Dashboard Generale - Scorte Magazzino',
-                atec: 'Gestione Inventario - Magazzino ATEC',
-                kronos: 'Gestione Inventario - Magazzino KRONOS',
-                orders: 'Gestione Ordini Prodotti',
-                admin: 'Pannello di Amministrazione & Trasferimenti',
-                users: 'Gestione Utenti e Accessi di Sistema'
-            };
-            document.getElementById('page-title').innerText = titles[tabId] || 'Gestionale';
-
-            if (tabId === 'dashboard') {
-                renderDashboard();
-            }
+            if (secId === 'sec-dashboard') renderDashboard();
+            if (secId === 'sec-atec') renderInventory('atec');
+            if (secId === 'sec-kronos') renderInventory('kronos');
+            if (secId === 'sec-orders') renderOrders();
+            if (secId === 'sec-users') renderUsers();
         }
 
+        // --- DASHBOARD E GRAFICI ---
         function renderDashboard() {
-            const totalAtec = atecItems.reduce((acc, item) => acc + parseInt(item.qty || 0), 0);
-            const totalKronos = kronosItems.reduce((acc, item) => acc + parseInt(item.qty || 0), 0);
-            
+            const totalAtec = appData.atec.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
+            const totalKronos = appData.kronos.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
             document.getElementById('count-atec').innerText = totalAtec;
             document.getElementById('count-kronos').innerText = totalKronos;
-            
-            updateChartsData();
+
+            renderHorizontalBarChart('chartAtec', appData.atec, 'Scorte ATEC', ['#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff']);
+            renderHorizontalBarChart('chartKronos', appData.kronos, 'Scorte KRONOS', ['#10b981','#34d399','#6ee7b7','#a7f3d0','#ecfdf5']);
         }
 
-        function renderTables() {
-            const canEdit = (currentRole === 'Super Admin' || currentRole === 'Admin Magazzino');
+        function renderHorizontalBarChart(canvasId, items, labelText, colors) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const labels = items.map(i => `${i.name} (${i.model})`);
+            const dataVals = items.map(i => i.qty);
 
-            let tbodyAtec = '';
-            atecItems.forEach(item => {
-                tbodyAtec += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-mono text-xs text-slate-500">${item.ean}</td>
-                        <td class="p-3 font-medium text-slate-800">${item.name}</td>
-                        <td class="p-3 text-slate-600">${item.model}</td>
-                        <td class="p-3 font-bold text-indigo-600">${item.qty}</td>
-                `;
-                if (canEdit) {
-                    tbodyAtec += `
-                        <td class="p-3 text-right space-x-2">
-                            <button onclick="editItem('atec', ${item.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteItem('atec', ${item.id})" class="text-red-600 hover:text-red-800 text-xs font-medium"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    `;
-                } else {
-                    tbodyAtec += `<td class="p-3 text-right text-slate-400 text-xs">-</td>`;
-                }
-                tbodyAtec += `</tr>`;
+            if (canvasId === 'chartAtec' && chartAtecInstance) chartAtecInstance.destroy();
+            if (canvasId === 'chartKronos' && chartKronosInstance) chartKronosInstance.destroy();
+
+            const chartObj = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: labelText,
+                        data: dataVals,
+                        backgroundColor: colors,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'right',
+                            color: '#334155',
+                            font: { weight: 'bold', size: 11 }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, beginAtZero: true },
+                        y: { grid: { display: false } }
+                    }
+                },
+                plugins: [ChartDataLabels]
             });
-            document.getElementById('table-atec').innerHTML = tbodyAtec;
-            if (!canEdit) document.getElementById('th-actions-atec').classList.add('hidden');
-            else document.getElementById('th-actions-atec').classList.remove('hidden');
 
-            let tbodyKronos = '';
-            kronosItems.forEach(item => {
-                tbodyKronos += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-mono text-xs text-slate-500">${item.ean}</td>
-                        <td class="p-3 font-medium text-slate-800">${item.name}</td>
-                        <td class="p-3 text-slate-600">${item.model}</td>
-                        <td class="p-3 font-bold text-indigo-600">${item.qty}</td>
-                `;
-                if (canEdit) {
-                    tbodyKronos += `
-                        <td class="p-3 text-right space-x-2">
-                            <button onclick="editItem('kronos', ${item.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteItem('kronos', ${item.id})" class="text-red-600 hover:text-red-800 text-xs font-medium"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    `;
-                } else {
-                    tbodyKronos += `<td class="p-3 text-right text-slate-400 text-xs">-</td>`;
-                }
-                tbodyKronos += `</tr>`;
-            });
-            document.getElementById('table-kronos').innerHTML = tbodyKronos;
-            if (!canEdit) document.getElementById('th-actions-kronos').classList.add('hidden');
-            else document.getElementById('th-actions-kronos').classList.remove('hidden');
-
-            localStorage.setItem('atec_items', JSON.stringify(atecItems));
-            localStorage.setItem('kronos_items', JSON.stringify(kronosItems));
+            if (canvasId === 'chartAtec') chartAtecInstance = chartObj;
+            if (canvasId === 'chartKronos') chartKronosInstance = chartObj;
         }
 
-        let editingItemData = null;
-        function openAddItemModal(warehouse) {
-            editingItemData = null;
-            document.getElementById('item-warehouse').value = warehouse;
+        // --- INVENTARIO ATEC / KRONOS ---
+        function renderInventory(wh) {
+            const tbody = document.getElementById(`table-${wh}`);
+            const canEdit = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
+            document.getElementById(`header-add-${wh}`).style.display = canEdit ? 'inline-block' : 'none';
+
+            let html = '';
+            appData[wh].forEach(item => {
+                html += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-mono text-xs text-slate-600">${item.ean}</td>
+                        <td class="p-3 font-semibold text-slate-800">${item.name}</td>
+                        <td class="p-3 text-slate-600">${item.model}</td>
+                        <td class="p-3 font-bold text-indigo-600">${item.qty}</td>
+                        <td class="p-3 text-right">
+                            ${canEdit ? `
+                                <button onclick="editItem('${wh}',${item.id})" class="text-slate-400 hover:text-indigo-600 p-1"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteItem('${wh}',${item.id})" class="text-slate-400 hover:text-red-600 p-1 ml-2"><i class="fa-solid fa-trash"></i></button>
+                            ` : '<span class="text-xs text-slate-400">Solo lettura</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        let editingItemId = null;
+        function openAddItemModal(wh) {
+            editingItemId = null;
+            document.getElementById('item-warehouse').value = wh;
+            document.getElementById('item-modal-title').innerText = `Nuovo Articolo - Magazzino ${wh.toUpperCase()}`;
             document.getElementById('item-ean').value = '';
             document.getElementById('item-name').value = '';
             document.getElementById('item-model').value = '';
-            document.getElementById('item-qty').value = '';
+            document.getElementById('item-qty').value = '1';
             document.getElementById('item-modal').classList.remove('hidden');
         }
 
-        function editItem(warehouse, id) {
-            const list = warehouse === 'atec' ? atecItems : kronosItems;
-            const item = list.find(i => i.id === id);
+        function editItem(wh, id) {
+            const item = appData[wh].find(x => x.id === id);
             if (!item) return;
-
-            editingItemData = { warehouse, id };
-            document.getElementById('item-warehouse').value = warehouse;
+            editingItemId = id;
+            document.getElementById('item-warehouse').value = wh;
+            document.getElementById('item-modal-title').innerText = `Modifica Articolo - Magazzino ${wh.toUpperCase()}`;
             document.getElementById('item-ean').value = item.ean;
             document.getElementById('item-name').value = item.name;
             document.getElementById('item-model').value = item.model;
@@ -778,61 +729,102 @@
             document.getElementById('item-modal').classList.add('hidden');
         }
 
-        function saveItem(event) {
-            event.preventDefault();
+        function saveItem(e) {
+            e.preventDefault();
             const wh = document.getElementById('item-warehouse').value;
-            const ean = document.getElementById('item-ean').value.trim();
-            const name = document.getElementById('item-name').value.trim();
-            const model = document.getElementById('item-model').value.trim();
-            const qty = parseInt(document.getElementById('item-qty').value);
+            const newItem = {
+                id: editingItemId ? editingItemId : Date.now(),
+                ean: document.getElementById('item-ean').value,
+                name: document.getElementById('item-name').value,
+                model: document.getElementById('item-model').value,
+                qty: parseInt(document.getElementById('item-qty').value)
+            };
 
-            const list = wh === 'atec' ? atecItems : kronosItems;
+            if (editingItemId) {
+                const idx = appData[wh].findIndex(x => x.id === editingItemId);
+                if (idx !== -1) appData[wh][idx] = newItem;
+            } else {
+                appData[wh].push(newItem);
+            }
+            saveData();
+            closeAddItemModal();
+            renderInventory(wh);
+        }
 
-            if (editingItemData) {
-                const targetList = editingItemData.warehouse === 'atec' ? atecItems : kronosItems;
-                const item = targetList.find(i => i.id === editingItemData.id);
-                if (item) {
-                    item.ean = ean;
-                    item.name = name;
-                    item.model = model;
-                    item.qty = qty;
+        function deleteItem(wh, id) {
+            if (confirm('Eliminare questo articolo dall’inventario?')) {
+                appData[wh] = appData[wh].filter(x => x.id !== id);
+                saveData();
+                renderInventory(wh);
+            }
+        }
+
+        // --- ORDINI E SPEDIZIONI ---
+        function renderOrders() {
+            const tbody = document.getElementById('table-orders');
+            const canManageOrders = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
+            
+            // Gestione visibilità pulsante "Nuovo Ordine"
+            const btnNewOrder = document.getElementById('btn-new-order');
+            if (btnNewOrder) btnNewOrder.style.display = canManageOrders ? 'inline-block' : 'none';
+
+            // Gestione visibilità colonna "Azioni" nell'intestazione della tabella
+            const theadRow = document.querySelector('#sec-orders thead tr');
+            let thActions = theadRow.querySelector('.th-actions-order');
+            if (canManageOrders) {
+                if (!thActions) {
+                    const th = document.createElement('th');
+                    th.className = 'p-3 font-bold text-right th-actions-order';
+                    th.innerText = 'Azioni';
+                    theadRow.appendChild(th);
                 }
             } else {
-                const newId = list.length > 0 ? Math.max(...list.map(i => i.id)) + 1 : 1;
-                list.push({ id: newId, ean, name, model, qty });
+                if (thActions) thActions.remove();
             }
 
-            closeAddItemModal();
-            renderTables();
-            renderDashboard();
-        }
+            let html = '';
+            appData.orders.forEach(ord => {
+                const badgeColor = ord.status === 'Evaso' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700';
+                const itemsText = ord.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+                
+                html += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-mono text-xs font-bold text-slate-800">${ord.id}</td>
+                        <td class="p-3 text-xs text-slate-600">${ord.date}</td>
+                        <td class="p-3 text-xs"><b>${ord.invoice}</b><br><span class="text-slate-400">${ord.deal}</span></td>
+                        <td class="p-3 text-slate-700">${ord.sko2}</td>
+                        <td class="p-3 text-slate-700">${ord.sko3}</td>
+                        <td class="p-3 uppercase text-xs font-bold text-indigo-600">${ord.warehouse}</td>
+                        <td class="p-3 text-xs text-slate-600 max-w-xs truncate">${itemsText}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${ord.status}</span></td>
+                `;
 
-        function deleteItem(warehouse, id) {
-            if (!confirm('Sei sicuro di voler eliminare questo articolo?')) return;
-            if (warehouse === 'atec') {
-                atecItems = atecItems.filter(i => i.id !== id);
-            } else {
-                kronosItems = kronosItems.filter(i => i.id !== id);
-            }
-            renderTables();
-            renderDashboard();
-        }
+                if (canManageOrders) {
+                    html += `
+                        <td class="p-3 text-right">
+                            ${ord.status !== 'Evaso' ? `
+                                <button onclick="openShippingModal('${ord.id}')" class="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-sm">Evadi</button>
+                            ` : `
+                                <span class="text-xs text-emerald-600 font-semibold"><i class="fa-solid fa-check mr-1"></i> ${ord.shipping.tracking}</span>
+                            `}
+                        </td>
+                    `;
+                }
 
-        let orderItemRowsCount = 0;
+                html += `</tr>`;
+            });
+            tbody.innerHTML = html;
+        }
 
         function openOrderModal() {
             document.getElementById('order-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('order-warehouse').value = 'atec';
             document.getElementById('order-invoice').value = '';
             document.getElementById('order-deal').value = '';
             document.getElementById('order-sko1').value = '';
-            document.getElementById('order-sko2').value = currentUser || '';
+            document.getElementById('order-sko2').value = currentUser.username;
             document.getElementById('order-sko3').value = '';
-            
             document.getElementById('order-items-container').innerHTML = '';
-            orderItemRowsCount = 0;
             addOrderItemRow();
-
             document.getElementById('order-modal').classList.remove('hidden');
         }
 
@@ -841,196 +833,75 @@
         }
 
         function addOrderItemRow() {
-            orderItemRowsCount++;
             const container = document.getElementById('order-items-container');
             const wh = document.getElementById('order-warehouse').value;
-            const list = wh === 'atec' ? atecItems : kronosItems;
+            const items = appData[wh];
 
-            let optionsHtml = '';
-            list.forEach(item => {
-                optionsHtml += `<option value="${item.name} (${item.model})">${item.name} - Mod: ${item.model} (Disp: ${item.qty})</option>`;
+            let options = '';
+            items.forEach(i => {
+                options += `<option value="${i.name}">${i.name} (${i.model}) - Disp: ${i.qty}</option>`;
             });
 
-            const rowId = 'order-row-' + orderItemRowsCount;
-            const rowDiv = document.createElement('div');
-            rowDiv.id = rowId;
-            rowDiv.className = "flex items-center space-x-2 bg-slate-50 p-2.5 rounded-xl border";
-            rowDiv.innerHTML = `
-                <div class="flex-1">
-                    <select class="order-item-select w-full border rounded-xl p-2 text-sm bg-white" required>
-                        ${optionsHtml}
-                    </select>
-                </div>
-                <div class="w-28">
-                    <input type="number" min="1" value="1" class="order-item-qty w-full border rounded-xl p-2 text-sm bg-white font-bold text-center" required>
-                </div>
-                <button type="button" onclick="document.getElementById('${rowId}').remove()" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+            const row = document.createElement('div');
+            row.className = 'flex items-center space-x-2';
+            row.innerHTML = `
+                <select class="order-item-sel flex-1 border rounded-xl p-2.5 text-sm bg-white">${options}</select>
+                <input type="number" min="1" value="1" class="order-item-qty w-24 border rounded-xl p-2.5 text-sm" placeholder="Quantità">
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash"></i></button>
             `;
-            container.appendChild(rowDiv);
+            container.appendChild(row);
         }
 
         function updateAllOrderCatalogs() {
-            const wh = document.getElementById('order-warehouse').value;
-            const list = wh === 'atec' ? atecItems : kronosItems;
-
-            let optionsHtml = '';
-            list.forEach(item => {
-                optionsHtml += `<option value="${item.name} (${item.model})">${item.name} - Mod: ${item.model} (Disp: ${item.qty})</option>`;
-            });
-
-            document.querySelectorAll('.order-item-select').forEach(select => {
-                const currentVal = select.value;
-                select.innerHTML = optionsHtml;
-                select.value = currentVal;
-            });
+            document.getElementById('order-items-container').innerHTML = '';
+            addOrderItemRow();
         }
 
-        function submitOrder(event) {
-            event.preventDefault();
-            const date = document.getElementById('order-date').value;
-            const warehouse = document.getElementById('order-warehouse').value;
-            const invoice = document.getElementById('order-invoice').value.trim();
-            const deal = document.getElementById('order-deal').value.trim();
-            const sko1 = document.getElementById('order-sko1').value.trim();
-            const sko2 = document.getElementById('order-sko2').value.trim();
-            const sko3 = document.getElementById('order-sko3').value.trim();
-
+        function submitOrder(e) {
+            e.preventDefault();
+            const wh = document.getElementById('order-warehouse').value;
             const rows = document.querySelectorAll('#order-items-container > div');
-            if (rows.length === 0) {
-                alert('Aggiungi almeno un prodotto all\'ordine.');
+            const items = [];
+
+            rows.forEach(r => {
+                const name = r.querySelector('.order-item-sel').value;
+                const qty = parseInt(r.querySelector('.order-item-qty').value);
+                items.push({ name, qty });
+            });
+
+            if (items.length === 0) {
+                alert('Aggiungi almeno un prodotto all’ordine.');
                 return;
             }
 
-            let items = [];
-            rows.forEach(row => {
-                const prodName = row.querySelector('.order-item-select').value;
-                const qty = parseInt(row.querySelector('.order-item-qty').value);
-                items.push({ name: prodName, qty });
-            });
-
-            const newIdNum = ordersData.length > 0 ? ordersData.length + 1 : 1;
-            const newOrder = {
-                id: 'ORD-2026-' + String(newIdNum).padStart(3, '0'),
-                date,
-                invoice,
-                deal,
-                sko1,
-                sko2,
-                sko3,
-                warehouse,
-                items,
-                status: 'In Attesa',
+            const newOrd = {
+                id: 'ORD-2026-' + Math.floor(100 + Math.random() * 900),
+                date: document.getElementById('order-date').value,
+                warehouse: wh,
+                invoice: document.getElementById('order-invoice').value,
+                deal: document.getElementById('order-deal').value,
+                sko1: document.getElementById('order-sko1').value,
+                sko2: document.getElementById('order-sko2').value,
+                sko3: document.getElementById('order-sko3').value,
+                items: items,
+                status: 'In Lavorazione',
                 shipping: null
             };
 
-            ordersData.unshift(newOrder);
-            localStorage.setItem('atec_orders', JSON.stringify(ordersData));
-
+            appData.orders.unshift(newOrd);
+            saveData();
             closeOrderModal();
             renderOrders();
         }
 
-        function renderOrders() {
-            const tbody = document.getElementById('table-orders');
-            let html = '';
-
-            const canManage = (currentRole === 'Super Admin' || currentRole === 'Admin Magazzino');
-
-            ordersData.forEach(ord => {
-                let itemsListHtml = '<ul class="text-xs space-y-1">';
-                ord.items.forEach(it => {
-                    itemsListHtml += `<li><span class="font-semibold">${it.name}</span> (Qt: <span class="font-bold text-indigo-600">${it.qty}</span>)</li>`;
-                });
-                itemsListHtml += '</ul>';
-
-                let statusBadge = '';
-                if (ord.status === 'In Attesa') {
-                    statusBadge = `<span class="px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-clock mr-1"></i> In Attesa</span>`;
-                } else if (ord.status === 'Evaso') {
-                    let shipInfo = '';
-                    if (ord.shipping) {
-                        shipInfo = `
-                            <div class="mt-2 text-xs text-slate-500 bg-emerald-50 p-2 rounded-lg border border-emerald-100 space-y-0.5">
-                                <p><strong>Corriere:</strong> ${ord.shipping.method}</p>
-                                <p><strong>Tracking:</strong> <span class="font-mono text-slate-700">${ord.shipping.tracking}</span></p>
-                                <p><strong>Colli:</strong> ${ord.shipping.packages.length} collo/i</p>
-                            </div>
-                        `;
-                    }
-                    statusBadge = `
-                        <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-check mr-1"></i> Evaso</span>
-                        ${shipInfo}
-                    `;
-                }
-
-                let actionButtons = '';
-                if (canManage) {
-                    if (ord.status === 'In Attesa') {
-                        actionButtons = `
-                            <div class="flex items-center justify-end space-x-2">
-                                <button onclick="openShippingModal('${ord.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-medium transition flex items-center shadow-sm">
-                                    <i class="fa-solid fa-truck-fast mr-1"></i> Evadi & Spedisci
-                                </button>
-                                <button onclick="deleteOrder('${ord.id}')" class="text-red-500 hover:text-red-700 p-1.5 text-xs"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        `;
-                    } else {
-                        actionButtons = `
-                            <div class="flex items-center justify-end space-x-2">
-                                <button onclick="openShippingModal('${ord.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-medium transition">Modifica Spedizione</button>
-                                <button onclick="deleteOrder('${ord.id}')" class="text-red-500 hover:text-red-700 p-1.5 text-xs"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        `;
-                    }
-                } else {
-                    actionButtons = `<span class="text-slate-400 text-xs">Solo lettura</span>`;
-                }
-
-                html += `
-                    <tr class="hover:bg-slate-50 transition align-top">
-                        <td class="p-3 font-mono font-bold text-xs text-slate-800">${ord.id}</td>
-                        <td class="p-3 text-xs text-slate-600">${ord.date}</td>
-                        <td class="p-3 text-xs">
-                            <span class="font-semibold text-slate-800">${ord.invoice}</span><br>
-                            <span class="text-slate-500 text-[11px]">${ord.deal}</span>
-                        </td>
-                        <td class="p-3 text-xs font-medium text-indigo-600">${ord.sko2}</td>
-                        <td class="p-3 text-xs text-slate-700">${ord.sko3}</td>
-                        <td class="p-3 text-xs uppercase font-bold text-slate-700">${ord.warehouse}</td>
-                        <td class="p-3">${itemsListHtml}</td>
-                        <td class="p-3">${statusBadge}</td>
-                        <td class="p-3 text-right">${actionButtons}</td>
-                    </tr>
-                `;
-            });
-
-            tbody.innerHTML = html;
-        }
-
-        let packageRowsCount = 0;
-
+        // Spedizione & Colli
+        let currentShippingOrderId = null;
         function openShippingModal(orderId) {
-            document.getElementById('shipping-order-id').value = orderId;
+            currentShippingOrderId = orderId;
             document.getElementById('shipping-method').value = '';
             document.getElementById('shipping-tracking').value = '';
-            
-            const ord = ordersData.find(o => o.id === orderId);
-            if (ord && ord.shipping) {
-                document.getElementById('shipping-method').value = ord.shipping.method || '';
-                document.getElementById('shipping-tracking').value = ord.shipping.tracking || '';
-            }
-
             document.getElementById('packages-container').innerHTML = '';
-            packageRowsCount = 0;
-
-            if (ord && ord.shipping && ord.shipping.packages && ord.shipping.packages.length > 0) {
-                ord.shipping.packages.forEach(pkg => {
-                    addPackageRow(pkg.weight, pkg.dimensions);
-                });
-            } else {
-                addPackageRow('', '');
-            }
-
+            addPackageRow();
             document.getElementById('shipping-modal').classList.remove('hidden');
         }
 
@@ -1038,72 +909,48 @@
             document.getElementById('shipping-modal').classList.add('hidden');
         }
 
-        function addPackageRow(weight = '', dimensions = '') {
-            packageRowsCount++;
+        function addPackageRow() {
             const container = document.getElementById('packages-container');
-            const pkgId = 'package-row-' + packageRowsCount;
-
-            const div = document.createElement('div');
-            div.id = pkgId;
-            div.className = "bg-slate-50 p-4 rounded-xl border space-y-3 relative";
-            div.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-700 uppercase"><i class="fa-solid fa-box mr-1 text-emerald-600"></i> Collo #${packageRowsCount}</span>
-                    ${packageRowsCount > 1 ? `<button type="button" onclick="document.getElementById('${pkgId}').remove()" class="text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i> Rimuovi</button>` : ''}
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Peso (es. 15 kg)</label>
-                        <input type="text" class="pkg-weight w-full border rounded-xl p-2 text-sm bg-white" required placeholder="es. 15 kg" value="${weight}">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Dimensioni (es. 50x40x30 cm)</label>
-                        <input type="text" class="pkg-dimensions w-full border rounded-xl p-2 text-sm bg-white" required placeholder="es. 50x40x30 cm" value="${dimensions}">
-                    </div>
-                </div>
+            const row = document.createElement('div');
+            row.className = 'flex items-center space-x-2 bg-slate-50 p-2.5 rounded-xl border';
+            row.innerHTML = `
+                <input type="text" class="pkg-weight flex-1 border rounded-lg p-2 text-xs" placeholder="Peso (es. 3.2 kg)">
+                <input type="text" class="pkg-dims flex-1 border rounded-lg p-2 text-xs" placeholder="Dimensioni (es. 40x30x20)">
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash"></i></button>
             `;
-            container.appendChild(div);
+            container.appendChild(row);
         }
 
-        function saveShippingData(event) {
-            event.preventDefault();
-            const orderId = document.getElementById('shipping-order-id').value;
+        function saveShippingData(e) {
+            e.preventDefault();
             const method = document.getElementById('shipping-method').value;
-            const tracking = document.getElementById('shipping-tracking').value.trim();
+            const tracking = document.getElementById('shipping-tracking').value;
+            const pkgRows = document.querySelectorAll('#packages-container > div');
+            const packages = [];
 
-            const pkgDivs = document.querySelectorAll('#packages-container > div');
-            let packages = [];
-            pkgDivs.forEach(div => {
-                const weight = div.querySelector('.pkg-weight').value.trim();
-                const dimensions = div.querySelector('.pkg-dimensions').value.trim();
-                packages.push({ weight, dimensions });
+            pkgRows.forEach(r => {
+                packages.push({
+                    weight: r.querySelector('.pkg-weight').value,
+                    dims: r.querySelector('.pkg-dims').value
+                });
             });
 
-            const ord = ordersData.find(o => o.id === orderId);
+            const ord = appData.orders.find(o => o.id === currentShippingOrderId);
             if (ord) {
                 ord.status = 'Evaso';
-                ord.shipping = {
-                    method,
-                    tracking,
-                    packages
-                };
-                localStorage.setItem('atec_orders', JSON.stringify(ordersData));
+                ord.shipping = { method, tracking, packages };
+                saveData();
             }
 
             closeShippingModal();
             renderOrders();
         }
 
-        function deleteOrder(orderId) {
-            if (!confirm(`Sei sicuro di voler eliminare l'ordine ${orderId}?`)) return;
-            ordersData = ordersData.filter(o => o.id !== orderId);
-            localStorage.setItem('atec_orders', JSON.stringify(ordersData));
-            renderOrders();
-        }
-
+        // --- TRASFERIMENTO MERCE INTERNO ---
         function openTransferModal() {
+            document.getElementById('transfer-from').value = 'atec';
+            document.getElementById('transfer-to').value = 'kronos';
             updateTransferItems();
-            document.getElementById('transfer-qty').value = 1;
             document.getElementById('transfer-modal').classList.remove('hidden');
         }
 
@@ -1113,48 +960,38 @@
 
         function updateTransferItems() {
             const fromWh = document.getElementById('transfer-from').value;
-            const toSelect = document.getElementById('transfer-to');
-            
-            toSelect.value = fromWh === 'atec' ? 'kronos' : 'atec';
+            const toWh = fromWh === 'atec' ? 'kronos' : 'atec';
+            document.getElementById('transfer-to').value = toWh;
 
-            const list = fromWh === 'atec' ? atecItems : kronosItems;
-            let options = '';
-            list.forEach(item => {
-                options += `<option value="${item.id}">${item.name} (Mod: ${item.model}) - Disponibili: ${item.qty}</option>`;
+            const select = document.getElementById('transfer-item-id');
+            let html = '';
+            appData[fromWh].forEach(i => {
+                html += `<option value="${i.id}">${i.name} (${i.model}) - Disponibili: ${i.qty}</option>`;
             });
-            document.getElementById('transfer-item-id').innerHTML = options;
+            select.innerHTML = html;
         }
 
-        function executeTransfer(event) {
-            event.preventDefault();
+        function executeTransfer(e) {
+            e.preventDefault();
             const fromWh = document.getElementById('transfer-from').value;
             const toWh = document.getElementById('transfer-to').value;
             const itemId = parseInt(document.getElementById('transfer-item-id').value);
             const qty = parseInt(document.getElementById('transfer-qty').value);
 
-            const sourceList = fromWh === 'atec' ? atecItems : kronosItems;
-            const targetList = toWh === 'atec' ? atecItems : kronosItems;
-
-            const sourceItem = sourceList.find(i => i.id === itemId);
-            if (!sourceItem) {
-                alert('Articolo non trovato.');
-                return;
-            }
-
-            if (sourceItem.qty < qty) {
-                alert('Quantità insufficiente nel magazzino di origine! Disponibili: ' + sourceItem.qty);
+            const sourceItem = appData[fromWh].find(i => i.id === itemId);
+            if (!sourceItem || sourceItem.qty < qty) {
+                alert('Quantità non sufficiente per il trasferimento!');
                 return;
             }
 
             sourceItem.qty -= qty;
 
-            let targetItem = targetList.find(i => i.ean === sourceItem.ean || i.model === sourceItem.model);
-            if (targetItem) {
-                targetItem.qty += qty;
+            let destItem = appData[toWh].find(i => i.ean === sourceItem.ean);
+            if (destItem) {
+                destItem.qty += qty;
             } else {
-                const newId = targetList.length > 0 ? Math.max(...targetList.map(i => i.id)) + 1 : 1;
-                targetList.push({
-                    id: newId,
+                appData[toWh].push({
+                    id: Date.now(),
                     ean: sourceItem.ean,
                     name: sourceItem.name,
                     model: sourceItem.model,
@@ -1162,24 +999,25 @@
                 });
             }
 
+            saveData();
             closeTransferModal();
-            renderTables();
-            renderDashboard();
             alert('Trasferimento completato con successo!');
+            renderDashboard();
         }
 
+        // --- GESTIONE UTENTI ---
         function renderUsers() {
             const tbody = document.getElementById('table-users');
             let html = '';
-            usersData.forEach(u => {
+            appData.users.forEach(u => {
                 html += `
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-medium text-slate-800">${u.username}</td>
+                        <td class="p-3 font-bold text-slate-800">${u.username}</td>
                         <td class="p-3 font-mono text-xs text-slate-500">${u.password}</td>
-                        <td class="p-3"><span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold">${u.role}</span></td>
-                        <td class="p-3 text-right space-x-2">
-                            <button onclick="editUser(${u.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium"><i class="fa-solid fa-pen"></i></button>
-                            ${u.username !== 'admin' ? `<button onclick="deleteUser(${u.id})" class="text-red-600 hover:text-red-800 text-xs font-medium"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        <td class="p-3"><span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">${u.role}</span></td>
+                        <td class="p-3 text-right">
+                            <button onclick="editUser(${u.id})" class="text-slate-400 hover:text-indigo-600 p-1"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteUser(${u.id})" class="text-slate-400 hover:text-red-600 p-1 ml-2"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -1187,20 +1025,21 @@
             tbody.innerHTML = html;
         }
 
+        let editingUserId = null;
         function openUserModal() {
-            document.getElementById('user-modal-title').innerText = 'Aggiungi Nuovo Utente';
-            document.getElementById('user-edit-id').value = '';
+            editingUserId = null;
+            document.getElementById('user-modal-title').innerText = 'Nuovo Utente';
             document.getElementById('user-name').value = '';
             document.getElementById('user-password').value = '';
-            document.getElementById('user-role').value = 'Admin Magazzino';
+            document.getElementById('user-role').value = 'Visualizzatore';
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
         function editUser(id) {
-            const u = usersData.find(item => item.id === id);
+            const u = appData.users.find(x => x.id === id);
             if (!u) return;
+            editingUserId = id;
             document.getElementById('user-modal-title').innerText = 'Modifica Utente';
-            document.getElementById('user-edit-id').value = u.id;
             document.getElementById('user-name').value = u.username;
             document.getElementById('user-password').value = u.password;
             document.getElementById('user-role').value = u.role;
@@ -1211,135 +1050,43 @@
             document.getElementById('user-modal').classList.add('hidden');
         }
 
-        function saveUser(event) {
-            event.preventDefault();
-            const editId = document.getElementById('user-edit-id').value;
-            const username = document.getElementById('user-name').value.trim();
-            const password = document.getElementById('user-password').value.trim();
+        function saveUser(e) {
+            e.preventDefault();
+            const username = document.getElementById('user-name').value;
+            const password = document.getElementById('user-password').value;
             const role = document.getElementById('user-role').value;
 
-            if (editId) {
-                const u = usersData.find(item => item.id == editId);
+            if (editingUserId) {
+                const u = appData.users.find(x => x.id === editingUserId);
                 if (u) {
                     u.username = username;
                     u.password = password;
                     u.role = role;
                 }
             } else {
-                if (usersData.some(item => item.username === username)) {
-                    alert('Esiste già un utente con questo nome.');
-                    return;
-                }
-                const newId = usersData.length > 0 ? Math.max(...usersData.map(i => i.id)) + 1 : 1;
-                usersData.push({ id: newId, username, password, role });
+                appData.users.push({
+                    id: Date.now(),
+                    username,
+                    password,
+                    role
+                });
             }
 
-            localStorage.setItem('atec_users', JSON.stringify(usersData));
+            saveData();
             closeUserModal();
             renderUsers();
         }
 
         function deleteUser(id) {
-            if (!confirm('Eliminare questo utente?')) return;
-            usersData = usersData.filter(i => i.id !== id);
-            localStorage.setItem('atec_users', JSON.stringify(usersData));
-            renderUsers();
-        }
-
-        function resetData() {
-            if (!confirm('ATTENZIONE: Verranno ripristinati tutti i dati di fabbrica (magazzini, utenti, ordini). Continuare?')) return;
-            localStorage.clear();
-            location.reload();
-        }
-
-        let chartAtecInstance = null;
-        let chartKronosInstance = null;
-
-        function initCharts() {
-            Chart.register(ChartDataLabels);
-
-            const ctxAtec = document.getElementById('chartAtec').getContext('2d');
-            chartAtecInstance = new Chart(ctxAtec, {
-                type: 'bar', // Tipo barra orizzontale tramite l'opzione indexAxis: 'y'
-                data: getChartData('atec'),
-                options: getChartOptions()
-            });
-
-            const ctxKronos = document.getElementById('chartKronos').getContext('2d');
-            chartKronosInstance = new Chart(ctxKronos, {
-                type: 'bar',
-                data: getChartData('kronos'),
-                options: getChartOptions()
-            });
-        }
-
-        function updateChartsData() {
-            if (chartAtecInstance && chartKronosInstance) {
-                chartAtecInstance.data = getChartData('atec');
-                chartAtecInstance.update();
-
-                chartKronosInstance.data = getChartData('kronos');
-                chartKronosInstance.update();
+            if (appData.users.length <= 1) {
+                alert('Impossibile eliminare l’ultimo utente amministratore.');
+                return;
             }
-        }
-
-        function getChartData(warehouse) {
-            const list = warehouse === 'atec' ? atecItems : kronosItems;
-            const labels = list.map(i => `${i.name} (${i.model})`);
-            const data = list.map(i => i.qty);
-
-            // Assegna colori differenti ciclando sulla palette per ogni prodotto/modello
-            const bgColors = list.map((_, index) => colorPalette[index % colorPalette.length]);
-            const borderColors = list.map((_, index) => borderPalette[index % borderPalette.length]);
-
-            return {
-                labels: labels,
-                datasets: [{
-                    label: 'Quantità in Magazzino',
-                    data: data,
-                    backgroundColor: bgColors,
-                    borderColor: borderColors,
-                    borderWidth: 1,
-                    borderRadius: 6
-                }]
-            };
-        }
-
-        function getChartOptions() {
-            return {
-                indexAxis: 'y', // Rende le barre orizzontali
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'right',
-                        font: { weight: 'bold', size: 11 },
-                        color: '#334155'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return ` Quantità: ${context.parsed.x}`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        grid: { color: '#f1f5f9' },
-                        ticks: { font: { size: 11 } }
-                    },
-                    y: {
-                        grid: { display: false },
-                        ticks: { 
-                            font: { size: 11, weight: '500' }
-                        }
-                    }
-                }
-            };
+            if (confirm('Eliminare questo utente?')) {
+                appData.users = appData.users.filter(x => x.id !== id);
+                saveData();
+                renderUsers();
+            }
         }
     </script>
 </body>
