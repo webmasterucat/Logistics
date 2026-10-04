@@ -42,9 +42,10 @@
 
             <div class="border-t pt-4 text-xs text-slate-400 space-y-1">
                 <p class="font-semibold text-slate-500">Credenziali di test predefinite:</p>
-                <p>• Super Admin: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">admin</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">admin123</code></p>
-                <p>• Admin Magazzino: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">m.neri</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">password123</code></p>
-                <p>• Visualizzatore: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">user</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">user123</code></p>
+                <p>• Super Admin: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Admin</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Simone2026</code></p>
+                <p>• Admin Magazzino: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">LOGISTICA</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Simone2026</code></p>
+                <p>• Visualizzatore KRONOS: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">KRONOS</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Kronos2026</code></p>
+                <p>• Visualizzatore ATEC: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">ATEC</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600">Atec2026</code></p>
             </div>
         </div>
     </div>
@@ -413,9 +414,10 @@
     <script>
         const defaultData = {
             users: [
-                { id: 1, username: 'admin', password: 'admin123', role: 'Super Admin' },
-                { id: 2, username: 'm.neri', password: 'password123', role: 'Admin Magazzino' },
-                { id: 3, username: 'user', password: 'user123', role: 'Visualizzatore' }
+                { id: 1, username: 'Admin', password: 'Simone2026', role: 'Super Admin' },
+                { id: 2, username: 'LOGISTICA', password: 'Simone2026', role: 'Admin Magazzino' },
+                { id: 3, username: 'KRONOS', password: 'Kronos2026', role: 'Visualizzatore' },
+                { id: 4, username: 'ATEC', password: 'Atec2026', role: 'Visualizzatore' }
             ],
             warehouses: {
                 atec: {
@@ -453,7 +455,7 @@
                     invoice: 'FAT-2026/045',
                     deal: 'DEAL-8832',
                     sko1: 'Fornitore Esempio S.r.l.',
-                    sko2: 'M. Neri',
+                    sko2: 'LOGISTICA',
                     sko3: 'Rossi Spedizioni',
                     items: [
                         { name: 'Sensore di Movimento IoT', qty: 5 },
@@ -466,7 +468,6 @@
         };
 
         let appData = JSON.parse(localStorage.getItem('atec_kronos_db')) || defaultData;
-        // Compatibilità retroattiva se il vecchio formato era salvato
         if (!appData.warehouses) {
             appData.warehouses = defaultData.warehouses;
             appData.inventory = { atec: appData.atec || [], kronos: appData.kronos || [] };
@@ -520,7 +521,6 @@
             document.getElementById('current-user-display').innerText = currentUser.username;
             document.getElementById('current-role-display').innerText = currentUser.role;
             buildDynamicSections();
-            buildSidebar();
             switchSection('sec-dashboard', 'Dashboard Generale');
         }
 
@@ -594,10 +594,6 @@
 
             nav.innerHTML = sidebarHtml;
             document.getElementById('dynamic-warehouse-sections').innerHTML = sectionsHtml;
-        }
-
-        function buildSidebar() {
-            // Già gestito in buildDynamicSections
         }
 
         function switchSection(secId, title) {
@@ -684,7 +680,6 @@
             document.getElementById('dashboard-warehouses-grid').innerHTML = gridHtml;
             document.getElementById('dashboard-charts-container').innerHTML = chartsHtml;
 
-            // Renderizza i grafici
             Object.keys(appData.warehouses).forEach(key => {
                 renderHorizontalBarChart(`chart-${key}`, appData.inventory[key] || [], `Scorte ${appData.warehouses[key].name}`, ['#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff']);
             });
@@ -962,7 +957,6 @@
         function openOrderModal() {
             document.getElementById('order-date').value = new Date().toISOString().split('T')[0];
             
-            // Popola selettore magazzini nell'ordine
             const whSelect = document.getElementById('order-warehouse');
             let whOptHtml = '';
             Object.keys(appData.warehouses).forEach(k => {
