@@ -152,7 +152,6 @@
                         </div>
                     </div>
 
-                    <!-- GRAFICO IN BASSO: Somme dei prodotti di entrambi i magazzini per modello -->
                     <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
                         <div class="flex items-center justify-between border-b pb-3">
                             <div>
@@ -229,9 +228,14 @@
                                 <h3 class="font-bold text-slate-800">Gestione Ordini Prodotti</h3>
                                 <p class="text-xs text-slate-500">Tracciamento fatture, deal, spedizioni, colli e stati di lavorazione</p>
                             </div>
-                            <button id="btn-new-order" onclick="openOrderModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                                <i class="fa-solid fa-plus mr-1"></i> Nuovo Ordine
-                            </button>
+                            <div class="space-x-2">
+                                <button onclick="downloadCompletedOrdersPDF()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                                    <i class="fa-solid fa-file-pdf mr-1"></i> Scarica PDF Ordini Evasi
+                                </button>
+                                <button id="btn-new-order" onclick="openOrderModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                                    <i class="fa-solid fa-plus mr-1"></i> Nuovo Ordine
+                                </button>
+                            </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-sm">
@@ -595,6 +599,7 @@
                         { name: 'Gateway Wi-Fi Industriale', model: 'ATEC-GW-90', qty: 2 }
                     ],
                     status: 'Evaso',
+                    pdfDownloaded: false,
                     shipping: { date: '2026-10-02', method: 'Corriere Espresso', tracking: 'TRK9283192831', packages: [{ code: 'PCK-001', weight: '2.5', dims: '30x20x15' }] }
                 }
             ]
@@ -1061,7 +1066,15 @@
                                 </select>
                             `;
                             if (ord.status === 'Evaso') {
-                                html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium ml-1">Dettagli</button>`;
+                                html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium ml-1">Dettagli</button>`;
+                                
+                                // Pulsante di eliminazione protetto: richiede pdfDownloaded == true
+                                const canDelete = ord.pdfDownloaded;
+                                if (canDelete) {
+                                    html += `<button onclick="deleteOrder('${ord.id}')" class="px-2 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold ml-1" title="Elimina Ordine"><i class="fa-solid fa-trash"></i></button>`;
+                                } else {
+                                    html += `<button onclick="alert('Impossibile eliminare l\\'ordine evaso: devi prima scaricare il file PDF degli ordini evasi.')" class="px-2 py-1 bg-slate-100 text-slate-400 rounded-lg text-xs font-semibold ml-1 cursor-not-allowed" title="Scarica prima il PDF per sbloccare l'eliminazione"><i class="fa-solid fa-lock"></i></button>`;
+                                }
                             }
                         } else {
                             if (ord.status === 'Evaso' || ord.status === 'Pronto') {
@@ -1080,6 +1093,65 @@
             tbody.innerHTML = html;
         }
 
+        function downloadCompletedOrdersPDF() {
+            const completedOrders = appData.orders.filter(o => o.status === 'Evaso');
+            if (completedOrders.length === 0) {
+                alert('Nessun ordine evaso disponibile da esportare in PDF.');
+                return;
+            }
+
+            // Generazione simulata di un documento di testo/PDF scaricabile
+            let textContent = "=== REPORT ORDINI EVASI - ATEC & KRONOS ===\n\n";
+            completedOrders.forEach(o => {
+                textContent += `ID Ordine: ${o.id}\n`;
+                textContent += `Data: ${o.date} | Fattura: ${o.invoice} | Deal: ${o.deal}\n`;
+                textContent += `Magazzino: ${o.warehouse.toUpperCase()} | Acquirente: ${o.sko3}\n`;
+                textContent += `Prodotti:\n`;
+                o.items.forEach(i => {
+                    textContent += ` - ${i.name} (${i.model}) x ${i.qty}\n`;
+                });
+                if (o.shipping) {
+                    textContent += `Spedizione: ${o.shipping.date} - ${o.shipping.method} (Tracking: ${o.shipping.tracking})\n`;
+                }
+                textContent += `--------------------------------------------------\n\n`;
+            });
+
+            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Ordini_Evasi_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // Sblocca il flag di download PDF per tutti gli ordini evasi correnti
+            completedOrders.forEach(o => {
+                o.pdfDownloaded = true;
+            });
+            saveData();
+            renderOrders();
+
+            alert('PDF degli ordini evasi scaricato con successo! Ora i relativi pulsanti di eliminazione sono sbloccati.');
+        }
+
+        function deleteOrder(orderId) {
+            const ord = appData.orders.find(o => o.id === orderId);
+            if (!ord) return;
+
+            if (ord.status === 'Evaso' && !ord.pdfDownloaded) {
+                alert('Azione non consentita: devi prima scaricare il PDF degli ordini evasi.');
+                return;
+            }
+
+            if (confirm(`Sei sicuro di voler eliminare permanentemente l'ordine ${orderId}?`)) {
+                appData.orders = appData.orders.filter(o => o.id !== orderId);
+                saveData();
+                renderOrders();
+            }
+        }
+
         function updateOrderStatus(orderId, newStatus) {
             if (newStatus === 'Evaso') {
                 openShippingModal(orderId);
@@ -1087,6 +1159,7 @@
                 const ord = appData.orders.find(o => o.id === orderId);
                 if (ord) {
                     ord.status = newStatus;
+                    ord.pdfDownloaded = false; // Reset se cambia stato
                     saveData();
                     renderOrders();
                 }
@@ -1171,6 +1244,7 @@
                 sko3: document.getElementById('order-sko3').value,
                 items: items,
                 status: 'In Lavorazione',
+                pdfDownloaded: false,
                 shipping: null
             };
 
@@ -1237,6 +1311,7 @@
                 });
 
                 ord.status = 'Evaso';
+                ord.pdfDownloaded = false; // Richiede nuovo download PDF per abilitare l'eliminazione
                 ord.shipping = { date, method, tracking, packages };
                 saveData();
             }
