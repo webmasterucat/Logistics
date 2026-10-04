@@ -509,7 +509,9 @@
         };
 
         let appData = JSON.parse(localStorage.getItem('atec_kronos_db')) || defaultData;
-        appData.users = defaultData.users;
+        if (!appData.users) appData.users = defaultData.users;
+        if (!appData.atec) appData.atec = defaultData.atec;
+        if (!appData.kronos) appData.kronos = defaultData.kronos;
         saveData();
 
         let currentUser = JSON.parse(localStorage.getItem('atec_kronos_user')) || null;
@@ -655,7 +657,6 @@
 
         function renderInventory(wh) {
             const tbody = document.getElementById(`table-${wh}`);
-            // Super Admin e Admin Magazzino possono aggiungere/modificare prodotti
             const canEdit = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
             document.getElementById(`header-add-${wh}`).style.display = canEdit ? 'inline-block' : 'none';
 
@@ -728,17 +729,21 @@
             const wh = document.getElementById('item-warehouse').value;
             const newItem = {
                 id: editingItemId ? editingItemId : Date.now(),
-                ean: document.getElementById('item-ean').value,
-                name: document.getElementById('item-name').value,
-                model: document.getElementById('item-model').value,
-                qty: parseInt(document.getElementById('item-qty').value)
+                ean: document.getElementById('item-ean').value.trim(),
+                name: document.getElementById('item-name').value.trim(),
+                model: document.getElementById('item-model').value.trim(),
+                qty: parseInt(document.getElementById('item-qty').value) || 0
             };
+
             if (editingItemId) {
                 const idx = appData[wh].findIndex(x => x.id === editingItemId);
-                if (idx !== -1) appData[wh][idx] = newItem;
+                if (idx !== -1) {
+                    appData[wh][idx] = newItem;
+                }
             } else {
                 appData[wh].push(newItem);
             }
+
             saveData();
             closeAddItemModal();
             renderInventory(wh);
@@ -1027,6 +1032,7 @@
             document.getElementById('user-name').value = u.username;
             document.getElementById('user-password').value = u.password;
             document.getElementById('user-role').value = u.role;
+            document.getElementById('user-modal').classList.add('hidden'); // fix
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
@@ -1036,8 +1042,8 @@
 
         function saveUser(e) {
             e.preventDefault();
-            const username = document.getElementById('user-name').value;
-            const password = document.getElementById('user-password').value;
+            const username = document.getElementById('user-name').value.trim();
+            const password = document.getElementById('user-password').value.trim();
             const role = document.getElementById('user-role').value;
 
             if (editingUserId) {
