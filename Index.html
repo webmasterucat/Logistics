@@ -214,7 +214,7 @@
                     </div>
                 </section>
 
-                <!-- 4. GESTIONE ORDINI -->
+                <!-- 4. GESTIONE ORDINI (AGGIORNATA) -->
                 <section id="sec-orders" class="hidden space-y-6">
                     <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
                         <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -230,17 +230,18 @@
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b">
-                                        <th class="p-3 font-bold">ID Ordine</th>
                                         <th class="p-3 font-bold">Data</th>
-                                        <th class="p-3 font-bold">Fattura / Deal</th>
+                                        <th class="p-3 font-bold">Fattura</th>
+                                        <th class="p-3 font-bold">Deal</th>
                                         <th class="p-3 font-bold">Fornitore (SKO1)</th>
                                         <th class="p-3 font-bold">Creatore (SKO2)</th>
                                         <th class="p-3 font-bold">Acquirente (SKO3)</th>
                                         <th class="p-3 font-bold">Magazzino scarico</th>
-                                        <th class="p-3 font-bold">Prodotti</th>
+                                        <th class="p-3 font-bold">Prodotto</th>
                                         <th class="p-3 font-bold">Modello</th>
+                                        <th class="p-3 font-bold">Quantità</th>
                                         <th class="p-3 font-bold">Stato</th>
-                                        <th class="p-3 font-bold text-right">Azioni / Dettagli</th>
+                                        <th class="p-3 font-bold text-right">Azioni/Dettagli</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-orders" class="divide-y divide-slate-100"></tbody>
@@ -840,7 +841,7 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        datalabels: { anchor: 'end', align: 'right', color: '#334155', font: { weight: 'bold', size: 11 } }
+                        datalabels: { anchor: 'center', align: 'center', color: '#000000', font: { weight: 'bold', size: 12 } }
                     },
                     scales: {
                         x: { grid: { display: false }, beginAtZero: true },
@@ -954,64 +955,83 @@
             }
         }
 
+        // --- FUNZIONE RENDERING ORDINI AGGIORNATA CON RIGHE MULTIPLE E RAGGRUPPAMENTO ---
         function renderOrders() {
             const tbody = document.getElementById('table-orders');
             const btnNewOrder = document.getElementById('btn-new-order');
             if (btnNewOrder) btnNewOrder.style.display = 'inline-block';
 
             let html = '';
-            appData.orders.forEach(ord => {
+            appData.orders.forEach((ord, index) => {
                 let badgeColor = 'bg-amber-50 text-amber-700';
                 if (ord.status === 'Preso in carico') badgeColor = 'bg-purple-50 text-purple-700';
                 if (ord.status === 'Pronto') badgeColor = 'bg-blue-50 text-blue-700';
                 if (ord.status === 'Evaso') badgeColor = 'bg-emerald-50 text-emerald-700';
 
-                const itemsText = ord.items.map(i => `${i.name} (x${i.qty})`).join(', ');
-                const modelsText = ord.items.map(i => i.model).join(', ');
                 const canManageOrders = currentUser.role === 'Super Admin' || currentUser.role === 'Admin Magazzino';
+                const totalItems = ord.items.length;
 
-                html += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-mono text-xs font-bold text-slate-800">${ord.id}</td>
-                        <td class="p-3 text-xs text-slate-600">${ord.date}</td>
-                        <td class="p-3 text-xs"><b>${ord.invoice}</b><br><span class="text-slate-400">${ord.deal}</span></td>
-                        <td class="p-3 text-slate-700 font-medium text-xs">${ord.sko1 || '-'}</td>
-                        <td class="p-3 text-slate-700">${ord.sko2}</td>
-                        <td class="p-3 text-slate-700">${ord.sko3}</td>
-                        <td class="p-3 uppercase text-xs font-bold text-indigo-600">${ord.warehouse}</td>
-                        <td class="p-3 text-xs text-slate-600 max-w-xs truncate">${itemsText}</td>
-                        <td class="p-3 text-xs font-semibold text-slate-700 max-w-xs truncate">${modelsText}</td>
-                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${ord.status}</span></td>
-                        <td class="p-3 text-right space-x-1">
-                `;
+                ord.items.forEach((item, itemIdx) => {
+                    const isFirst = (itemIdx === 0);
+                    // Linea di separazione orizzontale marcata tra gruppi di ordini diversi
+                    const rowBorderClass = (isFirst && index > 0) ? 'border-t-2 border-slate-200' : 'border-t border-slate-100';
 
-                if (canManageOrders) {
-                    // Menu a tendina o pulsanti per impostare lo stato desiderato da Admin Magazzino / Super Admin
+                    html += `<tr class="hover:bg-slate-50 transition ${rowBorderClass}">`;
+
+                    if (isFirst) {
+                        html += `
+                            <td class="p-3 text-xs text-slate-600" rowspan="${totalItems}">${ord.date}</td>
+                            <td class="p-3 text-xs font-bold text-slate-800" rowspan="${totalItems}">${ord.invoice}</td>
+                            <td class="p-3 text-xs text-slate-600" rowspan="${totalItems}">${ord.deal}</td>
+                            <td class="p-3 text-slate-700 font-medium text-xs" rowspan="${totalItems}">${ord.sko1 || '-'}</td>
+                            <td class="p-3 text-slate-700 text-xs" rowspan="${totalItems}">${ord.sko2}</td>
+                            <td class="p-3 text-slate-700 text-xs" rowspan="${totalItems}">${ord.sko3}</td>
+                            <td class="p-3 uppercase text-xs font-bold text-indigo-600" rowspan="${totalItems}">${ord.warehouse}</td>
+                        `;
+                    }
+
+                    // Colonne specifiche per ogni singolo prodotto dell'ordine
                     html += `
-                        <select onchange="updateOrderStatus('${ord.id}', this.value)" class="text-xs border rounded-lg p-1.5 bg-white font-semibold text-slate-700">
-                            <option value="" disabled selected>Cambia Stato...</option>
-                            <option value="Preso in carico" ${ord.status === 'Preso in carico' ? 'selected' : ''}>Preso in carico</option>
-                            <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
-                            <option value="Evaso" ${ord.status === 'Evaso' ? 'selected' : ''}>Evaso</option>
-                        </select>
+                        <td class="p-3 text-xs font-semibold text-slate-800">${item.name}</td>
+                        <td class="p-3 text-xs text-slate-600">${item.model}</td>
+                        <td class="p-3 text-xs font-bold text-indigo-600">${item.qty}</td>
                     `;
-                    if (ord.status === 'Evaso') {
-                        html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium ml-1">Dettagli</button>`;
-                    }
-                } else {
-                    if (ord.status === 'Evaso' || ord.status === 'Pronto') {
-                        html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold">Visualizza Dati</button>`;
-                    } else {
-                        html += `<span class="text-xs text-slate-400 italic">In lavorazione</span>`;
-                    }
-                }
 
-                html += `</td></tr>`;
+                    if (isFirst) {
+                        html += `
+                            <td class="p-3" rowspan="${totalItems}"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${ord.status}</span></td>
+                            <td class="p-3 text-right space-x-1" rowspan="${totalItems}">
+                        `;
+
+                        if (canManageOrders) {
+                            html += `
+                                <select onchange="updateOrderStatus('${ord.id}', this.value)" class="text-xs border rounded-lg p-1.5 bg-white font-semibold text-slate-700">
+                                    <option value="" disabled selected>Cambia Stato...</option>
+                                    <option value="Preso in carico" ${ord.status === 'Preso in carico' ? 'selected' : ''}>Preso in carico</option>
+                                    <option value="Pronto" ${ord.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
+                                    <option value="Evaso" ${ord.status === 'Evaso' ? 'selected' : ''}>Evaso</option>
+                                </select>
+                            `;
+                            if (ord.status === 'Evaso') {
+                                html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium ml-1">Dettagli</button>`;
+                            }
+                        } else {
+                            if (ord.status === 'Evaso' || ord.status === 'Pronto') {
+                                html += `<button onclick="viewOrderDetails('${ord.id}')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold">Visualizza Dati</button>`;
+                            } else {
+                                html += `<span class="text-xs text-slate-400 italic">In lavorazione</span>`;
+                            }
+                        }
+
+                        html += `</td>`;
+                    }
+
+                    html += `</tr>`;
+                });
             });
             tbody.innerHTML = html;
         }
 
-        // Funzione per cambiare lo stato direttamente o aprire il modale di evasione se viene selezionato "Evaso"
         function updateOrderStatus(orderId, newStatus) {
             if (newStatus === 'Evaso') {
                 openShippingModal(orderId);
@@ -1125,7 +1145,7 @@
 
         function closeShippingModal() {
             document.getElementById('shipping-modal').classList.add('hidden');
-            renderOrders(); // Ripristina la selezione nella tabella se viene annullata l'apertura
+            renderOrders();
         }
 
         function addPackageRow() {
@@ -1290,6 +1310,10 @@
         }
 
         let editingUserId = null;
+        function openUserManagerModal() {
+            // Se necessario
+        }
+
         function openUserModal() {
             editingUserId = null;
             document.getElementById('user-modal-title').innerText = 'Nuovo Utente';
