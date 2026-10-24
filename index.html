@@ -12,6 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Chart.js Plugin DataLabels -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-100 font-sans antialiased">
 
@@ -556,6 +558,11 @@
 
     <!-- JAVASCRIPT -->
     <script>
+        // CONFIGURAZIONE SUPABASE CLOUD
+        const SUPABASE_URL = "https://IL_TUO_PROJECT_URL.supabase.co"; // Sostituisci con il tuo Project URL
+        const SUPABASE_ANON_KEY = "sb_publishable_A0OrTompC_7O8JKJzklKNg_8gnA3_rX";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         const defaultData = {
             users: [
                 { id: 1, username: 'ADMIN', password: 'Simone2026', role: 'Super Admin' },
@@ -599,26 +606,52 @@
             ]
         };
 
-        // Inizializzazione dati
-        let appData = JSON.parse(localStorage.getItem('atec_kronos_db'));
-        if (!appData || !appData.users || appData.users.length === 0) {
-            appData = defaultData;
-            saveData();
-        }
-
+        let appData = defaultData;
         let currentUser = JSON.parse(localStorage.getItem('atec_kronos_user')) || null;
         let chartAtecInstance = null;
         let chartKronosInstance = null;
         let chartCombinedModelsInstance = null;
 
-        function saveData() {
-            localStorage.setItem('atec_kronos_db', JSON.stringify(appData));
-        }
+        // CARICAMENTO E SALVATAGGIO CLOUD IN TEMPO REALE
+        async function loadDataFromCloud() {
+            try {
+                const { data, error } = await supabaseClient.from('app_state').select('data').eq('id', 'main_db').single();
+                if (data && data.data) {
+                    appData = data.data;
+                } else {
+                    appData = defaultData;
+                    await saveData();
+                }
+            } catch (err) {
+                console.warn('Utilizzo della configurazione predefinita:', err);
+                appData = defaultData;
+            }
 
-        window.onload = function() {
             if (currentUser) {
                 showApp();
             }
+        }
+
+        async function saveData() {
+            localStorage.setItem('atec_kronos_db', JSON.stringify(appData));
+            try {
+                await supabaseClient.from('app_state').upsert({ id: 'main_db', data: appData });
+            } catch (err) {
+                console.error('Errore nel salvataggio su Supabase:', err);
+            }
+        }
+
+        // Ascolta in tempo reale le modifiche effettuate dagli altri utenti
+        supabaseClient.channel('schema-db-changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state' }, payload => {
+                if (payload.new && payload.new.data) {
+                    appData = payload.new.data;
+                    if (currentUser) renderOrders();
+                }
+            }).subscribe();
+
+        window.onload = function() {
+            loadDataFromCloud();
         };
 
         function handleLogin(e) {
